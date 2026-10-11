@@ -1,0 +1,119 @@
+# Compila las apps de android/<App>/ en GitHub (no hace falta PC).
+# - Push a main: compila solo las apps cuya carpeta ha cambiado.
+# - Manual (Actions -> Android -> Run workflow): una app concreta o todas.
+# Cada app se publica en su propia release "android-<App>-latest" con la APK lista para descargar.
+name: Android
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "android/**"
+      - ".github/workflows/android.yml"
+  workflow_dispatch:
+    inputs:
+      app:
+        description: "Carpeta de la app dentro de android/ (vacío = todas)"
+        required: false
+        default: ""
+
+permissions:
+  contents: write
+
+jobs:
+  detect:
+    runs-on: ubuntu-latest
+    outputs:
+      apps: ${{ steps.list.outputs.apps }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - id: list
+        env:
+          EVENT: ${{ github.event_name }}
+          INPUT_APP: ${{ github.event.inputs.app }}
+          BEFORE: ${{ github.event.before }}
+        run: |
+          all() { for d in android/*/; do [ -f "$d/gradlew" ] && basename "$d"; done; }
+
+          if [ "$EVENT" = "workflow_dispatch" ]; then
+            if [ -n "$INPUT_APP" ]; then apps="$INPUT_APP"; else apps=$(all); fi
+          elif [ -z "$BEFORE" ] || [ "$BEFORE" = "0000000000000000000000000000000000000000" ] \
+               || ! git cat-file -e "$BEFORE^{commit}" 2>/dev/null; then
+            apps=$(all)   # primer push o historial reescrito
+          else
+            changed=$(git diff --name-only "$BEFORE" HEAD)
+            if echo "$changed" | grep -q '^.github/workflows/android.yml$'; then
+              apps=$(all)
+            else
+              apps=$(echo "$changed" | grep '^android/' | cut -d/ -f2 | sort -u)
+            fi
+          fi
+
+          # Solo carpetas que existen y son proyectos Gradle
+          json=$(for a in $apps; do [ -f "android/$a/gradlew" ] && echo "$a"; done | jq -R . | jq -sc .)
+          echo "Apps a compilar: $json"
+          echo "apps=$json" >> "$GITHUB_OUTPUT"
+
+  build:
+    needs: detect
+    if: needs.detect.outputs.apps != '[]'
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        app: ${{ fromJson(needs.detect.outputs.apps) }}
+    defaults:
+      run:
+        working-directory: android/${{ matrix.app }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - uses: gradle/actions/setup-gradle@v4
+
+      - name: Preparar keystore (si existe en los secrets)
+        env:
+          KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+        run: |
+          if [ -n "$KEYSTORE_BASE64" ]; then
+            echo "$KEYSTORE_BASE64" | base64 -d > "$RUNNER_TEMP/release.jks"
+            echo "SIGNING_KEYSTORE=$RUNNER_TEMP/release.jks" >> "$GITHUB_ENV"
+            echo "Firmando con el keystore del repo."
+          else
+            echo "::warning::Sin ANDROID_KEYSTORE_BASE64: se firma con clave debug (no podrás actualizar encima, habrá que desinstalar)."
+          fi
+
+      - name: Compilar APK release
+        env:
+          SIGNING_STORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          SIGNING_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          SIGNING_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          chmod +x gradlew
+          ./gradlew assembleRelease --no-daemon
+          apk=$(ls app/build/outputs/apk/release/*.apk | head -1)
+          cp "$apk" "${{ matrix.app }}.apk"
+          ls -lh "${{ matrix.app }}.apk"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.app }}-apk
+          path: android/${{ matrix.app }}/${{ matrix.app }}.apk
+
+      - name: Publicar en Releases
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: android-${{ matrix.app }}-latest
+        run: |
+          gh release delete "$TAG" --yes --cleanup-tag || true
+          gh release create "$TAG" "${{ matrix.app }}.apk" \
+            --target "$GITHUB_SHA" \
+            --title "${{ matrix.app }} (Android) · build ${GITHUB_RUN_NUMBER}" \
+            --notes "Compilada automáticamente desde ${GITHUB_SHA::7}."

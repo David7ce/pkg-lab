@@ -1,0 +1,4 @@
+<resources>
+    <!-- Tema mínimo de la ventana; los colores reales los pone Compose (Material 3). -->
+    <style name="Theme.VozReves" parent="android:Theme.Material.Light.NoActionBar" />
+</resources>
