@@ -37,7 +37,7 @@ jobs:
           INPUT_APP: ${{ github.event.inputs.app }}
           BEFORE: ${{ github.event.before }}
         run: |
-          all() { for d in android/*/; do [ -f "$d/gradlew" ] && basename "$d"; done; }
+          all() { for d in android/*/; do [ -f "$d/gradlew" ] && basename "$d"; done; return 0; }  # carpetas sin gradlew (shared) no cuentan
 
           if [ "$EVENT" = "workflow_dispatch" ]; then
             if [ -n "$INPUT_APP" ]; then apps="$INPUT_APP"; else apps=$(all); fi
