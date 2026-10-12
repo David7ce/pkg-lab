@@ -16,7 +16,7 @@ class RecetarioApplication : Application() {
             images = FileImageStore(File(filesDir, "images")),
             codec = AndroidImageCodec(),
             zip = JvmZipCodec(),
-            web = AndroidWebClient("Mozilla/5.0 (Linux; Android) Recetario/1.0 (personal recipe import)"),
+            web = HttpWebClient("Mozilla/5.0 (Linux; Android) Recetario/1.0 (personal recipe import)"),
             pdf = AndroidPdfExporter(),
             clock = System::currentTimeMillis,
         )

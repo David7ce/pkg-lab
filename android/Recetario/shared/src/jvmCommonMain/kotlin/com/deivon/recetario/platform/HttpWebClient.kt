@@ -10,8 +10,8 @@ import java.net.MalformedURLException
 import java.net.URL
 import java.nio.charset.Charset
 
-/** Plain HttpURLConnection: one GET per import, no need for an HTTP library. */
-class AndroidWebClient(private val userAgent: String) : WebClient {
+/** Plain HttpURLConnection (Android and desktop JVM): one GET per import, no need for an HTTP library. */
+class HttpWebClient(private val userAgent: String) : WebClient {
     override suspend fun getText(url: String, maxBytes: Int): String = withContext(Dispatchers.IO) {
         val (bytes, contentType) = fetch(url, maxBytes)
         String(bytes, charsetOf(contentType))

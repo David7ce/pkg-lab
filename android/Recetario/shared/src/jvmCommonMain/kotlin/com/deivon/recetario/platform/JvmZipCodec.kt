@@ -9,7 +9,7 @@ import java.util.zip.ZipEntry
 import java.util.zip.ZipInputStream
 import java.util.zip.ZipOutputStream
 
-/** java.util.zip: available on Android and on desktop JVMs alike. */
+/** java.util.zip: same on Android and on desktop JVMs. */
 class JvmZipCodec : ZipCodec {
     override fun zip(entries: Map<String, ByteArray>): ByteArray {
         val out = ByteArrayOutputStream()

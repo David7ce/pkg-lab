@@ -12,6 +12,8 @@ kotlin {
     androidTarget {
         compilerOptions { jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17) }
     }
+    // Escritorio (Windows y Linux): misma UI Compose, sin recursos de Android.
+    jvm("desktop")
     sourceSets {
         commonMain.dependencies {
             // "api": las apps que incluyen este módulo usan Compose directamente.

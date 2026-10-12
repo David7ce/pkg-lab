@@ -1,0 +1,86 @@
+# Recetario para escritorio: instalador de Windows (.msi) y Linux (.deb), cada uno en su propio sistema.
+# - Push a main que toque android/Recetario/ o android/shared/ (o manual).
+# - Tests de escritorio en ambos sistemas; después publica en el release "desktop-recetario-latest".
+name: Desktop
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "android/Recetario/**"
+      - "android/shared/**"
+      - ".github/workflows/desktop.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+defaults:
+  run:
+    shell: bash
+    working-directory: android/Recetario
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    name: build (${{ matrix.os }})
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - uses: gradle/actions/setup-gradle@v5
+
+      - name: Tests de escritorio
+        run: |
+          chmod +x gradlew
+          ./gradlew :shared:desktopTest --no-daemon
+
+      - name: Instalador Linux (.deb)
+        if: runner.os == 'Linux'
+        run: ./gradlew :shared:packageDeb --no-daemon
+
+      - name: Instalador Windows (.msi)
+        if: runner.os == 'Windows'
+        run: ./gradlew :shared:packageMsi --no-daemon
+
+      - name: Guardar instalador
+        uses: actions/upload-artifact@v5
+        with:
+          name: desktop-${{ runner.os }}
+          path: |
+            android/Recetario/shared/build/compose/binaries/main/msi/*.msi
+            android/Recetario/shared/build/compose/binaries/main/deb/*.deb
+          if-no-files-found: error
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v5
+        with:
+          pattern: desktop-*
+          merge-multiple: true
+          path: dist
+
+      - name: Publicar en Releases
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          ls -lh dist
+          gh release delete desktop-recetario-latest --yes --cleanup-tag || true
+          gh release create desktop-recetario-latest dist/* \
+            --target "$GITHUB_SHA" \
+            --title "Recetario (escritorio)" \
+            --notes "Compilado automáticamente desde ${GITHUB_SHA::7}.
+
+          - **.msi**: instalador de Windows.
+          - **.deb**: paquete de Linux (Debian, Ubuntu y derivados)."

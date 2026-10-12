@@ -158,32 +158,28 @@ RecipeSage export and a real `.rtk`, in `androidUnitTest/resources`), backup lay
 planning, search/filter/sort, the v1 → v2 migration, and the repository and full backup → ZIP → restore path
 against real SQLite.
 
-## Next steps: Windows and Linux
+## Escritorio (Windows y Linux)
 
-What is ready: all UI, logic, persistence and formats are in `commonMain`; platform code is behind the
-interfaces in `platform/Services.kt` and `PlatformUi`. The JVM-only implementations (`JvmZipCodec`,
-`FileImageStore`, `AndroidWebClient`'s `HttpURLConnection` code) already work on any JVM.
+Mismo código y misma interfaz que Android: `commonMain` es Compose puro. Compose Multiplatform dibuja la UI
+igual en todos los sistemas (estilo Material 3, no widgets nativos del sistema).
 
-Steps (estimate: 2–3 days including packaging and testing on both systems):
+- `shared/src/jvmCommonMain`: zip, descargas web y almacenamiento de imágenes (JVM, compartido con Android).
+- `shared/src/desktopMain`: `DesktopMain.kt` (ventana y arranque), `DesktopImageCodec` (Skia), `DesktopPlatformUi`
+  (diálogos nativos AWT y enlaces), SQLite por JDBC. Sin PDF por ahora (`Services.pdf = null`, la opción se oculta).
+- Datos: `%APPDATA%\Recetario` en Windows, `~/.recetario` en Linux.
+- Compilar en local: `./gradlew :shared:desktopRun` (ejecuta la app), `:shared:desktopTest` (tests),
+  `:shared:packageMsi` (Windows) o `:shared:packageDeb` (Linux).
+- CI: `.github/workflows/desktop.yml` compila e instala en `ubuntu-latest` (.deb) y `windows-latest` (.msi),
+  ejecuta los tests de escritorio y publica en el release `desktop-recetario-latest`.
 
-1. In `shared/build.gradle.kts` add `jvm("desktop")` and a `desktopMain` source set with
-   `app.cash.sqldelight:sqlite-driver` and `kotlinx-coroutines-swing`. Move `JvmZipCodec` and `FileImageStore`
-   to a `jvmCommon` source set shared by `androidMain` and `desktopMain` (or copy them).
-2. Implement for desktop: `ImageCodec` (Skia: `Image.makeFromEncoded(bytes).toComposeImageBitmap()`; resize
-   with Skia), `WebClient` (`java.net.http.HttpClient`), `PdfExporter` (PDFBox, or omit and hide the menu items:
-   `Services.pdf` is nullable for this reason), and `PlatformUi` (Swing/AWT `FileDialog` for open/save,
-   `Desktop.browse` for links).
-3. New module `desktopApp` with the Compose Multiplatform Gradle plugin (`org.jetbrains.compose`):
-   `application { mainClass = …; nativeDistributions { targetFormats(Msi, Deb, AppImage) } }`, a `main()` that
-   opens a resizable `Window`, creates `AppState` with a data folder (`%APPDATA%\Recetario`,
-   `~/.local/share/recetario`) and maps Escape/Alt+Left to `AppState.back()`.
-4. CI: `linux.yml` / `windows.yml` following the repo pattern (`packageDeb`/`packageAppImage` on
-   ubuntu-latest, `packageMsi` on windows-latest), releases `linux-Recetario-latest`, `windows-Recetario-latest`.
-   The project folder can stay here or move to a top-level `kmp/` if more multiplatform apps arrive.
+Pendiente en escritorio:
+- Rotación EXIF de fotos de móvil (las fotos pueden salir de lado al importarlas).
+- Atajos de teclado (Escape / Alt+←) para volver atrás.
+- Exportar PDF (necesita una librería PDF para JVM, p. ej. PDFBox).
+- Migraciones de esquema de la base de datos de escritorio (hoy solo se crea la base nueva).
 
-Upgrading to Compose Multiplatform 1.12+ needs AGP 9: `shared` switches from `com.android.library` +
-`androidTarget()` to `com.android.kotlin.multiplatform.library` with `kotlin { android { … } }`, unit tests
-become `androidHostTest`, and `testReleaseUnitTest` must be aliased for the shared CI step.
+Actualizar Compose Multiplatform a 1.12+ exige AGP 9: `shared` pasará de `com.android.library` +
+`androidTarget()` a `com.android.kotlin.multiplatform.library`, y los tests unitarios de Android cambian de nombre.
 
 ## Known limitations
 
