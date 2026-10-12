@@ -1,6 +1,6 @@
 # Recetario para escritorio. Solo lo mínimo, cada formato en el sistema que lo genera:
 #   Windows x64  → .msi
-#   Linux x64    → AppImage (un fichero, funciona en cualquier distro)
+#   Linux x64    → tar.gz con la app y su Java incluido (sin instalar nada, cualquier distro x64)
 #   macOS arm64  → .dmg (runner arm)
 # Pendientes a propósito: Linux arm64, iOS (requiere cuenta de Apple Developer para instalar en un iPhone).
 name: Desktop
@@ -27,8 +27,8 @@ jobs:
             task: packageMsi
             glob: "*.msi"
           - os: ubuntu-latest
-            task: packageAppImage
-            glob: "*.AppImage"
+            task: createDistributable
+            glob: "Recetario-linux-x64.tar.gz"
           - os: macos-14
             task: packageDmg
             glob: "*.dmg"
@@ -60,10 +60,19 @@ jobs:
       - name: Localizar instalador
         run: |
           mkdir -p "$RUNNER_TEMP/installers"
-          found=$(find shared/build/compose -type f -name '${{ matrix.glob }}' | head -1)
-          echo "::notice title=Instalador::${found:-no encontrado}"
-          [ -n "$found" ] || { echo "::error::No se generó ${{ matrix.glob }}"; find shared/build/compose -maxdepth 4 | head -50; exit 1; }
-          cp "$found" "$RUNNER_TEMP/installers/"
+          if [ "$RUNNER_OS" = "Linux" ]; then
+            # createDistributable deja app/<Nombre>/bin/<Nombre>; se empaqueta la carpeta entera.
+            bin=$(find shared/build/compose -type f -path '*/bin/Recetario' | head -1)
+            [ -n "$bin" ] || { echo "::error::No se generó la app de Linux"; find shared/build/compose -maxdepth 4 | head -50; exit 1; }
+            appdir=$(dirname "$(dirname "$bin")")
+            tar -czf "$RUNNER_TEMP/installers/${{ matrix.glob }}" -C "$(dirname "$appdir")" "$(basename "$appdir")"
+            ls -lh "$RUNNER_TEMP/installers/"
+          else
+            found=$(find shared/build/compose -type f -name '${{ matrix.glob }}' | head -1)
+            echo "::notice title=Instalador::${found:-no encontrado}"
+            [ -n "$found" ] || { echo "::error::No se generó ${{ matrix.glob }}"; find shared/build/compose -maxdepth 4 | head -50; exit 1; }
+            cp "$found" "$RUNNER_TEMP/installers/"
+          fi
 
       - name: Guardar instalador
         uses: actions/upload-artifact@v5
@@ -88,14 +97,14 @@ jobs:
           GH_REPO: ${{ github.repository }}
         run: |
           set -o pipefail
-          files=$(find dist -type f \( -name '*.msi' -o -name '*.AppImage' -o -name '*.dmg' \))
+          files=$(find dist -type f \( -name '*.msi' -o -name '*.tar.gz' -o -name '*.dmg' \))
           echo "::notice title=Instaladores::$(echo $files | tr '\n' ' ')"
           [ -n "$files" ] || { echo "::error::No hay instaladores que publicar"; exit 1; }
           cat > "$RUNNER_TEMP/notes.md" <<NOTES
           Compilado automáticamente desde ${GITHUB_SHA::7}.
 
           - **.msi**: Windows (64 bits).
-          - **.AppImage**: Linux (64 bits). Hazlo ejecutable y ábrelo, no necesita instalación.
+          - **.tar.gz**: Linux (64 bits). Descomprime y ejecuta `Recetario/bin/Recetario`. Incluye Java, no hace falta instalar nada.
           - **.dmg**: macOS (Apple Silicon).
           NOTES
           gh release delete desktop-recetario-latest --yes --cleanup-tag >/dev/null 2>&1 || true
