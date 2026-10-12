@@ -31,8 +31,9 @@ object RecipePage {
     )
 
     private val scriptTag = Regex(
-        "<script[^>]*type\\s*=\\s*[\"']?application/ld\\+json[\"']?[^>]*>(.*?)</script>",
-        setOf(RegexOption.IGNORE_CASE, RegexOption.DOT_MATCHES_ALL),
+        // [\s\S] instead of "." + DOT_MATCHES_ALL, which is not available on every Kotlin target.
+        "<script[^>]*type\\s*=\\s*[\"']?application/ld\\+json[\"']?[^>]*>([\\s\\S]*?)</script>",
+        RegexOption.IGNORE_CASE,
     )
     private val lenient = Json { isLenient = true }
 
@@ -128,7 +129,7 @@ object RecipePage {
         }
     }
 
-    private val blockBreak = Regex("(?i)<\\s*(br|/p|/li|/div)\\s*/?>|\\n")
+    private val blockBreak = Regex("<\\s*(br|/p|/li|/div)\\s*/?>|\\n", RegexOption.IGNORE_CASE)
     private val numbering = Regex("^\\d{1,2}[.)]\\s+")
 
     private fun splitInstructionText(raw: String): List<String> =
