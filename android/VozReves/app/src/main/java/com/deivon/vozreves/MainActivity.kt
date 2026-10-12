@@ -11,7 +11,6 @@ import android.graphics.Color
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.provider.Settings as AndroidSettings
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.SystemBarStyle
@@ -227,7 +226,7 @@ private fun MainScreen(vm: MainViewModel, onPhrases: () -> Unit, onHistory: () -
                 )
                 if (permissionDenied) TextButton(onClick = {
                     context.startActivity(
-                        Intent(AndroidSettings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.fromParts("package", context.packageName, null))
+                        Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.fromParts("package", context.packageName, null))
                     )
                 }) { Text(stringResource(R.string.open_settings)) }
             }

@@ -30,9 +30,9 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
     private val engine = AudioEngine()
     private val history = History(File(app.filesDir, "recordings"))
     private val phrasesStore = Phrases(File(app.filesDir, "phrases.txt")).also {
-        it.seedIfNew(Settings.wrap(app).resources.getStringArray(R.array.default_phrases).toList())
+        it.seedIfNew(com.deivon.vozreves.Settings.wrap(app).resources.getStringArray(R.array.default_phrases).toList())
     }
-    val settings = Settings(app)
+    val settings = com.deivon.vozreves.Settings(app)
     private var job: Job? = null
     private var jobIsPlayback = false
 
