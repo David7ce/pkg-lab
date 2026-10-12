@@ -81,22 +81,27 @@ jobs:
 
       - uses: gradle/actions/setup-gradle@v4
 
-      - name: Preparar keystore (si existe en los secrets)
+      # El keystore va cifrado (AES-256) en .github/signing/; solo la contraseña es secret.
+      # La misma clave firma todas las apps, así cada versión nueva se instala encima.
+      - name: Preparar keystore
+        working-directory: .
         env:
-          KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
         run: |
-          if [ -n "$KEYSTORE_BASE64" ]; then
-            echo "$KEYSTORE_BASE64" | base64 -d > "$RUNNER_TEMP/release.jks"
+          if [ -n "$KEYSTORE_PASSWORD" ] && [ -f .github/signing/release.jks.enc ]; then
+            openssl enc -d -aes-256-cbc -pbkdf2 -iter 200000 \
+              -in .github/signing/release.jks.enc -out "$RUNNER_TEMP/release.jks" \
+              -pass env:KEYSTORE_PASSWORD
             echo "SIGNING_KEYSTORE=$RUNNER_TEMP/release.jks" >> "$GITHUB_ENV"
           else
-            echo "::warning::Sin ANDROID_KEYSTORE_BASE64: se firma con clave debug (para actualizar habrá que desinstalar)."
+            echo "::warning::Falta el secret ANDROID_KEYSTORE_PASSWORD: se firma con clave debug (para actualizar habrá que desinstalar)."
           fi
 
       - name: Compilar APK (${{ matrix.abi }})
         env:
           SIGNING_STORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
-          SIGNING_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
-          SIGNING_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+          SIGNING_KEY_ALIAS: pkglab
+          SIGNING_KEY_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
         run: |
           chmod +x gradlew
           ./gradlew assembleRelease -Pabi=${{ matrix.abi }} --no-daemon

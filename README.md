@@ -27,15 +27,15 @@ pkg-lab/
 ### Firma (recomendado)
 
 Sin keystore, cada build se firma con una clave debug distinta y Android no deja actualizar encima:
-hay que desinstalar antes. Para evitarlo, añade en *Settings → Secrets and variables → Actions*:
+hay que desinstalar antes. Por eso todas las apps se firman con una clave común:
 
-| Secret | Contenido |
-|---|---|
-| `ANDROID_KEYSTORE_BASE64` | el archivo `.jks` en base64 |
-| `ANDROID_KEYSTORE_PASSWORD` | contraseña del keystore |
-| `ANDROID_KEY_ALIAS` | alias de la clave |
-| `ANDROID_KEY_PASSWORD` | contraseña de la clave |
+- `.github/signing/release.jks.enc`: keystore cifrado con AES-256 (alias `pkglab`). Es seguro
+  tenerlo en un repo público; sin la contraseña no sirve de nada.
+- Secret `ANDROID_KEYSTORE_PASSWORD` (*Settings → Secrets and variables → Actions*): la contraseña.
+  **Guárdala también en un gestor de contraseñas**: si se pierde, las apps instaladas no podrán
+  actualizarse con una clave nueva.
 
+Para descifrarlo en local: `openssl enc -d -aes-256-cbc -pbkdf2 -iter 200000 -in release.jks.enc -out release.jks`.
 Las apps leen la firma de las variables `SIGNING_*` en su `app/build.gradle.kts` (ver VozReves como ejemplo).
 
 ## Otras plataformas
