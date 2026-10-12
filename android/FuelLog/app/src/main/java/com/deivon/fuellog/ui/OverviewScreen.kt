@@ -54,8 +54,22 @@ fun OverviewScreen(vm: AppViewModel, formats: Formats, modifier: Modifier, onOpe
         Spacer(Modifier.height(12.dp))
         Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
             StatCard(AppIcons.Payments, stringResource(R.string.this_month), formats.money(monthSpent), "", Modifier.weight(1f))
-            StatCard(AppIcons.Speed, stringResource(R.string.consumption),
-                latest?.let { formats.consumption(it.litresPer100Km) }, needsTwo, Modifier.weight(1f))
+            val reference = vm.vehicle.referenceDl100
+            val diff = FuelStats.versusReference(latest?.litresPer100Km, reference)
+            StatCard(
+                AppIcons.Speed, stringResource(R.string.consumption),
+                latest?.let { formats.consumption(it.litresPer100Km) }, needsTwo, Modifier.weight(1f),
+                extra = reference?.let {
+                    val ref = stringResource(R.string.reference_short, formats.consumption(it / 10.0))
+                    if (diff == null) ref else "$ref · ${formats.percent(diff)}"
+                },
+                extraColor = when {
+                    diff == null -> Color.Unspecified
+                    diff > 5 -> highColor()
+                    diff < -5 -> lowColor()
+                    else -> Color.Unspecified
+                },
+            )
         }
         Spacer(Modifier.height(12.dp))
         Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {

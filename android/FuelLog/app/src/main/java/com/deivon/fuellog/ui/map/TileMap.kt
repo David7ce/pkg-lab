@@ -1,5 +1,6 @@
 package com.deivon.fuellog.ui.map
 
+import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.util.LruCache
 import androidx.compose.foundation.Canvas
@@ -49,7 +50,7 @@ const val MAX_ZOOM = 19.0
  * At most 4 downloads at once, as the OSM tile usage policy asks for modest use.
  */
 private class TileLoader(private val scope: CoroutineScope) {
-    private val memory = LruCache<String, ImageBitmap>(96)
+    private val memory = LruCache<String, ImageBitmap>(96) // ≈12 MB at RGB_565
     private val pending = HashSet<String>() // main thread only
     private val failed = HashSet<String>()  // not retried while this map is open
     private val downloads = Semaphore(4)
@@ -77,7 +78,9 @@ private class TileLoader(private val scope: CoroutineScope) {
         c.connectTimeout = 10_000
         c.readTimeout = 10_000
         c.useCaches = true
-        try { c.inputStream.use { BitmapFactory.decodeStream(it) }?.asImageBitmap() } finally { c.disconnect() }
+        // RGB_565: map tiles have no transparency; half the memory of ARGB_8888 (128 KB per tile).
+        val options = BitmapFactory.Options().apply { inPreferredConfig = Bitmap.Config.RGB_565 }
+        try { c.inputStream.use { BitmapFactory.decodeStream(it, null, options) }?.asImageBitmap() } finally { c.disconnect() }
     }.getOrNull()
 
     companion object { const val USER_AGENT = "FuelLog/1.0 (Android; personal fuel log; github.com/David7ce/pkg-lab)" }

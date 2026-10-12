@@ -7,6 +7,7 @@
     <string name="average_price">Preço médio</string>
     <string name="best_consumption">Melhor consumo</string>
     <string name="cancel">Cancelar</string>
+    <string name="catalog_note">Modelos mais vendidos em Espanha (2025). Consumo: WLTP aproximado de uma versão comum; pode editá-lo.</string>
     <string name="consumption">Consumo</string>
     <string name="cost_per_km">Custo por km</string>
     <string name="currency">Moeda</string>
@@ -31,6 +32,11 @@
     <string name="export_json">Exportar cópia de segurança (JSON)</string>
     <string name="exported">Ficheiro guardado</string>
     <string name="file_error">Não foi possível ler ou escrever o ficheiro</string>
+    <string name="fuel_cng">GNC</string>
+    <string name="fuel_diesel">Gasóleo</string>
+    <string name="fuel_hybrid">Híbrido</string>
+    <string name="fuel_lpg">GPL</string>
+    <string name="fuel_petrol">Gasolina</string>
     <string name="fuel_type">Combustível (opcional)</string>
     <string name="full_tank">Depósito cheio</string>
     <string name="full_tank_hint">Necessário para medir o consumo</string>
@@ -43,6 +49,8 @@
     <string name="litres">Litros</string>
     <string name="location_unavailable">Localização indisponível</string>
     <string name="lowest_price">Preço mais baixo</string>
+    <string name="missed_previous">Não registei o abastecimento anterior</string>
+    <string name="missed_previous_hint">O consumo não é calculado nesse intervalo</string>
     <string name="my_location">A minha localização</string>
     <string name="needs_two_full">São precisos dois atestos</string>
     <string name="new_refuel">Novo abastecimento</string>
@@ -58,7 +66,11 @@
     <string name="period_summary">%1$d abastecimentos · %2$s</string>
     <string name="period_year">Este ano</string>
     <string name="pick_location">Escolher localização</string>
+    <string name="pick_model">Escolher marca e modelo</string>
     <string name="price_per_litre">Preço por litro</string>
+    <string name="reference_consumption">Consumo de referência (opcional)</string>
+    <string name="reference_hint">Valor oficial ou esperado, para comparar com o seu consumo real</string>
+    <string name="reference_short">Ref. %1$s</string>
     <string name="refuel_count">%1$d abastecimentos</string>
     <string name="registration">Matrícula (opcional)</string>
     <string name="remove_location">Remover localização</string>
@@ -68,6 +80,7 @@
     <string name="restore_title">Restaurar cópia?</string>
     <string name="restored">Cópia restaurada</string>
     <string name="save">Guardar</string>
+    <string name="search_model">Pesquisar, ex. seat leon</string>
     <string name="selected">Selecionado</string>
     <string name="station">Posto</string>
     <string name="switch_vehicle">Mudar de veículo</string>

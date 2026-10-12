@@ -16,6 +16,8 @@ data class Vehicle(
     val registration: String = "",
     val fuelType: String = "",
     val notes: String = "",
+    /** Expected consumption in tenths of a litre per 100 km (e.g. 54 = 5.4 L/100 km), or null. */
+    val referenceDl100: Int? = null,
 )
 
 /**
@@ -34,6 +36,8 @@ data class Refuel(
     val pricePerLitreMilli: Long,
     val totalCents: Long,
     val fullTank: Boolean = true,
+    /** The user skipped logging the refuelling before this one: consumption must not span the gap. */
+    val missedPrevious: Boolean = false,
     val notes: String = "",
     val latitude: Double? = null,
     val longitude: Double? = null,

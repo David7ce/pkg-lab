@@ -7,6 +7,7 @@
     <string name="average_price">平均价格</string>
     <string name="best_consumption">最低油耗</string>
     <string name="cancel">取消</string>
+    <string name="catalog_note">西班牙畅销车型（2025）。油耗为常见版本的近似 WLTP 值，可编辑。</string>
     <string name="consumption">油耗</string>
     <string name="cost_per_km">每公里成本</string>
     <string name="currency">货币</string>
@@ -31,6 +32,11 @@
     <string name="export_json">导出备份（JSON）</string>
     <string name="exported">文件已保存</string>
     <string name="file_error">无法读取或写入文件</string>
+    <string name="fuel_cng">压缩天然气</string>
+    <string name="fuel_diesel">柴油</string>
+    <string name="fuel_hybrid">混动</string>
+    <string name="fuel_lpg">液化石油气</string>
+    <string name="fuel_petrol">汽油</string>
     <string name="fuel_type">燃料类型（可选）</string>
     <string name="full_tank">加满</string>
     <string name="full_tank_hint">用于计算油耗</string>
@@ -43,6 +49,8 @@
     <string name="litres">升</string>
     <string name="location_unavailable">无法获取位置</string>
     <string name="lowest_price">最低价格</string>
+    <string name="missed_previous">漏记了上一次加油</string>
+    <string name="missed_previous_hint">不计算这段空缺的油耗</string>
     <string name="my_location">我的位置</string>
     <string name="needs_two_full">需要两次加满记录</string>
     <string name="new_refuel">新加油记录</string>
@@ -58,7 +66,11 @@
     <string name="period_summary">%1$d 次加油 · %2$s</string>
     <string name="period_year">今年</string>
     <string name="pick_location">选择位置</string>
+    <string name="pick_model">选择品牌和型号</string>
     <string name="price_per_litre">每升价格</string>
+    <string name="reference_consumption">参考油耗（可选）</string>
+    <string name="reference_hint">官方或预期数值，用于与实际油耗比较</string>
+    <string name="reference_short">参考 %1$s</string>
     <string name="refuel_count">%1$d 次加油</string>
     <string name="registration">车牌（可选）</string>
     <string name="remove_location">移除位置</string>
@@ -68,6 +80,7 @@
     <string name="restore_title">恢复备份？</string>
     <string name="restored">备份已恢复</string>
     <string name="save">保存</string>
+    <string name="search_model">搜索，例如 toyota corolla</string>
     <string name="selected">已选择</string>
     <string name="station">加油站</string>
     <string name="switch_vehicle">切换车辆</string>

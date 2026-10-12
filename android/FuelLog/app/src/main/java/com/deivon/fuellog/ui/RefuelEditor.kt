@@ -73,11 +73,11 @@ fun RefuelEditor(vm: AppViewModel, form: RefuelForm, formats: Formats, showMessa
 
     if (pickingLocation) {
         BackHandler { pickingLocation = false }
-        val start = form.location ?: vm.savedLocations().firstOrNull()
+        val start = form.location ?: vm.savedLocations.firstOrNull()
         MapPicker(
             initial = start ?: GeoPoint(40.4168, -3.7038), // Madrid when nothing is known yet
             initialZoom = if (start != null) 16.0 else 5.0,
-            pins = remember { vm.savedLocations() },
+            pins = vm.savedLocations,
             onPick = { update(form.copy(location = it)); pickingLocation = false },
             onClose = { pickingLocation = false },
             showMessage = showMessage,
@@ -110,7 +110,7 @@ fun RefuelEditor(vm: AppViewModel, form: RefuelForm, formats: Formats, showMessa
                 error = if (FormError.Station in errors) stringResource(R.string.error_required) else null,
                 capitalize = true, icon = AppIcons.Fuel
             )
-            val suggestions = remember(vm.refuels) { vm.recentStations() }.filter { it.first != form.station }
+            val suggestions = vm.recentStations.filter { it.first != form.station }
             if (suggestions.isNotEmpty()) {
                 Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     suggestions.forEach { (name, point) ->
@@ -143,7 +143,7 @@ fun RefuelEditor(vm: AppViewModel, form: RefuelForm, formats: Formats, showMessa
                 Field(
                     form.price, { update(form.copy(price = it)) }, R.string.price_per_litre, KeyboardType.Decimal,
                     error = if (FormError.Price in errors) stringResource(R.string.error_positive) else null,
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(1f), icon = AppIcons.Payments
                 )
             }
             TotalRow(form, formats)
@@ -158,9 +158,19 @@ fun RefuelEditor(vm: AppViewModel, form: RefuelForm, formats: Formats, showMessa
                 }
                 Switch(checked = form.fullTank, onCheckedChange = { update(form.copy(fullTank = it)) })
             }
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Column(Modifier.weight(1f)) {
+                    Text(stringResource(R.string.missed_previous))
+                    Text(
+                        stringResource(R.string.missed_previous_hint), style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+                Switch(checked = form.missedPrevious, onCheckedChange = { update(form.copy(missedPrevious = it)) })
+            }
 
             LocationRow(form.location, onPick = { pickingLocation = true }, onClear = { update(form.copy(location = null)) })
-            Field(form.notes, { update(form.copy(notes = it)) }, R.string.notes, singleLine = false, capitalize = true)
+            Field(form.notes, { update(form.copy(notes = it)) }, R.string.notes, singleLine = false, capitalize = true, icon = AppIcons.Notes)
 
             vm.summary.byEndId[form.id]?.let {
                 Text(

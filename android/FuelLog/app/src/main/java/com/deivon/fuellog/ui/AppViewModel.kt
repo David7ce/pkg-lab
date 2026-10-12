@@ -12,6 +12,8 @@ import com.deivon.fuellog.data.FuelDatabase
 import com.deivon.fuellog.data.Refuel
 import com.deivon.fuellog.data.Vehicle
 import com.deivon.fuellog.logic.Backup
+import com.deivon.fuellog.logic.CatalogModel
+import com.deivon.fuellog.logic.ModelCatalog
 import com.deivon.fuellog.logic.Decimals
 import com.deivon.fuellog.logic.FormError
 import com.deivon.fuellog.logic.FormResult
@@ -43,6 +45,18 @@ class AppViewModel(app: Application) : AndroidViewModel(app) {
     var loaded by mutableStateOf(false)
         private set
 
+    /** Derived once per data change instead of on every recomposition. */
+    var recentStations by mutableStateOf(emptyList<Pair<String, GeoPoint?>>())
+        private set
+    var savedLocations by mutableStateOf(emptyList<GeoPoint>())
+        private set
+    var refuelCounts by mutableStateOf(emptyMap<Long, Int>())
+        private set
+
+    /** Brand/model catalogue from assets, loaded on first use. */
+    var catalog by mutableStateOf(emptyList<CatalogModel>())
+        private set
+
     val vehicle: Vehicle get() = vehicles.firstOrNull { it.id == settings.vehicleId } ?: vehicles.firstOrNull() ?: Vehicle()
 
     /** Add/edit forms currently open, or null. Kept here so they survive rotation and language changes. */
@@ -54,9 +68,11 @@ class AppViewModel(app: Application) : AndroidViewModel(app) {
         private set
 
     init {
-        // Disk cache for map tiles (and any other HTTP GET): platform API, no extra library.
-        if (HttpResponseCache.getInstalled() == null) {
-            runCatching { HttpResponseCache.install(File(app.cacheDir, "http"), 30L * 1024 * 1024) }
+        viewModelScope.launch(Dispatchers.IO) {
+            // Disk cache for map tiles: platform API, no extra library. Opening it touches disk, so not on main.
+            if (HttpResponseCache.getInstalled() == null) {
+                runCatching { HttpResponseCache.install(File(app.cacheDir, "http"), 30L * 1024 * 1024) }
+            }
         }
         reload()
     }
@@ -68,8 +84,33 @@ class AppViewModel(app: Application) : AndroidViewModel(app) {
         }
         vehicles = v
         all = list
+        withContext(Dispatchers.Default) {
+            Triple(
+                list.distinctBy { it.station }.take(4).map { r ->
+                    r.station to list.firstOrNull { it.station == r.station && it.latitude != null }
+                        ?.let { GeoPoint.of(it.latitude, it.longitude) }
+                },
+                list.mapNotNull { GeoPoint.of(it.latitude, it.longitude) }.distinct(),
+                list.groupingBy { it.vehicleId }.eachCount(),
+            )
+        }.let { (stations, locations, counts) ->
+            recentStations = stations
+            savedLocations = locations
+            refuelCounts = counts
+        }
         recompute()
         loaded = true
+    }
+
+    fun loadCatalog() {
+        if (catalog.isNotEmpty()) return
+        viewModelScope.launch {
+            catalog = withContext(Dispatchers.IO) {
+                runCatching {
+                    getApplication<Application>().assets.open("models_es.csv").bufferedReader().use { ModelCatalog.parse(it.readText()) }
+                }.getOrDefault(emptyList())
+            }
+        }
     }
 
     private suspend fun recompute() {
@@ -118,16 +159,6 @@ class AppViewModel(app: Application) : AndroidViewModel(app) {
         reload()
     }
 
-    /** Recent distinct stations across all vehicles, with their last known location. */
-    fun recentStations(limit: Int = 4): List<Pair<String, GeoPoint?>> =
-        all.distinctBy { it.station }.take(limit).map { r ->
-            r.station to all.firstOrNull { it.station == r.station && it.latitude != null }
-                ?.let { GeoPoint.of(it.latitude, it.longitude) }
-        }
-
-    /** Distinct saved locations, shown as pins on the map. */
-    fun savedLocations(): List<GeoPoint> = all.mapNotNull { GeoPoint.of(it.latitude, it.longitude) }.distinct()
-
     // --- Vehicles ----------------------------------------------------------------------------
 
     fun editVehicle(v: Vehicle?) { vehicleForm = v ?: Vehicle() }
@@ -149,12 +180,12 @@ class AppViewModel(app: Application) : AndroidViewModel(app) {
         reload()
     }
 
-    fun refuelCount(vehicleId: Long) = all.count { it.vehicleId == vehicleId }
+    fun refuelCount(vehicleId: Long) = refuelCounts[vehicleId] ?: 0
 
     // --- Backup ------------------------------------------------------------------------------
 
-    suspend fun exportCsv(uri: Uri) = write(uri, Backup.toCsv(vehicles, all))
-    suspend fun exportJson(uri: Uri) = write(uri, Backup.toJson(vehicles, all))
+    suspend fun exportCsv(uri: Uri) = write(uri) { Backup.toCsv(vehicles, all) }
+    suspend fun exportJson(uri: Uri) = write(uri) { Backup.toJson(vehicles, all) }
 
     /** Reads and validates a backup; nothing is changed until [restore]. Throws on unusable files. */
     suspend fun readBackup(uri: Uri): Backup.Parsed = withContext(Dispatchers.IO) {
@@ -173,8 +204,10 @@ class AppViewModel(app: Application) : AndroidViewModel(app) {
         reload()
     }
 
-    private suspend fun write(uri: Uri, text: String) = withContext(Dispatchers.IO) {
-        getApplication<Application>().contentResolver.openOutputStream(uri, "wt")?.bufferedWriter()?.use { it.write(text) }
+    /** Builds the text and writes it off the main thread. */
+    private suspend fun write(uri: Uri, text: () -> String) = withContext(Dispatchers.IO) {
+        val content = text()
+        getApplication<Application>().contentResolver.openOutputStream(uri, "wt")?.bufferedWriter()?.use { it.write(content) }
             ?: error("Cannot write file")
     }
 

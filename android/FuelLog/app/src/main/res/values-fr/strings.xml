@@ -7,6 +7,7 @@
     <string name="average_price">Prix moyen</string>
     <string name="best_consumption">Meilleure consommation</string>
     <string name="cancel">Annuler</string>
+    <string name="catalog_note">Modèles les plus vendus en Espagne (2025). Consommation : WLTP approximative d\'une version courante ; modifiable.</string>
     <string name="consumption">Consommation</string>
     <string name="cost_per_km">Coût par km</string>
     <string name="currency">Devise</string>
@@ -31,6 +32,11 @@
     <string name="export_json">Exporter une sauvegarde (JSON)</string>
     <string name="exported">Fichier enregistré</string>
     <string name="file_error">Impossible de lire ou d\'écrire le fichier</string>
+    <string name="fuel_cng">GNV</string>
+    <string name="fuel_diesel">Diesel</string>
+    <string name="fuel_hybrid">Hybride</string>
+    <string name="fuel_lpg">GPL</string>
+    <string name="fuel_petrol">Essence</string>
     <string name="fuel_type">Carburant (facultatif)</string>
     <string name="full_tank">Plein complet</string>
     <string name="full_tank_hint">Nécessaire pour mesurer la consommation</string>
@@ -43,6 +49,8 @@
     <string name="litres">Litres</string>
     <string name="location_unavailable">Position indisponible</string>
     <string name="lowest_price">Prix le plus bas</string>
+    <string name="missed_previous">Plein précédent non enregistré</string>
+    <string name="missed_previous_hint">La consommation n\'est pas calculée sur cet écart</string>
     <string name="my_location">Ma position</string>
     <string name="needs_two_full">Il faut deux pleins complets</string>
     <string name="new_refuel">Nouveau plein</string>
@@ -58,7 +66,11 @@
     <string name="period_summary">%1$d pleins · %2$s</string>
     <string name="period_year">Cette année</string>
     <string name="pick_location">Choisir un lieu</string>
+    <string name="pick_model">Choisir marque et modèle</string>
     <string name="price_per_litre">Prix au litre</string>
+    <string name="reference_consumption">Consommation de référence (facultatif)</string>
+    <string name="reference_hint">Valeur officielle ou attendue, pour la comparer à votre consommation réelle</string>
+    <string name="reference_short">Réf. %1$s</string>
     <string name="refuel_count">%1$d pleins</string>
     <string name="registration">Immatriculation (facultatif)</string>
     <string name="remove_location">Retirer le lieu</string>
@@ -68,6 +80,7 @@
     <string name="restore_title">Restaurer la sauvegarde ?</string>
     <string name="restored">Sauvegarde restaurée</string>
     <string name="save">Enregistrer</string>
+    <string name="search_model">Rechercher, ex. peugeot 208</string>
     <string name="selected">Sélectionné</string>
     <string name="station">Station</string>
     <string name="switch_vehicle">Changer de véhicule</string>

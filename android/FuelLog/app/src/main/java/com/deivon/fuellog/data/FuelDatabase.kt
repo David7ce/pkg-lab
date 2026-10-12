@@ -22,7 +22,8 @@ class FuelDatabase(context: Context) : SQLiteOpenHelper(context, "fuellog.db", n
                 registration TEXT NOT NULL DEFAULT '',
                 fuel_type TEXT NOT NULL DEFAULT '',
                 notes TEXT NOT NULL DEFAULT '',
-                type TEXT NOT NULL DEFAULT 'car')"""
+                type TEXT NOT NULL DEFAULT 'car',
+                ref_consumption_dl INTEGER)"""
         )
         createRefuelTable(db, "refuel")
         db.execSQL("INSERT INTO vehicle (id) VALUES (1)")
@@ -40,6 +41,7 @@ class FuelDatabase(context: Context) : SQLiteOpenHelper(context, "fuellog.db", n
                 price_per_litre_milli INTEGER NOT NULL CHECK (price_per_litre_milli > 0),
                 total_cents INTEGER NOT NULL CHECK (total_cents >= 0),
                 full_tank INTEGER NOT NULL DEFAULT 1,
+                missed_previous INTEGER NOT NULL DEFAULT 0,
                 notes TEXT NOT NULL DEFAULT '',
                 latitude REAL,
                 longitude REAL)"""
@@ -69,9 +71,23 @@ class FuelDatabase(context: Context) : SQLiteOpenHelper(context, "fuellog.db", n
             db.execSQL("DROP TABLE refuel")
             db.execSQL("ALTER TABLE refuel_v2 RENAME TO refuel")
         }
-        // Future: `if (oldVersion < 3) { ... }` — always migrate, never drop user data.
+        // v2 → v3: optional reference consumption per vehicle and the "missed previous refuel" flag.
+        // A v1 database already got missed_previous from the table rebuilt above, hence the checks.
+        if (oldVersion < 3) {
+            if (!db.hasColumn("vehicle", "ref_consumption_dl")) db.execSQL("ALTER TABLE vehicle ADD COLUMN ref_consumption_dl INTEGER")
+            if (!db.hasColumn("refuel", "missed_previous")) {
+                db.execSQL("ALTER TABLE refuel ADD COLUMN missed_previous INTEGER NOT NULL DEFAULT 0")
+            }
+        }
+        // Future: `if (oldVersion < 4) { ... }` — always migrate, never drop user data.
         db.execSQL("CREATE INDEX IF NOT EXISTS refuel_vehicle_time ON refuel(vehicle_id, timestamp)")
     }
+
+    private fun SQLiteDatabase.hasColumn(table: String, column: String): Boolean =
+        rawQuery("PRAGMA table_info($table)", null).use { c ->
+            val name = c.getColumnIndexOrThrow("name")
+            generateSequence { if (c.moveToNext()) c.getString(name) else null }.any { it == column }
+        }
 
     override fun onOpen(db: SQLiteDatabase) {
         db.execSQL("CREATE INDEX IF NOT EXISTS refuel_vehicle_time ON refuel(vehicle_id, timestamp)")
@@ -127,6 +143,7 @@ class FuelDatabase(context: Context) : SQLiteOpenHelper(context, "fuellog.db", n
         if (id != 0L) put("id", id)
         put("name", name); put("type", type.key); put("registration", registration)
         put("fuel_type", fuelType); put("notes", notes)
+        if (referenceDl100 != null) put("ref_consumption_dl", referenceDl100) else putNull("ref_consumption_dl")
     }
 
     private fun Refuel.toValues() = ContentValues().apply {
@@ -134,7 +151,8 @@ class FuelDatabase(context: Context) : SQLiteOpenHelper(context, "fuellog.db", n
         put("vehicle_id", vehicleId); put("timestamp", timestamp); put("station", station)
         put("odometer_km", odometerKm); put("volume_ml", volumeMl)
         put("price_per_litre_milli", pricePerLitreMilli); put("total_cents", totalCents)
-        put("full_tank", if (fullTank) 1 else 0); put("notes", notes)
+        put("full_tank", if (fullTank) 1 else 0); put("missed_previous", if (missedPrevious) 1 else 0)
+        put("notes", notes)
         if (latitude != null && longitude != null) { put("latitude", latitude); put("longitude", longitude) }
         else { putNull("latitude"); putNull("longitude") }
     }
@@ -142,19 +160,21 @@ class FuelDatabase(context: Context) : SQLiteOpenHelper(context, "fuellog.db", n
     private fun Cursor.str(col: String) = getString(getColumnIndexOrThrow(col)) ?: ""
     private fun Cursor.long(col: String) = getLong(getColumnIndexOrThrow(col))
     private fun Cursor.doubleOrNull(col: String) = getColumnIndexOrThrow(col).let { if (isNull(it)) null else getDouble(it) }
+    private fun Cursor.intOrNull(col: String) = getColumnIndexOrThrow(col).let { if (isNull(it)) null else getInt(it) }
 
     private fun Cursor.toVehicle() = Vehicle(
         id = long("id"), name = str("name"), type = VehicleType.of(str("type")),
         registration = str("registration"), fuelType = str("fuel_type"), notes = str("notes"),
+        referenceDl100 = intOrNull("ref_consumption_dl"),
     )
 
     private fun Cursor.toRefuel() = Refuel(
         id = long("id"), vehicleId = long("vehicle_id"), timestamp = long("timestamp"),
         station = str("station"), odometerKm = long("odometer_km"), volumeMl = long("volume_ml"),
         pricePerLitreMilli = long("price_per_litre_milli"), totalCents = long("total_cents"),
-        fullTank = long("full_tank") != 0L, notes = str("notes"),
+        fullTank = long("full_tank") != 0L, missedPrevious = long("missed_previous") != 0L, notes = str("notes"),
         latitude = doubleOrNull("latitude"), longitude = doubleOrNull("longitude"),
     )
 
-    private companion object { const val VERSION = 2 }
+    private companion object { const val VERSION = 3 }
 }

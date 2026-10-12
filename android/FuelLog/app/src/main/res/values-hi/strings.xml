@@ -7,6 +7,7 @@
     <string name="average_price">औसत कीमत</string>
     <string name="best_consumption">सबसे अच्छी खपत</string>
     <string name="cancel">रद्द करें</string>
+    <string name="catalog_note">स्पेन के सबसे ज़्यादा बिकने वाले मॉडल (2025)। खपत: सामान्य संस्करण का अनुमानित WLTP मान; आप इसे बदल सकते हैं।</string>
     <string name="consumption">खपत</string>
     <string name="cost_per_km">प्रति किमी लागत</string>
     <string name="currency">मुद्रा</string>
@@ -31,6 +32,11 @@
     <string name="export_json">बैकअप निर्यात करें (JSON)</string>
     <string name="exported">फ़ाइल सहेजी गई</string>
     <string name="file_error">फ़ाइल पढ़ी या लिखी नहीं जा सकी</string>
+    <string name="fuel_cng">सीएनजी</string>
+    <string name="fuel_diesel">डीज़ल</string>
+    <string name="fuel_hybrid">हाइब्रिड</string>
+    <string name="fuel_lpg">एलपीजी</string>
+    <string name="fuel_petrol">पेट्रोल</string>
     <string name="fuel_type">ईंधन प्रकार (वैकल्पिक)</string>
     <string name="full_tank">पूरी टंकी</string>
     <string name="full_tank_hint">खपत मापने के लिए आवश्यक</string>
@@ -43,6 +49,8 @@
     <string name="litres">लीटर</string>
     <string name="location_unavailable">स्थान उपलब्ध नहीं</string>
     <string name="lowest_price">सबसे कम कीमत</string>
+    <string name="missed_previous">पिछला ईंधन भराव दर्ज नहीं किया</string>
+    <string name="missed_previous_hint">इस अंतराल पर खपत की गणना नहीं होती</string>
     <string name="my_location">मेरा स्थान</string>
     <string name="needs_two_full">दो बार पूरी टंकी भरना ज़रूरी</string>
     <string name="new_refuel">नया ईंधन भराव</string>
@@ -58,7 +66,11 @@
     <string name="period_summary">%1$d भराव · %2$s</string>
     <string name="period_year">इस वर्ष</string>
     <string name="pick_location">स्थान चुनें</string>
+    <string name="pick_model">ब्रांड और मॉडल चुनें</string>
     <string name="price_per_litre">प्रति लीटर कीमत</string>
+    <string name="reference_consumption">संदर्भ खपत (वैकल्पिक)</string>
+    <string name="reference_hint">आधिकारिक या अपेक्षित मान, आपकी वास्तविक खपत से तुलना के लिए</string>
+    <string name="reference_short">संदर्भ %1$s</string>
     <string name="refuel_count">%1$d ईंधन भराव</string>
     <string name="registration">पंजीकरण संख्या (वैकल्पिक)</string>
     <string name="remove_location">स्थान हटाएँ</string>
@@ -68,6 +80,7 @@
     <string name="restore_title">बैकअप पुनर्स्थापित करें?</string>
     <string name="restored">बैकअप पुनर्स्थापित हुआ</string>
     <string name="save">सहेजें</string>
+    <string name="search_model">खोजें, जैसे toyota corolla</string>
     <string name="selected">चयनित</string>
     <string name="station">पेट्रोल पंप</string>
     <string name="switch_vehicle">वाहन बदलें</string>

@@ -53,11 +53,13 @@ fun HistoryScreen(vm: AppViewModel, formats: Formats, modifier: Modifier, onOpen
                 FilterChip(selected = period == p, onClick = { period = p }, label = { Text(stringResource(periodLabels.getValue(p))) })
             }
         }
-        val totals = listOfNotNull(
-            formats.money(FuelStats.spentCents(records)),
-            formats.litres(FuelStats.volumeMl(records)),
-            periodConsumption?.let { formats.consumption(it) },
-        ).joinToString(" · ")
+        val totals = remember(records, periodConsumption, formats) {
+            listOfNotNull(
+                formats.money(FuelStats.spentCents(records)),
+                formats.litres(FuelStats.volumeMl(records)),
+                periodConsumption?.let { formats.consumption(it) },
+            ).joinToString(" · ")
+        }
         Text(
             stringResource(R.string.period_summary, records.size, totals),
             style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant,

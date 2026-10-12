@@ -21,6 +21,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.takeOrElse
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
@@ -35,7 +36,10 @@ val CardShape = RoundedCornerShape(16.dp)
 
 /** One figure on the overview. [value] null → "—" with [unavailable] explaining why. */
 @Composable
-fun StatCard(icon: ImageVector, label: String, value: String?, unavailable: String, modifier: Modifier = Modifier) {
+fun StatCard(
+    icon: ImageVector, label: String, value: String?, unavailable: String,
+    modifier: Modifier = Modifier, extra: String? = null, extraColor: Color = Color.Unspecified,
+) {
     Surface(shape = CardShape, color = MaterialTheme.colorScheme.surfaceContainer, modifier = modifier) {
         Column(Modifier.padding(16.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
@@ -47,17 +51,22 @@ fun StatCard(icon: ImageVector, label: String, value: String?, unavailable: Stri
             Text(value ?: "—", style = MaterialTheme.typography.titleLarge, maxLines = 1, overflow = TextOverflow.Ellipsis)
             if (value == null) {
                 Text(unavailable, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            } else if (extra != null) {
+                Text(extra, style = MaterialTheme.typography.bodySmall, color = extraColor.takeOrElse { MaterialTheme.colorScheme.onSurfaceVariant })
             }
         }
     }
 }
 
 @Composable
-fun SectionTitle(text: String, modifier: Modifier = Modifier) {
-    Text(
-        text, style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.primary,
-        modifier = modifier.padding(top = 20.dp, bottom = 8.dp)
-    )
+fun SectionTitle(text: String, icon: ImageVector? = null, modifier: Modifier = Modifier) {
+    Row(modifier.padding(top = 20.dp, bottom = 8.dp), verticalAlignment = Alignment.CenterVertically) {
+        if (icon != null) {
+            Icon(icon, null, Modifier.size(18.dp), tint = MaterialTheme.colorScheme.primary)
+            Spacer(Modifier.width(8.dp))
+        }
+        Text(text, style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.primary)
+    }
 }
 
 /** Vehicle type icon in a tinted circle. */

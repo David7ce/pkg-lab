@@ -23,6 +23,7 @@ class Formats(val locale: Locale, currencyCode: String) {
     private val money3 = money(3)
     private val oneDecimal = NumberFormat.getNumberInstance(locale).apply { minimumFractionDigits = 1; maximumFractionDigits = 1 }
     private val integer = NumberFormat.getIntegerInstance(locale)
+    private val percentFormat = NumberFormat.getPercentInstance(locale)
     private val date = DateFormat.getDateInstance(DateFormat.MEDIUM, locale)
     private val time = DateFormat.getTimeInstance(DateFormat.SHORT, locale)
 
@@ -32,6 +33,8 @@ class Formats(val locale: Locale, currencyCode: String) {
     fun litres(ml: Long): String = Decimals.format(ml, 3, locale, minFraction = 2, maxFraction = 2) + " L"
     fun km(km: Long): String = integer.format(km) + " km"
     fun consumption(l100: Double): String = oneDecimal.format(l100) + " L/100 km"
+    /** Signed percentage, e.g. "+12 %" / "−8 %", with locale digits. */
+    fun percent(value: Int): String = (if (value > 0) "+" else if (value < 0) "−" else "") + percentFormat.format(kotlin.math.abs(value) / 100.0)
     fun date(millis: Long): String = date.format(Date(millis))
     fun time(millis: Long): String = time.format(Date(millis))
 }

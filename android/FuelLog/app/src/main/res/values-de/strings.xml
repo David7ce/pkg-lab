@@ -7,6 +7,7 @@
     <string name="average_price">Durchschnittspreis</string>
     <string name="best_consumption">Bester Verbrauch</string>
     <string name="cancel">Abbrechen</string>
+    <string name="catalog_note">Meistverkaufte Modelle in Spanien (2025). Verbrauch: ungefährer WLTP-Wert einer gängigen Version; änderbar.</string>
     <string name="consumption">Verbrauch</string>
     <string name="cost_per_km">Kosten pro km</string>
     <string name="currency">Währung</string>
@@ -31,6 +32,11 @@
     <string name="export_json">Sicherung exportieren (JSON)</string>
     <string name="exported">Datei gespeichert</string>
     <string name="file_error">Datei konnte nicht gelesen oder geschrieben werden</string>
+    <string name="fuel_cng">Erdgas (CNG)</string>
+    <string name="fuel_diesel">Diesel</string>
+    <string name="fuel_hybrid">Hybrid</string>
+    <string name="fuel_lpg">Autogas (LPG)</string>
+    <string name="fuel_petrol">Benzin</string>
     <string name="fuel_type">Kraftstoff (optional)</string>
     <string name="full_tank">Vollgetankt</string>
     <string name="full_tank_hint">Nötig, um den Verbrauch zu messen</string>
@@ -43,6 +49,8 @@
     <string name="litres">Liter</string>
     <string name="location_unavailable">Standort nicht verfügbar</string>
     <string name="lowest_price">Niedrigster Preis</string>
+    <string name="missed_previous">Vorherige Tankung nicht erfasst</string>
+    <string name="missed_previous_hint">Über diese Lücke wird kein Verbrauch berechnet</string>
     <string name="my_location">Mein Standort</string>
     <string name="needs_two_full">Zwei Volltankungen nötig</string>
     <string name="new_refuel">Neue Tankung</string>
@@ -58,7 +66,11 @@
     <string name="period_summary">%1$d Tankungen · %2$s</string>
     <string name="period_year">Dieses Jahr</string>
     <string name="pick_location">Ort wählen</string>
+    <string name="pick_model">Marke und Modell wählen</string>
     <string name="price_per_litre">Preis pro Liter</string>
+    <string name="reference_consumption">Referenzverbrauch (optional)</string>
+    <string name="reference_hint">Offizieller oder erwarteter Wert zum Vergleich mit deinem echten Verbrauch</string>
+    <string name="reference_short">Ref. %1$s</string>
     <string name="refuel_count">%1$d Tankungen</string>
     <string name="registration">Kennzeichen (optional)</string>
     <string name="remove_location">Ort entfernen</string>
@@ -68,6 +80,7 @@
     <string name="restore_title">Sicherung wiederherstellen?</string>
     <string name="restored">Sicherung wiederhergestellt</string>
     <string name="save">Speichern</string>
+    <string name="search_model">Suchen, z. B. vw t-roc</string>
     <string name="selected">Ausgewählt</string>
     <string name="station">Tankstelle</string>
     <string name="switch_vehicle">Fahrzeug wechseln</string>

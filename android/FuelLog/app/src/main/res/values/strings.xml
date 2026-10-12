@@ -8,6 +8,7 @@
     <string name="average_price">Average price</string>
     <string name="best_consumption">Best consumption</string>
     <string name="cancel">Cancel</string>
+    <string name="catalog_note">Best-selling models in Spain (2025). Consumption: approximate WLTP of a common version; you can edit it.</string>
     <string name="consumption">Consumption</string>
     <string name="cost_per_km">Cost per km</string>
     <string name="currency">Currency</string>
@@ -32,6 +33,11 @@
     <string name="export_json">Export backup (JSON)</string>
     <string name="exported">File saved</string>
     <string name="file_error">Could not read or write the file</string>
+    <string name="fuel_cng">CNG</string>
+    <string name="fuel_diesel">Diesel</string>
+    <string name="fuel_hybrid">Hybrid</string>
+    <string name="fuel_lpg">LPG</string>
+    <string name="fuel_petrol">Petrol</string>
     <string name="fuel_type">Fuel type (optional)</string>
     <string name="full_tank">Full tank</string>
     <string name="full_tank_hint">Needed to measure consumption</string>
@@ -44,6 +50,8 @@
     <string name="litres">Litres</string>
     <string name="location_unavailable">Location not available</string>
     <string name="lowest_price">Lowest price</string>
+    <string name="missed_previous">Missed logging the previous refuel</string>
+    <string name="missed_previous_hint">Consumption is not calculated across the gap</string>
     <string name="my_location">My location</string>
     <string name="needs_two_full">Needs two full-tank fills</string>
     <string name="new_refuel">New refuelling</string>
@@ -59,7 +67,11 @@
     <string name="period_summary">%1$d fills · %2$s</string>
     <string name="period_year">This year</string>
     <string name="pick_location">Choose location</string>
+    <string name="pick_model">Choose make and model</string>
     <string name="price_per_litre">Price per litre</string>
+    <string name="reference_consumption">Reference consumption (optional)</string>
+    <string name="reference_hint">Official or expected figure, to compare with your real consumption</string>
+    <string name="reference_short">Ref. %1$s</string>
     <string name="refuel_count">%1$d refuellings</string>
     <string name="registration">Registration (optional)</string>
     <string name="remove_location">Remove location</string>
@@ -69,6 +81,7 @@
     <string name="restore_title">Restore backup?</string>
     <string name="restored">Backup restored</string>
     <string name="save">Save</string>
+    <string name="search_model">Search, e.g. seat leon</string>
     <string name="selected">Selected</string>
     <string name="station">Station</string>
     <string name="switch_vehicle">Switch vehicle</string>

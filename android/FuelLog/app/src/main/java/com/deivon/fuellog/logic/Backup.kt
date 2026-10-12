@@ -15,6 +15,8 @@ import java.time.format.DateTimeFormatter
  * JSON stores the same exact integers as the database, so a round trip changes nothing.
  *
  * Format versions: 1 = single vehicle (FuelLog 1.0); 2 = list of vehicles, each with its refuellings.
+ * Optional fields added later without a version bump (absent = default): vehicle "referenceDl100",
+ * refuel "missedPrevious".
  * Version 1 files are still accepted: their free-text location is moved into the notes, as in the
  * database migration.
  */
@@ -36,6 +38,7 @@ object Backup {
             list.put(
                 JSONObject().put("name", v.name).put("type", v.type.key).put("registration", v.registration)
                     .put("fuelType", v.fuelType).put("notes", v.notes).put("refuels", items)
+                    .apply { v.referenceDl100?.let { put("referenceDl100", it) } }
             )
         }
         return JSONObject().put("format", FORMAT).put("version", VERSION).put("exportedAt", exportedAt)
@@ -45,7 +48,7 @@ object Backup {
     private fun refuelJson(r: Refuel) = JSONObject()
         .put("timestamp", r.timestamp).put("station", r.station).put("odometerKm", r.odometerKm)
         .put("volumeMl", r.volumeMl).put("pricePerLitreMilli", r.pricePerLitreMilli).put("totalCents", r.totalCents)
-        .put("fullTank", r.fullTank).put("notes", r.notes)
+        .put("fullTank", r.fullTank).put("missedPrevious", r.missedPrevious).put("notes", r.notes)
         .apply { if (r.latitude != null && r.longitude != null) put("latitude", r.latitude).put("longitude", r.longitude) }
 
     /**
@@ -80,6 +83,7 @@ object Backup {
     private fun vehicleOf(o: JSONObject) = Vehicle(
         name = o.optString("name"), type = VehicleType.of(o.optString("type", "car")),
         registration = o.optString("registration"), fuelType = o.optString("fuelType"), notes = o.optString("notes"),
+        referenceDl100 = o.optInt("referenceDl100", 0).takeIf { it in 1..999 },
     )
 
     private fun parseRefuels(items: JSONArray): Pair<List<Refuel>, Int> {
@@ -98,7 +102,7 @@ object Backup {
             timestamp = o.getLong("timestamp"), station = o.getString("station"),
             odometerKm = o.getLong("odometerKm"), volumeMl = o.getLong("volumeMl"),
             pricePerLitreMilli = o.getLong("pricePerLitreMilli"), totalCents = o.getLong("totalCents"),
-            fullTank = o.optBoolean("fullTank", true),
+            fullTank = o.optBoolean("fullTank", true), missedPrevious = o.optBoolean("missedPrevious"),
             notes = listOf(notes, oldLocation).filter { it.isNotEmpty() }.joinToString("\n"),
             latitude = point?.lat, longitude = point?.lon,
         ).takeIf {

@@ -1,0 +1,52 @@
+# Best-selling car models in Spain, 2025 (ANFAC registrations via motor.es), top 50.
+# Excluded: electric-only (Tesla Model 3), plug-in-hybrid-led (BYD Seal U, MG EHS) and the Mini range,
+# since a single fuel figure would mislead.
+# l100 = APPROXIMATE WLTP combined consumption of a common version (L/100 km), not verified against
+# IDAE data. Reference only; users can edit it per vehicle. fuel: petrol | diesel | hybrid
+brand,model,fuel,l100
+Audi,A3,petrol,5.6
+Audi,Q3,petrol,6.7
+BMW,X1,petrol,6.4
+Citroën,C3,petrol,5.7
+Citroën,C4,petrol,5.7
+Cupra,Formentor,petrol,6.4
+Cupra,León,petrol,6.0
+Dacia,Duster,petrol,5.7
+Dacia,Sandero,petrol,5.4
+Ford,Kuga,hybrid,5.4
+Ford,Puma,petrol,5.5
+Hyundai,i20,petrol,5.3
+Hyundai,Kona,hybrid,4.8
+Hyundai,Tucson,hybrid,5.6
+Jaecoo,7,petrol,7.5
+Kia,Niro,hybrid,4.4
+Kia,Sportage,hybrid,5.9
+Kia,Stonic,petrol,5.4
+Mercedes-Benz,GLA,petrol,6.6
+Mercedes-Benz,GLC,diesel,5.8
+MG,3,hybrid,4.4
+MG,ZS,hybrid,5.0
+Nissan,Juke,petrol,5.9
+Nissan,Qashqai,petrol,6.3
+Omoda,5,petrol,7.4
+Opel,Corsa,petrol,5.4
+Peugeot,208,petrol,5.4
+Peugeot,2008,petrol,5.6
+Peugeot,3008,hybrid,5.6
+Renault,Austral,hybrid,4.7
+Renault,Captur,petrol,5.7
+Renault,Clio,petrol,5.3
+Seat,Arona,petrol,5.6
+Seat,Ibiza,petrol,5.3
+Seat,León,petrol,5.6
+Skoda,Fabia,petrol,5.1
+Skoda,Kamiq,petrol,5.5
+Toyota,C-HR,hybrid,4.9
+Toyota,Corolla,hybrid,4.5
+Toyota,RAV4,hybrid,5.6
+Toyota,Yaris,hybrid,4.0
+Toyota,Yaris Cross,hybrid,4.7
+Volkswagen,T-Cross,petrol,5.6
+Volkswagen,T-Roc,petrol,6.0
+Volkswagen,Taigo,petrol,5.6
+Volkswagen,Tiguan,petrol,6.3

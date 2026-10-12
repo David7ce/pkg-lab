@@ -91,7 +91,7 @@ object FuelStats {
         var previousOdometer: Long? = null
 
         for (r in chronological(records)) {
-            if (previousOdometer != null && r.odometerKm <= previousOdometer) anchor = null
+            if (r.missedPrevious || (previousOdometer != null && r.odometerKm <= previousOdometer)) anchor = null
             previousOdometer = r.odometerKm
 
             val start = anchor
@@ -121,6 +121,12 @@ object FuelStats {
         if (ml == 0L) return null
         // cents × 10 = thousandths; ÷ (mL / 1000) = per litre  →  cents × 10 000 / mL, rounded half-up.
         return (records.sumOf { it.totalCents } * 10_000 + ml / 2) / ml
+    }
+
+    /** Difference between real and reference consumption as a percentage (+12 = 12 % more), or null. */
+    fun versusReference(realL100: Double?, referenceDl100: Int?): Int? {
+        if (realL100 == null || referenceDl100 == null || referenceDl100 <= 0) return null
+        return Math.round((realL100 * 10 / referenceDl100 - 1) * 100).toInt()
     }
 
     fun spentCents(records: List<Refuel>): Long = records.sumOf { it.totalCents }

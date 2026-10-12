@@ -12,6 +12,7 @@ data class RefuelForm(
     val litres: String = "",
     val price: String = "",
     val fullTank: Boolean = true,
+    val missedPrevious: Boolean = false,
     val notes: String = "",
     val location: GeoPoint? = null,
 ) {
@@ -28,7 +29,7 @@ data class RefuelForm(
             odometer = r.odometerKm.toString(),
             litres = Decimals.toInput(r.volumeMl, 3, locale),
             price = Decimals.toInput(r.pricePerLitreMilli, 3, locale),
-            fullTank = r.fullTank, notes = r.notes,
+            fullTank = r.fullTank, missedPrevious = r.missedPrevious, notes = r.notes,
             location = GeoPoint.of(r.latitude, r.longitude),
         )
     }
@@ -73,7 +74,7 @@ object RefuelValidator {
                 id = form.id, vehicleId = vehicleId, timestamp = form.timestamp,
                 station = form.station.trim(), odometerKm = odometer!!, volumeMl = ml!!,
                 pricePerLitreMilli = price!!, totalCents = totalCents(ml, price),
-                fullTank = form.fullTank, notes = form.notes.trim(),
+                fullTank = form.fullTank, missedPrevious = form.missedPrevious, notes = form.notes.trim(),
                 latitude = form.location?.lat, longitude = form.location?.lon,
             )
         )

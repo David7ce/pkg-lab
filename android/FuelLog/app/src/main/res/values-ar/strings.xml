@@ -7,6 +7,7 @@
     <string name="average_price">متوسط السعر</string>
     <string name="best_consumption">أفضل استهلاك</string>
     <string name="cancel">إلغاء</string>
+    <string name="catalog_note">الطرازات الأكثر مبيعًا في إسبانيا (2025). الاستهلاك: قيمة WLTP تقريبية لإصدار شائع؛ يمكنك تعديلها.</string>
     <string name="consumption">الاستهلاك</string>
     <string name="cost_per_km">التكلفة لكل كم</string>
     <string name="currency">العملة</string>
@@ -31,6 +32,11 @@
     <string name="export_json">تصدير نسخة احتياطية (JSON)</string>
     <string name="exported">تم حفظ الملف</string>
     <string name="file_error">تعذّرت قراءة الملف أو كتابته</string>
+    <string name="fuel_cng">الغاز الطبيعي المضغوط</string>
+    <string name="fuel_diesel">ديزل</string>
+    <string name="fuel_hybrid">هجين</string>
+    <string name="fuel_lpg">غاز البترول المسال</string>
+    <string name="fuel_petrol">بنزين</string>
     <string name="fuel_type">نوع الوقود (اختياري)</string>
     <string name="full_tank">خزان ممتلئ</string>
     <string name="full_tank_hint">ضروري لقياس الاستهلاك</string>
@@ -43,6 +49,8 @@
     <string name="litres">لترات</string>
     <string name="location_unavailable">الموقع غير متاح</string>
     <string name="lowest_price">أدنى سعر</string>
+    <string name="missed_previous">فاتني تسجيل التعبئة السابقة</string>
+    <string name="missed_previous_hint">لا يُحسب الاستهلاك عبر هذه الفجوة</string>
     <string name="my_location">موقعي</string>
     <string name="needs_two_full">يلزم ملء الخزان مرتين</string>
     <string name="new_refuel">تعبئة جديدة</string>
@@ -58,7 +66,11 @@
     <string name="period_summary">%1$d تعبئة · %2$s</string>
     <string name="period_year">هذا العام</string>
     <string name="pick_location">اختيار الموقع</string>
+    <string name="pick_model">اختيار الماركة والطراز</string>
     <string name="price_per_litre">السعر لكل لتر</string>
+    <string name="reference_consumption">الاستهلاك المرجعي (اختياري)</string>
+    <string name="reference_hint">قيمة رسمية أو متوقعة لمقارنتها باستهلاكك الفعلي</string>
+    <string name="reference_short">مرجع %1$s</string>
     <string name="refuel_count">%1$d تعبئة</string>
     <string name="registration">رقم اللوحة (اختياري)</string>
     <string name="remove_location">إزالة الموقع</string>
@@ -68,6 +80,7 @@
     <string name="restore_title">استعادة النسخة الاحتياطية؟</string>
     <string name="restored">تمت استعادة النسخة الاحتياطية</string>
     <string name="save">حفظ</string>
+    <string name="search_model">ابحث، مثل toyota corolla</string>
     <string name="selected">محدد</string>
     <string name="station">المحطة</string>
     <string name="switch_vehicle">تبديل المركبة</string>
