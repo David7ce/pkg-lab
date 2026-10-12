@@ -37,4 +37,22 @@
     <string name="rename">重命名</string>
     <string name="name">名称</string>
     <string name="save">保存</string>
+    <string name="phrases">常用语</string>
+    <string name="add">添加</string>
+    <string name="new_phrase">新短语</string>
+    <string name="phrases_empty">还没有短语</string>
+    <string name="preparing">正在准备语音…</string>
+    <string name="tts_error">无法生成语音，请确认已安装语音合成引擎。</string>
+    <string name="delete_one_confirm">删除这条录音？</string>
+    <string name="delete_many_confirm">删除 %1$d 条录音？</string>
+    <string name="selected_count">已选择 %1$d 项</string>
+    <string name="select_all">全选</string>
+    <string name="cancel">取消</string>
+    <string name="play_phrase">播放短语</string>
+    <string-array name="default_phrases">
+        <item>你好，你好吗？</item>
+        <item>早上好</item>
+        <item>非常感谢</item>
+        <item>我在学习倒着说话</item>
+    </string-array>
 </resources>

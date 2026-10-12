@@ -60,3 +60,70 @@ class HistoryTest {
         assertEquals(0, history.list().size)
     }
 }
+
+class NamesTest {
+    @Test fun defaultNameHasNoIllegalCharactersAndIncludesTheDay() {
+        val t = java.util.GregorianCalendar(2026, java.util.Calendar.OCTOBER, 12, 14, 30, 5).time
+        assertEquals("reverse_voice_2026_10_12_14-30-05.wav", voiceFileName(t, reverse = true))
+        assertEquals("normal_voice_2026_10_12_14-30-05.wav", voiceFileName(t, reverse = false))
+        assertEquals(false, voiceFileName(t, true).contains(':'))
+    }
+}
+
+class PhrasesTest {
+    @get:Rule val tmp = TemporaryFolder()
+
+    @Test fun seedsOnceAddsRemovesAndRejectsDuplicates() {
+        val phrases = Phrases(java.io.File(tmp.root, "p.txt"))
+        phrases.seedIfNew(listOf("Hola", "Adiós"))
+        assertEquals(listOf("Hola", "Adiós"), phrases.list())
+        phrases.remove("Hola"); phrases.remove("Adiós")
+        phrases.seedIfNew(listOf("Hola")) // the user emptied the list: do not bring the examples back
+        assertEquals(0, phrases.list().size)
+
+        assertEquals(true, phrases.add("  Buenos   días "))
+        assertEquals(false, phrases.add("buenos días"))
+        assertEquals(false, phrases.add("   "))
+        assertEquals(true, phrases.add("Otra"))
+        assertEquals(listOf("Otra", "Buenos días"), phrases.list())
+        phrases.remove("Otra")
+        assertEquals(listOf("Buenos días"), phrases.list())
+        assertEquals(Phrases.MAX_LENGTH, Phrases.clean("x".repeat(500)).length)
+    }
+}
+
+class DecodeWavTest {
+    private fun wav(rate: Int, channels: Int, frames: ShortArray, extraChunk: Boolean = false): ByteArray {
+        val extra = if (extraChunk) ByteBuffer.allocate(12).order(ByteOrder.LITTLE_ENDIAN)
+            .put("LIST".toByteArray()).putInt(4).put("abcd".toByteArray()).array() else ByteArray(0)
+        val b = ByteBuffer.allocate(36 + extra.size + 8 + frames.size * 2).order(ByteOrder.LITTLE_ENDIAN)
+        b.put("RIFF".toByteArray()).putInt(0).put("WAVE".toByteArray())
+        b.put("fmt ".toByteArray()).putInt(16).putShort(1).putShort(channels.toShort())
+            .putInt(rate).putInt(rate * 2 * channels).putShort((2 * channels).toShort()).putShort(16)
+        b.put(extra).put("data".toByteArray()).putInt(frames.size * 2)
+        frames.forEach { b.putShort(it) }
+        return b.array()
+    }
+
+    @Test fun sameRateIsUnchanged() {
+        val data = ShortArray(100) { it.toShort() }
+        assertArrayEquals(data, decodeWav(wav(SAMPLE_RATE, 1, data)))
+    }
+
+    @Test fun halfRateDoublesLengthAndKeepsEnds() {
+        val out = decodeWav(wav(SAMPLE_RATE / 2, 1, ShortArray(1000) { 100 }))
+        assertEquals(2000, out.size)
+        assertEquals(100.toShort(), out[0])
+        assertEquals(100.toShort(), out[1000])
+    }
+
+    @Test fun stereoIsMixedToMonoAndExtraChunksAreSkipped() {
+        val out = decodeWav(wav(SAMPLE_RATE, 2, shortArrayOf(100, 300, 200, 400), extraChunk = true))
+        assertArrayEquals(shortArrayOf(200, 300), out)
+    }
+
+    @Test fun garbageGivesEmpty() {
+        assertEquals(0, decodeWav(ByteArray(10)).size)
+        assertEquals(0, decodeWav(ByteArray(100)).size)
+    }
+}

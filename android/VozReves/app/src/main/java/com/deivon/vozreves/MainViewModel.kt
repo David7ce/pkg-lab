@@ -20,19 +20,21 @@ import android.os.Build
 import android.os.Environment
 import android.provider.MediaStore
 import java.io.File
-import java.text.SimpleDateFormat
 import java.util.Date
-import java.util.Locale
 
-enum class Mode { Idle, Recording, Playing, Paused }
+enum class Mode { Idle, Recording, Preparing, Playing, Paused }
 
 /** Estado de la app; sobrevive a rotaciones y al cambio de idioma. */
 class MainViewModel(app: Application) : AndroidViewModel(app) {
 
     private val engine = AudioEngine()
     private val history = History(File(app.filesDir, "recordings"))
+    private val phrasesStore = Phrases(File(app.filesDir, "phrases.txt")).also {
+        it.seedIfNew(Settings.wrap(app).resources.getStringArray(R.array.default_phrases).toList())
+    }
     val settings = Settings(app)
     private var job: Job? = null
+    private var jobIsPlayback = false
 
     var mode by mutableStateOf(Mode.Idle)
         private set
@@ -51,6 +53,11 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
     /** El micrófono estaba ocupado o no se pudo abrir. */
     var micError by mutableStateOf(false)
         private set
+    /** No se pudo generar la voz de una frase (sin motor de texto a voz o sin ese idioma). */
+    var ttsError by mutableStateOf(false)
+        private set
+    var phrases by mutableStateOf(emptyList<String>())
+        private set
 
     var reverse by mutableStateOf(true)
     /** Tramo a reproducir/compartir, como fracción 0..1 de la grabación. */
@@ -59,7 +66,12 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
     val hasRecording: Boolean get() = duration > 0f
     val isPlaying: Boolean get() = mode == Mode.Playing || mode == Mode.Paused
 
-    init { viewModelScope.launch { refreshHistory() } }
+    init {
+        viewModelScope.launch {
+            refreshHistory()
+            phrases = withContext(Dispatchers.IO) { phrasesStore.list() }
+        }
+    }
 
     /** Botón grande: empieza o para la grabación (al parar se guarda en el historial). */
     fun onRecordButton() {
@@ -78,28 +90,64 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
         }
     }
 
+    /**
+     * Play/pausa. El estado cambia al instante en el hilo principal (antes de lanzar nada), así que
+     * pulsaciones rápidas solo alternan pausa/reanudar y nunca arrancan dos reproducciones.
+     */
     fun togglePlay() {
         when (mode) {
-            Mode.Playing -> { engine.pause(); mode = Mode.Paused }
-            Mode.Paused -> { engine.resume(); mode = Mode.Playing }
-            Mode.Recording -> Unit
-            Mode.Idle -> launchExclusive {
-                val (from, to) = range() ?: return@launchExclusive
-                val total = engine.samples.size.toFloat()
+            Mode.Playing -> { mode = Mode.Paused; engine.pause() }
+            Mode.Paused -> { mode = Mode.Playing; engine.resume() }
+            Mode.Recording, Mode.Preparing -> Unit
+            Mode.Idle -> {
+                val (from, to) = range() ?: return
                 mode = Mode.Playing
-                withTicker(33, { engine.position().takeIf { it >= 0 }?.let { progress = it / total } }) {
-                    engine.play(reverse, from, to)
-                }
+                launchExclusive(playback = true) { playRange(from, to) }
             }
         }
     }
 
-    fun stop() = engine.stopPlayback()
+    private suspend fun playRange(from: Int, to: Int) {
+        val total = engine.samples.size.toFloat()
+        mode = Mode.Playing
+        withTicker(33, { engine.position().takeIf { it >= 0 }?.let { progress = it / total } }) {
+            engine.play(reverse, from, to)
+        }
+    }
+
+    /** Genera la voz de la frase, la deja como audio actual y la reproduce en el sentido elegido. */
+    fun playPhrase(text: String) {
+        if (mode == Mode.Recording) return
+        ttsError = false
+        mode = Mode.Preparing
+        launchExclusive(playback = true) {
+            mode = Mode.Preparing
+            val audio = synthesizePhrase(getApplication(), text, java.util.Locale.getDefault())
+            if (audio == null) { ttsError = true; return@launchExclusive }
+            engine.load(audio)
+            onNewAudio()
+            val (from, to) = range() ?: return@launchExclusive
+            playRange(from, to)
+        }
+    }
+
+    fun addPhrase(text: String) = viewModelScope.launch {
+        withContext(Dispatchers.IO) { phrasesStore.add(text) }
+        phrases = withContext(Dispatchers.IO) { phrasesStore.list() }
+    }
+
+    fun removePhrase(text: String) = viewModelScope.launch {
+        withContext(Dispatchers.IO) { phrasesStore.remove(text) }
+        phrases = withContext(Dispatchers.IO) { phrasesStore.list() }
+    }
+
+    /** Cancela también una reproducción que aún no ha empezado (pulsación muy rápida tras Play). */
+    fun stop() { job?.cancel(); engine.stopPlayback() }
 
     /** Al salir de la app: Android no deja grabar en segundo plano, así que se para y se guarda. */
     fun onBackground() {
         engine.stopRecording()
-        if (mode == Mode.Playing) { engine.pause(); mode = Mode.Paused }
+        if (mode == Mode.Playing) { mode = Mode.Paused; engine.pause() }
     }
 
     /**
@@ -133,10 +181,7 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
         }.isSuccess
     }
 
-    fun exportName(): String {
-        val stamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(Date())
-        return "VozReves_$stamp${if (reverse) "_reves" else ""}.wav"
-    }
+    fun exportName(): String = voiceFileName(Date(), reverse)
 
     fun renameRecording(item: History.Item, title: String) = viewModelScope.launch {
         withContext(Dispatchers.IO) { history.rename(item, title) }
@@ -146,8 +191,10 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
     /** WAV del tramo seleccionado en el sentido elegido, listo para compartir. */
     suspend fun exportSelection(): File? = withContext(Dispatchers.IO) {
         val (from, to) = range() ?: return@withContext null
-        val name = if (reverse) "reversed.wav" else "voice.wav"
-        File(getApplication<Application>().cacheDir, name).also { writeWav(it, engine.slice(from, to, reverse)) }
+        // Solo para compartir: la caché es temporal a propósito; el guardado permanente es "Guardar en Música".
+        val cache = getApplication<Application>().cacheDir
+        cache.listFiles { f -> "_voice_" in f.name && f.extension == "wav" }?.forEach { it.delete() }
+        File(cache, exportName()).also { writeWav(it, engine.slice(from, to, reverse)) }
     }
 
     fun loadRecording(item: History.Item) = launchExclusive {
@@ -157,6 +204,11 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
 
     fun deleteRecording(item: History.Item) = viewModelScope.launch {
         withContext(Dispatchers.IO) { history.delete(item) }
+        refreshHistory()
+    }
+
+    fun deleteRecordings(items: List<History.Item>) = viewModelScope.launch {
+        withContext(Dispatchers.IO) { items.forEach(history::delete) }
         refreshHistory()
     }
 
@@ -191,12 +243,17 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
         }
 
     /** Para lo que esté sonando y lanza la nueva acción cuando la anterior haya terminado. */
-    private fun launchExclusive(block: suspend () -> Unit) {
+    private fun launchExclusive(playback: Boolean = false, block: suspend () -> Unit) {
         engine.stopPlayback()
         val previous = job
+        // Una reproducción pendiente se cancela (no se encadena); una grabación en curso se espera.
+        if (jobIsPlayback) previous?.cancel()
+        jobIsPlayback = playback
         job = viewModelScope.launch {
-            previous?.join()
-            try { block() } finally { mode = Mode.Idle; progress = -1f }
+            try {
+                previous?.join()
+                block()
+            } finally { mode = Mode.Idle; progress = -1f }
         }
     }
 

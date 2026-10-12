@@ -37,4 +37,22 @@
     <string name="rename">Renombrar</string>
     <string name="name">Nombre</string>
     <string name="save">Guardar</string>
+    <string name="phrases">Frases</string>
+    <string name="add">Añadir</string>
+    <string name="new_phrase">Nueva frase</string>
+    <string name="phrases_empty">Aún no hay frases</string>
+    <string name="preparing">Preparando la voz…</string>
+    <string name="tts_error">No se pudo generar la voz. Comprueba que hay un motor de texto a voz instalado.</string>
+    <string name="delete_one_confirm">¿Borrar esta grabación?</string>
+    <string name="delete_many_confirm">¿Borrar %1$d grabaciones?</string>
+    <string name="selected_count">%1$d seleccionadas</string>
+    <string name="select_all">Seleccionar todo</string>
+    <string name="cancel">Cancelar</string>
+    <string name="play_phrase">Reproducir frase</string>
+    <string-array name="default_phrases">
+        <item>Hola, ¿cómo estás?</item>
+        <item>Buenos días</item>
+        <item>Muchas gracias</item>
+        <item>Estoy aprendiendo a hablar al revés</item>
+    </string-array>
 </resources>

@@ -1,9 +1,7 @@
 package com.deivon.vozreves
 
 import java.io.File
-import java.text.SimpleDateFormat
 import java.util.Date
-import java.util.Locale
 import java.util.Properties
 
 /**
@@ -29,15 +27,18 @@ class History(private val dir: File) {
     fun list(): List<Item> {
         val names = titles()
         return dir.listFiles { f -> f.extension == "wav" }.orEmpty()
-            .sortedByDescending { it.name }
+            .sortedWith(compareByDescending<File> { it.lastModified() }.thenByDescending { it.name })
             .map { Item(it, (it.length() - 44) / 2f / SAMPLE_RATE, names.getProperty(it.name)?.takeIf(String::isNotBlank)) }
     }
 
     fun save(data: ShortArray) {
         if (data.isEmpty()) return
         dir.mkdirs()
-        val stamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(Date())
-        writeWav(File(dir, "rec_$stamp.wav"), data)
+        // reverse_voice_AAAA_MM_DD_HH-mm-ss.wav; si ya existe (dos en el mismo segundo) se añade un sufijo.
+        var file = File(dir, voiceFileName(Date(), reverse = true))
+        var n = 1
+        while (file.exists()) file = File(dir, voiceFileName(Date(), true).removeSuffix(".wav") + "_${n++}.wav")
+        writeWav(file, data)
         list().drop(MAX_ITEMS).forEach(::delete) // Mantener el espacio acotado.
     }
 

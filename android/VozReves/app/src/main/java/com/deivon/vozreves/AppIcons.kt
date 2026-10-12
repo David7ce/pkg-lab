@@ -28,4 +28,9 @@ object AppIcons {
             " -3.13,7 -7,7c-1.93,0 -3.68,-0.79 -4.94,-2.06l-1.42,1.42C8.27,19.99 10.51,21 13,21" +
             "c4.97,0 9,-4.03 9,-9s-4.03,-9 -9,-9zM12,8v5l4.28,2.54 0.72,-1.21 -3.5,-2.08V8H12z"
     )
+    /** Sentido del audio: rebobinar (◀◀) = al revés, avance (▶▶) = normal. El play también se gira. */
+    val Rewind = icon("Rewind", "M11,18V6l-8.5,6 8.5,6zM11.5,12l8.5,6V6l-8.5,6z")
+    val Forward = icon("Forward", "M4,18l8.5,-6L4,6v12zM13,6v12l8.5,-6L13,6z")
+    val PlayReverse = icon("PlayReverse", "M16,5v14l-11,-7z")
+    val Quote = icon("Quote", "M6,17h3l2,-4V7H5v6h3zM14,17h3l2,-4V7h-6v6h3z")
 }

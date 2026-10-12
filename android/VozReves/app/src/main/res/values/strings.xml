@@ -37,4 +37,22 @@
     <string name="rename">Rename</string>
     <string name="name">Name</string>
     <string name="save">Save</string>
+    <string name="phrases">Phrases</string>
+    <string name="add">Add</string>
+    <string name="new_phrase">New phrase</string>
+    <string name="phrases_empty">No phrases yet</string>
+    <string name="preparing">Preparing voice…</string>
+    <string name="tts_error">Could not generate the voice. Check that a text-to-speech engine is installed.</string>
+    <string name="delete_one_confirm">Delete this recording?</string>
+    <string name="delete_many_confirm">Delete %1$d recordings?</string>
+    <string name="selected_count">%1$d selected</string>
+    <string name="select_all">Select all</string>
+    <string name="cancel">Cancel</string>
+    <string name="play_phrase">Play phrase</string>
+    <string-array name="default_phrases">
+        <item>Hello, how are you?</item>
+        <item>Good morning</item>
+        <item>Thank you very much</item>
+        <item>I am learning to speak backwards</item>
+    </string-array>
 </resources>

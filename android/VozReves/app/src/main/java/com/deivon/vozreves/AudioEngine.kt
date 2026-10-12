@@ -24,6 +24,9 @@ class AudioEngine {
     @Volatile private var recording = false
     @Volatile private var playing = false
     @Volatile private var track: AudioTrack? = null
+    /** Pausa pedida por el usuario; vale también si la pulsación llega antes de que exista la pista. */
+    @Volatile private var paused = false
+    private val lock = Any()
     @Volatile private var startPos = 0
     @Volatile private var direction = 1
 
@@ -117,8 +120,10 @@ class AudioEngine {
         startPos = if (reverse) to else from
         direction = if (reverse) -1 else 1
         playing = true
-        track = t
-        t.play()
+        synchronized(lock) {
+            track = t
+            if (!paused) t.play() // Si ya se pidió pausa (pulsación rápida), arranca en pausa.
+        }
         try {
             var offset = 0
             while (playing && isActive && offset < data.size) {
@@ -129,20 +134,24 @@ class AudioEngine {
             // Esperar a que suene lo que queda en el buffer (también mientras está en pausa).
             while (playing && isActive && t.playbackHeadPosition < data.size) delay(20)
         } finally {
-            track = null
-            t.pause()
-            t.flush()
-            t.release()
+            synchronized(lock) {
+                track = null
+                runCatching { t.pause(); t.flush() }
+                t.release()
+            }
             playing = false
         }
     }
 
-    fun pause() { runCatching { track?.pause() } }
-    fun resume() { runCatching { track?.play() } }
+    /** Idempotente: pausar dos veces seguidas o reanudar sin pausa no hace nada raro. */
+    fun pause() = synchronized(lock) { paused = true; runCatching { track?.pause() }; Unit }
+    fun resume() = synchronized(lock) { paused = false; runCatching { track?.play() }; Unit }
 
-    fun stopPlayback() {
+    fun stopPlayback() = synchronized(lock) {
         playing = false
+        paused = false
         // Pausar y vaciar el buffer desbloquea un write() que esté esperando.
         runCatching { track?.run { pause(); flush() } }
+        Unit
     }
 }

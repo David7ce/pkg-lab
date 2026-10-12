@@ -1,4 +1,4 @@
-@file:OptIn(ExperimentalMaterial3Api::class)
+@file:OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 
 package com.deivon.vozreves
 
@@ -23,7 +23,9 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -43,12 +45,14 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledIconButton
@@ -88,6 +92,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -113,7 +118,7 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-private enum class Screen { Main, History, Settings }
+private enum class Screen { Main, Phrases, History, Settings }
 
 @Composable
 fun App(vm: MainViewModel) {
@@ -122,7 +127,8 @@ fun App(vm: MainViewModel) {
     AppTheme(vm.settings.theme) {
         BackHandler(enabled = screen != Screen.Main, onBack = back)
         when (screen) {
-            Screen.Main -> MainScreen(vm, { screen = Screen.History }, { screen = Screen.Settings })
+            Screen.Main -> MainScreen(vm, { screen = Screen.Phrases }, { screen = Screen.History }, { screen = Screen.Settings })
+            Screen.Phrases -> PhrasesScreen(vm, back)
             Screen.History -> HistoryScreen(vm, back)
             Screen.Settings -> SettingsScreen(vm, back)
         }
@@ -149,7 +155,7 @@ fun AppTheme(theme: Int, content: @Composable () -> Unit) {
 }
 
 @Composable
-private fun MainScreen(vm: MainViewModel, onHistory: () -> Unit, onSettings: () -> Unit) {
+private fun MainScreen(vm: MainViewModel, onPhrases: () -> Unit, onHistory: () -> Unit, onSettings: () -> Unit) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     var permissionDenied by rememberSaveable { mutableStateOf(false) }
@@ -190,6 +196,9 @@ private fun MainScreen(vm: MainViewModel, onHistory: () -> Unit, onSettings: () 
         TopAppBar(
             title = { Text(stringResource(R.string.app_name), fontWeight = FontWeight.Bold) },
             actions = {
+                IconButton(onClick = onPhrases, enabled = !recording) {
+                    Icon(AppIcons.Quote, stringResource(R.string.phrases))
+                }
                 IconButton(onClick = onHistory, enabled = !recording) {
                     Icon(AppIcons.History, stringResource(R.string.history))
                 }
@@ -206,6 +215,10 @@ private fun MainScreen(vm: MainViewModel, onHistory: () -> Unit, onSettings: () 
             verticalArrangement = Arrangement.Center
         ) {
             Status(vm)
+            if (vm.ttsError) {
+                Spacer(Modifier.height(8.dp))
+                Text(stringResource(R.string.tts_error), color = MaterialTheme.colorScheme.error, textAlign = TextAlign.Center)
+            }
             if (permissionDenied || vm.micError) {
                 Spacer(Modifier.height(8.dp))
                 Text(
@@ -251,10 +264,7 @@ private fun MainScreen(vm: MainViewModel, onHistory: () -> Unit, onSettings: () 
                     }
                 }
                 Spacer(Modifier.height(16.dp))
-                Choice(
-                    listOf(true to stringResource(R.string.reverse), false to stringResource(R.string.normal)),
-                    vm.reverse, enabled = !playing
-                ) { vm.reverse = it }
+                DirectionChoice(vm.reverse, enabled = !playing) { vm.reverse = it }
                 Spacer(Modifier.height(16.dp))
                 Row(horizontalArrangement = Arrangement.spacedBy(20.dp), verticalAlignment = Alignment.CenterVertically) {
                     IconButton(onClick = vm::stop, enabled = playing) {
@@ -263,7 +273,11 @@ private fun MainScreen(vm: MainViewModel, onHistory: () -> Unit, onSettings: () 
                     FilledIconButton(onClick = vm::togglePlay, modifier = Modifier.size(64.dp)) {
                         val isPlaying = vm.mode == Mode.Playing
                         Icon(
-                            if (isPlaying) AppIcons.Pause else Icons.Filled.PlayArrow,
+                            when {
+                                isPlaying -> AppIcons.Pause
+                                vm.reverse -> AppIcons.PlayReverse // el triángulo mira atrás: suena al revés
+                                else -> Icons.Filled.PlayArrow
+                            },
                             stringResource(if (isPlaying) R.string.pause else R.string.play),
                             Modifier.size(32.dp)
                         )
@@ -289,6 +303,7 @@ private fun Status(vm: MainViewModel) {
             Mode.Recording -> stringResource(
                 R.string.status_recording, time.clock(vm.recorded), time.clock(vm.settings.maxSeconds.toFloat())
             )
+            Mode.Preparing -> stringResource(R.string.preparing)
             Mode.Playing -> stringResource(R.string.status_playing)
             Mode.Paused -> stringResource(R.string.status_paused)
             Mode.Idle -> if (vm.hasRecording) stringResource(R.string.recording_length, time.seconds(vm.duration))
@@ -321,9 +336,23 @@ private fun PlaybackTimes(vm: MainViewModel) {
     }
 }
 
+/** Al revés (◀◀) / normal (▶▶): cada estado con su icono, también para quien no lee el texto. */
+@Composable
+private fun DirectionChoice(reverse: Boolean, enabled: Boolean = true, onSelect: (Boolean) -> Unit) {
+    CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
+        Choice(
+            listOf(true to stringResource(R.string.reverse), false to stringResource(R.string.normal)),
+            reverse, enabled, icons = mapOf(true to AppIcons.Rewind, false to AppIcons.Forward), onSelect = onSelect
+        )
+    }
+}
+
 /** Selector de una opción (botones segmentados). */
 @Composable
-private fun <T> Choice(options: List<Pair<T, String>>, selected: T, enabled: Boolean = true, onSelect: (T) -> Unit) {
+private fun <T> Choice(
+    options: List<Pair<T, String>>, selected: T, enabled: Boolean = true,
+    icons: Map<T, ImageVector> = emptyMap(), onSelect: (T) -> Unit
+) {
     SingleChoiceSegmentedButtonRow(Modifier.fillMaxWidth()) {
         options.forEachIndexed { i, (value, label) ->
             SegmentedButton(
@@ -331,7 +360,10 @@ private fun <T> Choice(options: List<Pair<T, String>>, selected: T, enabled: Boo
                 onClick = { onSelect(value) },
                 shape = SegmentedButtonDefaults.itemShape(i, options.size),
                 enabled = enabled
-            ) { Text(label, maxLines = 1, textAlign = TextAlign.Center) }
+            ) {
+                icons[value]?.let { Icon(it, null, Modifier.size(18.dp)); Spacer(Modifier.size(6.dp)) }
+                Text(label, maxLines = 1, textAlign = TextAlign.Center)
+            }
         }
     }
 }
@@ -351,31 +383,124 @@ private fun SubScreen(title: String, onBack: () -> Unit, content: @Composable (P
 @Composable
 private fun HistoryScreen(vm: MainViewModel, onBack: () -> Unit) {
     var renaming by remember { mutableStateOf<History.Item?>(null) }
+    // Nombres de archivo seleccionados (selección múltiple) y borrado pendiente de confirmar.
+    var selected by remember { mutableStateOf(emptySet<String>()) }
+    var pendingDelete by remember { mutableStateOf<List<History.Item>?>(null) }
+    val names = vm.recordings.map { it.file.name }.toSet()
+    // Si desaparece algo del histórico (p. ej. el límite de 50), no queda seleccionado en el vacío.
+    val sel = selected intersect names
+    val selecting = sel.isNotEmpty()
+    BackHandler(enabled = selecting) { selected = emptySet() }
+
     renaming?.let { item -> RenameDialog(item.title.orEmpty(), onDismiss = { renaming = null }) { vm.renameRecording(item, it); renaming = null } }
+    pendingDelete?.let { items ->
+        AlertDialog(
+            onDismissRequest = { pendingDelete = null },
+            text = {
+                Text(if (items.size == 1) stringResource(R.string.delete_one_confirm)
+                     else stringResource(R.string.delete_many_confirm, items.size))
+            },
+            confirmButton = {
+                TextButton(onClick = { vm.deleteRecordings(items); selected = emptySet(); pendingDelete = null }) {
+                    Text(stringResource(R.string.delete))
+                }
+            },
+            dismissButton = { TextButton(onClick = { pendingDelete = null }) { Text(stringResource(R.string.cancel)) } }
+        )
+    }
+
     val time = rememberTimeFormat()
     val dates = remember(time.locale) { DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.SHORT, time.locale) }
-    SubScreen(stringResource(R.string.history), onBack) { padding ->
+    Scaffold(topBar = {
+        TopAppBar(
+            title = { Text(if (selecting) stringResource(R.string.selected_count, sel.size) else stringResource(R.string.history)) },
+            navigationIcon = {
+                if (selecting) IconButton(onClick = { selected = emptySet() }) { Icon(Icons.Filled.Close, stringResource(R.string.cancel)) }
+                else IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Filled.ArrowBack, stringResource(R.string.back)) }
+            },
+            actions = {
+                if (selecting) {
+                    TextButton(onClick = { selected = names }, enabled = sel.size < names.size) {
+                        Text(stringResource(R.string.select_all))
+                    }
+                    IconButton(onClick = { pendingDelete = vm.recordings.filter { it.file.name in sel } }) {
+                        Icon(Icons.Filled.Delete, stringResource(R.string.delete))
+                    }
+                }
+            }
+        )
+    }) { padding ->
         if (vm.recordings.isEmpty()) {
             Text(stringResource(R.string.history_empty), Modifier.padding(padding).padding(24.dp))
         }
         LazyColumn(contentPadding = padding) {
             items(vm.recordings, key = { it.file.name }) { item ->
                 val date = dates.format(Date(item.file.lastModified()))
+                val checked = item.file.name in sel
+                fun toggle() { selected = if (checked) sel - item.file.name else sel + item.file.name }
                 ListItem(
                     headlineContent = { Text(item.title ?: date) },
                     supportingContent = { Text(if (item.title != null) "$date · ${time.clock(item.seconds)}" else time.clock(item.seconds)) },
-                    trailingContent = {
+                    leadingContent = if (selecting) ({ Checkbox(checked = checked, onCheckedChange = null) }) else null,
+                    trailingContent = if (selecting) null else ({
                         Row {
                             IconButton(onClick = { renaming = item }) {
                                 Icon(Icons.Filled.Edit, stringResource(R.string.rename))
                             }
-                            IconButton(onClick = { vm.deleteRecording(item) }) {
+                            IconButton(onClick = { pendingDelete = listOf(item) }) {
                                 Icon(Icons.Filled.Delete, stringResource(R.string.delete))
                             }
                         }
-                    },
-                    modifier = Modifier.clickable { vm.loadRecording(item); onBack() }
+                    }),
+                    // Toque largo = empezar a seleccionar; con la selección activa, el toque marca/desmarca.
+                    modifier = Modifier.combinedClickable(
+                        onClick = { if (selecting) toggle() else { vm.loadRecording(item); onBack() } },
+                        onLongClick = { toggle() }
+                    )
                 )
+            }
+        }
+    }
+}
+
+@Composable
+private fun PhrasesScreen(vm: MainViewModel, onBack: () -> Unit) {
+    var text by rememberSaveable { mutableStateOf("") }
+    fun add() { vm.addPhrase(text); text = "" }
+    SubScreen(stringResource(R.string.phrases), onBack) { padding ->
+        Column(Modifier.padding(padding)) {
+            Column(Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) {
+                DirectionChoice(vm.reverse) { vm.reverse = it }
+                Spacer(Modifier.height(8.dp))
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    OutlinedTextField(
+                        value = text, onValueChange = { text = it.take(Phrases.MAX_LENGTH) },
+                        label = { Text(stringResource(R.string.new_phrase)) }, singleLine = true,
+                        modifier = Modifier.weight(1f)
+                    )
+                    Spacer(Modifier.size(8.dp))
+                    Button(onClick = { add() }, enabled = text.isNotBlank()) { Text(stringResource(R.string.add)) }
+                }
+            }
+            if (vm.phrases.isEmpty()) Text(stringResource(R.string.phrases_empty), Modifier.padding(24.dp))
+            LazyColumn {
+                items(vm.phrases, key = { it }) { phrase ->
+                    ListItem(
+                        headlineContent = { Text(phrase) },
+                        leadingContent = {
+                            // El icono muestra en qué sentido sonará al tocar.
+                            IconButton(onClick = { vm.playPhrase(phrase); onBack() }) {
+                                Icon(if (vm.reverse) AppIcons.PlayReverse else Icons.Filled.PlayArrow, stringResource(R.string.play_phrase))
+                            }
+                        },
+                        trailingContent = {
+                            IconButton(onClick = { vm.removePhrase(phrase) }) {
+                                Icon(Icons.Filled.Delete, stringResource(R.string.delete))
+                            }
+                        },
+                        modifier = Modifier.clickable { vm.playPhrase(phrase); onBack() }
+                    )
+                }
             }
         }
     }

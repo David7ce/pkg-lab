@@ -37,4 +37,22 @@
     <string name="rename">إعادة تسمية</string>
     <string name="name">الاسم</string>
     <string name="save">حفظ</string>
+    <string name="phrases">عبارات</string>
+    <string name="add">إضافة</string>
+    <string name="new_phrase">عبارة جديدة</string>
+    <string name="phrases_empty">لا توجد عبارات بعد</string>
+    <string name="preparing">جارٍ تجهيز الصوت…</string>
+    <string name="tts_error">تعذّر توليد الصوت. تأكد من تثبيت محرك تحويل النص إلى كلام.</string>
+    <string name="delete_one_confirm">حذف هذا التسجيل؟</string>
+    <string name="delete_many_confirm">حذف %1$d تسجيلات؟</string>
+    <string name="selected_count">تم تحديد %1$d</string>
+    <string name="select_all">تحديد الكل</string>
+    <string name="cancel">إلغاء</string>
+    <string name="play_phrase">تشغيل العبارة</string>
+    <string-array name="default_phrases">
+        <item>مرحبًا، كيف حالك؟</item>
+        <item>صباح الخير</item>
+        <item>شكرًا جزيلًا</item>
+        <item>أتعلم الكلام بالعكس</item>
+    </string-array>
 </resources>
