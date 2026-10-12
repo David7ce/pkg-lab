@@ -134,4 +134,7 @@
     <string name="selected_count">%1$d selecionado(s)</string>
     <string name="delete_refuel_confirm">Apagar este abastecimento?</string>
     <string name="delete_refuels_confirm">Apagar %1$d abastecimentos?</string>
+    <string name="shared_back">Voltar</string>
+    <string name="shared_close">Fechar</string>
+    <string name="shared_select_all">Selecionar tudo</string>
 </resources>

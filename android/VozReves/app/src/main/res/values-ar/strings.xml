@@ -58,4 +58,5 @@
     <string name="delete_phrase_confirm">حذف هذه العبارة؟</string>
     <string name="delete_phrases_confirm">حذف %1$d عبارات؟</string>
     <string name="clear_history_confirm">حذف كل التسجيلات؟</string>
+    <string name="shared_close">إغلاق</string>
 </resources>

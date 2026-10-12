@@ -58,4 +58,5 @@
     <string name="delete_phrase_confirm">删除这个短语？</string>
     <string name="delete_phrases_confirm">删除 %1$d 个短语？</string>
     <string name="clear_history_confirm">删除所有录音？</string>
+    <string name="shared_close">关闭</string>
 </resources>

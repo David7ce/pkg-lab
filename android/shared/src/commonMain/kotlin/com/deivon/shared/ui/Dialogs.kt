@@ -6,12 +6,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.res.stringResource
-import com.deivon.shared.R
 
 /**
  * Confirmación antes de una acción que no se puede deshacer. [destructive] pinta el botón de
- * confirmar en color de error. Siempre hay botón de cancelar a la izquierda y se cierra con atrás.
+ * confirmar en color de error. Siempre hay botón de cancelar y se cierra al tocar fuera.
  */
 @Composable
 fun ConfirmDialog(
@@ -34,6 +32,6 @@ fun ConfirmDialog(
                 ) else ButtonDefaults.textButtonColors()
             ) { Text(confirmLabel) }
         },
-        dismissButton = { TextButton(onClick = onDismiss) { Text(stringResource(R.string.shared_cancel)) } }
+        dismissButton = { TextButton(onClick = onDismiss) { Text(LocalSharedStrings.current.cancel) } }
     )
 }

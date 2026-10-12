@@ -90,6 +90,8 @@ import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import com.deivon.shared.reverseText
+import com.deivon.shared.ui.LocalSharedStrings
+import com.deivon.shared.ui.SharedStrings
 import com.deivon.shared.ui.ChoiceDropdown
 import com.deivon.shared.ui.ConfirmDialog
 import com.deivon.shared.ui.SectionTitle
@@ -123,13 +125,23 @@ private enum class Screen { Main, Phrases, History, Settings }
 fun App(vm: MainViewModel) {
     var screen by rememberSaveable { mutableStateOf(Screen.Main) }
     val back = { screen = Screen.Main }
+    // Textos comunes de los componentes compartidos (android/shared), en el idioma de la app.
+    val shared = SharedStrings(
+        cancel = stringResource(R.string.cancel),
+        back = stringResource(R.string.back),
+        close = stringResource(R.string.shared_close),
+        delete = stringResource(R.string.delete),
+        selectAll = stringResource(R.string.select_all),
+    )
     AppTheme(vm.settings.theme) {
-        BackHandler(enabled = screen != Screen.Main, onBack = back)
-        when (screen) {
-            Screen.Main -> MainScreen(vm, { screen = Screen.Phrases }, { screen = Screen.History }, { screen = Screen.Settings })
-            Screen.Phrases -> PhrasesScreen(vm, back)
-            Screen.History -> HistoryScreen(vm, back)
-            Screen.Settings -> SettingsScreen(vm, back)
+        CompositionLocalProvider(LocalSharedStrings provides shared) {
+            BackHandler(enabled = screen != Screen.Main, onBack = back)
+            when (screen) {
+                Screen.Main -> MainScreen(vm, { screen = Screen.Phrases }, { screen = Screen.History }, { screen = Screen.Settings })
+                Screen.Phrases -> PhrasesScreen(vm, back)
+                Screen.History -> HistoryScreen(vm, back)
+                Screen.Settings -> SettingsScreen(vm, back)
+            }
         }
     }
 }

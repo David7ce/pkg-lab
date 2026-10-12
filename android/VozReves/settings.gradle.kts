@@ -16,5 +16,5 @@ dependencyResolutionManagement {
 rootProject.name = "VozReves"
 include(":app")
 // Módulo compartido por todas las apps (android/shared).
-include(":shared")
-project(":shared").projectDir = file("../shared")
+include(":pkgshared")
+project(":pkgshared").projectDir = file("../shared")

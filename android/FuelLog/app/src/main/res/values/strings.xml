@@ -135,4 +135,7 @@
     <string name="selected_count">%1$d selected</string>
     <string name="delete_refuel_confirm">Delete this refuelling?</string>
     <string name="delete_refuels_confirm">Delete %1$d refuellings?</string>
+    <string name="shared_back">Back</string>
+    <string name="shared_close">Close</string>
+    <string name="shared_select_all">Select all</string>
 </resources>

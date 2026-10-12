@@ -58,4 +58,5 @@
     <string name="delete_phrase_confirm">यह वाक्यांश हटाएँ?</string>
     <string name="delete_phrases_confirm">%1$d वाक्यांश हटाएँ?</string>
     <string name="clear_history_confirm">सभी रिकॉर्डिंग हटाएँ?</string>
+    <string name="shared_close">बंद करें</string>
 </resources>

@@ -134,4 +134,7 @@
     <string name="selected_count">%1$d चुने गए</string>
     <string name="delete_refuel_confirm">यह ईंधन भराई हटाएँ?</string>
     <string name="delete_refuels_confirm">%1$d ईंधन भराइयाँ हटाएँ?</string>
+    <string name="shared_back">वापस</string>
+    <string name="shared_close">बंद करें</string>
+    <string name="shared_select_all">सभी चुनें</string>
 </resources>

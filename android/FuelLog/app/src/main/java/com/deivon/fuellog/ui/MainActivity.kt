@@ -7,6 +7,11 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.ui.res.stringResource
+import com.deivon.shared.ui.LocalSharedStrings
+import com.deivon.shared.ui.SharedStrings
 import androidx.activity.viewModels
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -58,7 +63,7 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContent { FuelTheme(vm.settings.theme) { FuelApp(vm) } }
+        setContent { FuelTheme(vm.settings.theme) { SharedTexts { FuelApp(vm) } } }
     }
 }
 
@@ -162,4 +167,17 @@ fun FuelApp(vm: AppViewModel) {
             }
         ) { padding -> content(Modifier.padding(padding)) }
     }
+}
+
+/** Textos comunes de los componentes compartidos (android/shared), en el idioma de la app. */
+@Composable
+private fun SharedTexts(content: @Composable () -> Unit) {
+    val shared = SharedStrings(
+        cancel = stringResource(R.string.cancel),
+        back = stringResource(R.string.shared_back),
+        close = stringResource(R.string.shared_close),
+        delete = stringResource(R.string.delete),
+        selectAll = stringResource(R.string.shared_select_all),
+    )
+    CompositionLocalProvider(LocalSharedStrings provides shared, content = content)
 }

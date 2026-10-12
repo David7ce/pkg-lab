@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <string name="shared_cancel">取消</string>
-    <string name="shared_back">返回</string>
-    <string name="shared_close">关闭</string>
-    <string name="shared_delete">删除</string>
-    <string name="shared_select_all">全选</string>
-</resources>

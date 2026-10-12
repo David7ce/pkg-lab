@@ -134,4 +134,7 @@
     <string name="selected_count">تم تحديد %1$d</string>
     <string name="delete_refuel_confirm">حذف عملية التزود هذه؟</string>
     <string name="delete_refuels_confirm">حذف %1$d عمليات تزود؟</string>
+    <string name="shared_back">رجوع</string>
+    <string name="shared_close">إغلاق</string>
+    <string name="shared_select_all">تحديد الكل</string>
 </resources>

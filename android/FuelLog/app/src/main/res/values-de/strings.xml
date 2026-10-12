@@ -134,4 +134,7 @@
     <string name="selected_count">%1$d ausgewählt</string>
     <string name="delete_refuel_confirm">Diesen Tankvorgang löschen?</string>
     <string name="delete_refuels_confirm">%1$d Tankvorgänge löschen?</string>
+    <string name="shared_back">Zurück</string>
+    <string name="shared_close">Schließen</string>
+    <string name="shared_select_all">Alle auswählen</string>
 </resources>

@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
@@ -9,7 +11,7 @@ val abiCodes = mapOf("armeabi-v7a" to 1, "arm64-v8a" to 2)
 
 android {
     namespace = "com.deivon.vozreves"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.deivon.vozreves"
@@ -60,7 +62,7 @@ android {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
-    kotlinOptions { jvmTarget = "17" }
+    kotlin { compilerOptions { jvmTarget.set(JvmTarget.JVM_17) } }
     buildFeatures { compose = true }
 
     // APK más ligera: fuera metadatos que la app no usa en ejecución.
@@ -75,15 +77,13 @@ android {
 }
 
 dependencies {
-    val composeBom = platform("androidx.compose:compose-bom:2024.12.01")
-    implementation(composeBom)
-    implementation("androidx.compose.material3:material3")
-    implementation("androidx.compose.ui:ui")
+    // Compose (runtime, ui, material3) llega desde :pkgshared (api, Compose Multiplatform 1.11.1).
+    implementation("androidx.compose.material:material-icons-core:1.7.8")
     implementation("androidx.activity:activity-compose:1.9.3")
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.7")
     implementation("androidx.core:core-ktx:1.15.0")
 
-    implementation(project(":shared"))
+    implementation(project(":pkgshared"))
 
     testImplementation("junit:junit:4.13.2")
 }

@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <string name="shared_cancel">रद्द करें</string>
-    <string name="shared_back">वापस</string>
-    <string name="shared_close">बंद करें</string>
-    <string name="shared_delete">हटाएँ</string>
-    <string name="shared_select_all">सभी चुनें</string>
-</resources>

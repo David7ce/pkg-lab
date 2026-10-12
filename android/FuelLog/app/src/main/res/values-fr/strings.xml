@@ -134,4 +134,7 @@
     <string name="selected_count">%1$d sélectionné(s)</string>
     <string name="delete_refuel_confirm">Supprimer ce plein ?</string>
     <string name="delete_refuels_confirm">Supprimer %1$d pleins ?</string>
+    <string name="shared_back">Retour</string>
+    <string name="shared_close">Fermer</string>
+    <string name="shared_select_all">Tout sélectionner</string>
 </resources>

@@ -1,8 +1,6 @@
 package com.deivon.shared.ui
 
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
@@ -51,7 +49,7 @@ fun <T> ChoiceDropdown(
                 DropdownMenuItem(
                     text = { Text(text, maxLines = 1, overflow = TextOverflow.Ellipsis) },
                     onClick = { open = false; onSelect(value) },
-                    trailingIcon = if (value == selected) ({ Icon(Icons.Filled.Check, null) }) else null
+                    trailingIcon = if (value == selected) ({ Icon(SharedIcons.Check, null) }) else null
                 )
             }
         }

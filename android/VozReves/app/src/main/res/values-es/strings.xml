@@ -58,4 +58,5 @@
     <string name="delete_phrase_confirm">¿Borrar esta frase?</string>
     <string name="delete_phrases_confirm">¿Borrar %1$d frases?</string>
     <string name="clear_history_confirm">¿Borrar todas las grabaciones?</string>
+    <string name="shared_close">Cerrar</string>
 </resources>

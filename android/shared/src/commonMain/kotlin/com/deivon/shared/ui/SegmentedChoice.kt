@@ -1,6 +1,5 @@
 package com.deivon.shared.ui
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -30,7 +29,7 @@ import androidx.compose.ui.unit.dp
 
 /**
  * Selector de una opción en fila, con icono opcional. Sustituye a SegmentedButton, que con icono
- * dejaba el icono encima del texto. Aquí cada segmento es una fila de altura fija: icono + texto
+ * dejaba el icono encima del texto. Cada segmento es una fila de altura fija: icono + texto
  * (el texto se recorta con "…" si no cabe). Sin check: el color de fondo indica la opción activa.
  */
 @Composable

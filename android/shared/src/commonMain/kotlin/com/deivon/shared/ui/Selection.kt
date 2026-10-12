@@ -1,8 +1,6 @@
 package com.deivon.shared.ui
 
 import androidx.compose.foundation.layout.RowScope
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
@@ -10,8 +8,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.res.stringResource
-import com.deivon.shared.R
 
 /**
  * Selección múltiple de una lista. Se activa con pulsación larga; mientras hay algo seleccionado,
@@ -44,10 +40,11 @@ fun <K> rememberSelection(): Selection<K> = remember { Selection() }
 /** Acciones de la barra superior en modo selección: seleccionar todo y borrar. */
 @Composable
 fun RowScope.SelectionActions(allSelected: Boolean, onSelectAll: () -> Unit, onDelete: () -> Unit) {
+    val strings = LocalSharedStrings.current
     IconButton(onClick = onSelectAll, enabled = !allSelected) {
-        Icon(SharedIcons.SelectAll, stringResource(R.string.shared_select_all))
+        Icon(SharedIcons.SelectAll, strings.selectAll)
     }
     IconButton(onClick = onDelete) {
-        Icon(Icons.Filled.Delete, stringResource(R.string.shared_delete))
+        Icon(SharedIcons.Delete, strings.delete)
     }
 }
