@@ -61,6 +61,10 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.darkColorScheme
+import androidx.compose.material3.dynamicDarkColorScheme
+import androidx.compose.material3.dynamicLightColorScheme
+import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
@@ -100,7 +104,7 @@ import java.util.Date
 class MainActivity : ComponentActivity() {
     private val vm: MainViewModel by viewModels()
 
-    override fun attachBaseContext(base: Context) = super.attachBaseContext(Settings.wrap(base))
+    override fun attachBaseContext(base: Context) = super.attachBaseContext(com.deivon.vozreves.Settings.wrap(base))
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -524,7 +528,7 @@ private fun SettingsScreen(vm: MainViewModel, onBack: () -> Unit) {
 
             SectionTitle(stringResource(R.string.language))
             ChoiceDropdown(
-                options = listOf("" to stringResource(R.string.system_default)) + Settings.LANGUAGES,
+                options = listOf("" to stringResource(R.string.system_default)) + com.deivon.vozreves.Settings.LANGUAGES,
                 selected = s.language
             ) { code ->
                 if (s.language != code) { s.updateLanguage(code); activity.recreate() }
