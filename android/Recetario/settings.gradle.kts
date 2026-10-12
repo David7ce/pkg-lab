@@ -14,4 +14,6 @@ dependencyResolutionManagement {
 }
 
 rootProject.name = "Recetario"
-include(":app", ":shared")
+include(":app", ":shared", ":pkgshared")
+// Componentes compartidos de todas las apps (android/shared).
+project(":pkgshared").projectDir = file("../shared")

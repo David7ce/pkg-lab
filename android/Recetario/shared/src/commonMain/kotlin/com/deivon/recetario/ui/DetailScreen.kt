@@ -20,6 +20,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
+import com.deivon.shared.ui.ConfirmDialog
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
@@ -160,18 +161,13 @@ fun DetailScreen(app: AppState, screen: Screen.Detail) {
     }
 
     if (screen.confirmDelete) {
-        AlertDialog(
-            onDismissRequest = { screen.confirmDelete = false },
-            icon = { Icon(AppIcons.Delete, contentDescription = null) },
-            title = { Text(s.deleteTitle) },
-            text = { Text(s.deleteBody(recipe.title)) },
-            confirmButton = {
-                TextButton(onClick = {
-                    screen.confirmDelete = false
-                    app.delete(recipe.id)
-                }) { Text(s.delete, color = MaterialTheme.colorScheme.error) }
-            },
-            dismissButton = { TextButton(onClick = { screen.confirmDelete = false }) { Text(s.cancel) } },
+        ConfirmDialog(
+            title = s.deleteTitle,
+            text = s.deleteBody(recipe.title),
+            confirmLabel = s.delete,
+            destructive = true,
+            onConfirm = { screen.confirmDelete = false; app.delete(recipe.id) },
+            onDismiss = { screen.confirmDelete = false },
         )
     }
 }

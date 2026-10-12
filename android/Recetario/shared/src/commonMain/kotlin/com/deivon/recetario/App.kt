@@ -25,6 +25,8 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import com.deivon.shared.ui.LocalSharedStrings
+import com.deivon.shared.ui.SharedStrings
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -51,7 +53,15 @@ import com.deivon.recetario.ui.isDark
 /** Root of the shared UI. Each platform provides [PlatformUi] and back handling, and calls this. */
 @Composable
 fun RecetarioApp(app: AppState, platform: PlatformUi) {
-    CompositionLocalProvider(LocalStrings provides app.strings, LocalPlatform provides platform) {
+    CompositionLocalProvider(
+        LocalStrings provides app.strings,
+        LocalPlatform provides platform,
+        // Textos de los componentes compartidos (android/shared), en el idioma elegido en la app.
+        LocalSharedStrings provides SharedStrings(
+            cancel = app.strings.cancel, back = app.strings.back, close = app.strings.close,
+            delete = app.strings.delete, selectAll = "Select all", // Recetario no tiene selección múltiple
+        ),
+    ) {
         RecetarioTheme(isDark(app.themeMode)) {
             val snackbar = remember { SnackbarHostState() }
             LaunchedEffect(app) { app.messages.collect { snackbar.showSnackbar(it) } }
