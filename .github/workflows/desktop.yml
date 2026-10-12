@@ -75,12 +75,22 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GH_REPO: ${{ github.repository }}
         run: |
-          ls -lh dist
-          gh release delete desktop-recetario-latest --yes --cleanup-tag || true
-          gh release create desktop-recetario-latest dist/* \
-            --target "$GITHUB_SHA" \
-            --title "Recetario (escritorio)" \
-            --notes "Compilado automáticamente desde ${GITHUB_SHA::7}.
+          set -o pipefail
+          files=$(find dist -type f \( -name '*.msi' -o -name '*.deb' \))
+          echo "::notice title=Instaladores::$(echo $files | tr '\n' ' ')"
+          [ -n "$files" ] || { echo "::error::No hay instaladores que publicar"; exit 1; }
+          cat > "$RUNNER_TEMP/notes.md" <<NOTES
+          Compilado automáticamente desde ${GITHUB_SHA::7}.
 
           - **.msi**: instalador de Windows.
-          - **.deb**: paquete de Linux (Debian, Ubuntu y derivados)."
+          - **.deb**: paquete de Linux (Debian, Ubuntu y derivados).
+          NOTES
+          gh release delete desktop-recetario-latest --yes --cleanup-tag >/dev/null 2>&1 || true
+          if ! out=$(gh release create desktop-recetario-latest $files \
+                --target "$GITHUB_SHA" \
+                --title "Recetario (escritorio)" \
+                --notes-file "$RUNNER_TEMP/notes.md" 2>&1); then
+            echo "::error title=Publicar en Releases::$out"
+            exit 1
+          fi
+          echo "$out"
