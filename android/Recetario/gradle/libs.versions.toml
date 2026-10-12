@@ -2,7 +2,7 @@
 [versions]
 agp = "8.13.2"                 # last 8.x; the KMP + com.android.library layout below needs AGP 8
 kotlin = "2.4.21"
-compose = "1.12.1"             # Compose Multiplatform (runtime, foundation, ui)
+compose = "1.11.1"             # Compose Multiplatform. 1.12 needs compileSdk 37 → AGP 9 (see README)
 material3 = "1.9.0"            # last stable multiplatform Material 3 (1.10+ are alpha)
 sqldelight = "2.4.1"
 serialization = "1.11.0"
