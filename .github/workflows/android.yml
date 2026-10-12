@@ -121,6 +121,10 @@ jobs:
         run: |
           set -o pipefail
           ./gradlew testReleaseUnitTest --no-daemon 2>&1 | tee -a "$RUNNER_TEMP/gradle.log"
+          # Summary visible on the run page: proves the tests ran, not just that nothing failed.
+          sum() { find . -path '*/build/test-results/*' -name 'TEST-*.xml' -exec grep -ho "<testsuite [^>]*" {} + \
+                    | grep -o " $1=\"[0-9]*\"" | grep -o '[0-9]*' | awk '{s+=$1} END {print s+0}'; }
+          echo "::notice title=Tests unitarios::$(sum tests) tests, $(sum failures) fallos, $(sum errors) errores, $(sum skipped) omitidos"
 
       # On failure, compiler errors, Gradle's summary and failed tests become annotations,
       # visible on the run page (and through the API) without opening the full log.
