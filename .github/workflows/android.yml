@@ -109,6 +109,11 @@ jobs:
           cp "$apk" "${{ matrix.app }}-${{ matrix.abi }}.apk"
           ls -lh "${{ matrix.app }}-${{ matrix.abi }}.apk"
 
+      # Unit tests once per app (not per ABI). Apps without tests pass with nothing to run.
+      - name: Tests unitarios
+        if: matrix.abi == 'universal'
+        run: ./gradlew testReleaseUnitTest --no-daemon
+
       - uses: actions/upload-artifact@v5
         with:
           name: ${{ matrix.app }}-${{ matrix.abi }}

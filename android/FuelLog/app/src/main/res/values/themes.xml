@@ -1,0 +1,4 @@
+<resources>
+    <!-- Window theme only; colours come from Compose (FuelTheme). -->
+    <style name="Theme.FuelLog" parent="android:Theme.Material.Light.NoActionBar" />
+</resources>
