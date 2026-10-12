@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="shared_cancel">إلغاء</string>
+    <string name="shared_back">رجوع</string>
+    <string name="shared_close">إغلاق</string>
+    <string name="shared_delete">حذف</string>
+    <string name="shared_select_all">تحديد الكل</string>
+</resources>

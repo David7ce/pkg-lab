@@ -55,4 +55,7 @@
         <item>बहुत धन्यवाद</item>
         <item>मैं उल्टा बोलना सीख रहा हूँ</item>
     </string-array>
+    <string name="delete_phrase_confirm">यह वाक्यांश हटाएँ?</string>
+    <string name="delete_phrases_confirm">%1$d वाक्यांश हटाएँ?</string>
+    <string name="clear_history_confirm">सभी रिकॉर्डिंग हटाएँ?</string>
 </resources>

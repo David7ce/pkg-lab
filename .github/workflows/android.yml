@@ -46,7 +46,7 @@ jobs:
             apps=$(all)   # primer push o historial reescrito
           else
             changed=$(git diff --name-only "$BEFORE" HEAD)
-            if echo "$changed" | grep -q '^.github/workflows/android.yml$'; then
+            if echo "$changed" | grep -qE '^(\.github/workflows/android\.yml|android/shared/)'; then
               apps=$(all)
             else
               apps=$(echo "$changed" | grep '^android/' | cut -d/ -f2 | sort -u)

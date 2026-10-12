@@ -1,6 +1,7 @@
 package com.deivon.vozreves
 
 import org.junit.Assert.assertArrayEquals
+import org.junit.Assert.assertTrue
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Rule
@@ -125,5 +126,28 @@ class DecodeWavTest {
     @Test fun garbageGivesEmpty() {
         assertEquals(0, decodeWav(ByteArray(10)).size)
         assertEquals(0, decodeWav(ByteArray(100)).size)
+    }
+}
+
+class SharedTest {
+    @Test fun reverseTextReversesByCodePoints() {
+        assertEquals("olleH", com.deivon.shared.reverseText("Hello"))
+        assertEquals("a😀", com.deivon.shared.reverseText("😀a"))
+        assertEquals("", com.deivon.shared.reverseText(""))
+    }
+
+    @Test fun selectionToggleSelectAllClearAndRetain() {
+        val sel = com.deivon.shared.ui.Selection<String>()
+        assertEquals(false, sel.active)
+        sel.toggle("a"); sel.toggle("b")
+        assertEquals(true, "a" in sel)
+        sel.toggle("a")
+        assertEquals(false, "a" in sel)
+        sel.selectAll(listOf("a", "b", "c"))
+        assertEquals(3, sel.keys.size)
+        sel.retain(listOf("b", "c"))          // "a" desapareció de la lista
+        assertEquals(setOf("b", "c"), sel.keys)
+        sel.clear()
+        assertEquals(false, sel.active)
     }
 }

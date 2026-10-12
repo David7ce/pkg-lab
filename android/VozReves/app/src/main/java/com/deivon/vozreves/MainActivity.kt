@@ -11,10 +11,8 @@ import android.graphics.Color
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material.icons.filled.Edit
-import android.widget.Toast
 import android.provider.Settings as AndroidSettings
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.SystemBarStyle
 import androidx.activity.compose.BackHandler
@@ -24,12 +22,11 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -40,24 +37,16 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.selection.selectable
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.PlayArrow
-import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
-import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExposedDropdownMenuBox
-import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -65,22 +54,17 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.RadioButton
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.RangeSlider
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SegmentedButton
-import androidx.compose.material3.SegmentedButtonDefaults
-import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.darkColorScheme
-import androidx.compose.material3.dynamicDarkColorScheme
-import androidx.compose.material3.dynamicLightColorScheme
-import androidx.compose.material3.lightColorScheme
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -89,18 +73,26 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
+import com.deivon.shared.reverseText
+import com.deivon.shared.ui.ChoiceDropdown
+import com.deivon.shared.ui.ConfirmDialog
+import com.deivon.shared.ui.SectionTitle
+import com.deivon.shared.ui.SegmentedChoice
+import com.deivon.shared.ui.SelectionActions
+import com.deivon.shared.ui.SubScreen
+import com.deivon.shared.ui.rememberSelection
 import kotlinx.coroutines.launch
 import java.text.DateFormat
 import java.util.Date
@@ -339,114 +331,69 @@ private fun PlaybackTimes(vm: MainViewModel) {
     }
 }
 
-/** Al revés (◀◀) / normal (▶▶): cada estado con su icono, también para quien no lee el texto. */
+/** Al revés (◀◀) / normal (▶▶). Siempre LTR: el orden de los iconos no cambia en árabe. */
 @Composable
 private fun DirectionChoice(reverse: Boolean, enabled: Boolean = true, onSelect: (Boolean) -> Unit) {
     CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
-        Choice(
-            listOf(true to stringResource(R.string.reverse), false to stringResource(R.string.normal)),
-            reverse, enabled, icons = mapOf(true to AppIcons.Rewind, false to AppIcons.Forward), onSelect = onSelect
+        SegmentedChoice(
+            options = listOf(true to stringResource(R.string.reverse), false to stringResource(R.string.normal)),
+            selected = reverse,
+            enabled = enabled,
+            icons = mapOf<Boolean, ImageVector>(true to AppIcons.Rewind, false to AppIcons.Forward),
+            onSelect = onSelect
         )
     }
-}
-
-/** Selector de una opción (botones segmentados). */
-@Composable
-private fun <T> Choice(
-    options: List<Pair<T, String>>, selected: T, enabled: Boolean = true,
-    icons: Map<T, ImageVector> = emptyMap(), onSelect: (T) -> Unit
-) {
-    SingleChoiceSegmentedButtonRow(Modifier.fillMaxWidth()) {
-        options.forEachIndexed { i, (value, label) ->
-            SegmentedButton(
-                selected = value == selected,
-                onClick = { onSelect(value) },
-                shape = SegmentedButtonDefaults.itemShape(i, options.size),
-                enabled = enabled,
-                icon = {} // Sin el check de "seleccionado": el color del botón ya lo indica.
-            ) {
-                icons[value]?.let { Icon(it, null, Modifier.size(18.dp)); Spacer(Modifier.size(6.dp)) }
-                Text(label, maxLines = 1, textAlign = TextAlign.Center)
-            }
-        }
-    }
-}
-
-@Composable
-private fun SubScreen(title: String, onBack: () -> Unit, content: @Composable (PaddingValues) -> Unit) {
-    Scaffold(topBar = {
-        TopAppBar(
-            title = { Text(title) },
-            navigationIcon = {
-                IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Filled.ArrowBack, stringResource(R.string.back)) }
-            }
-        )
-    }, content = content)
 }
 
 @Composable
 private fun HistoryScreen(vm: MainViewModel, onBack: () -> Unit) {
-    var renaming by remember { mutableStateOf<History.Item?>(null) }
-    // Nombres de archivo seleccionados (selección múltiple) y borrado pendiente de confirmar.
-    var selected by remember { mutableStateOf(emptySet<String>()) }
-    var pendingDelete by remember { mutableStateOf<List<History.Item>?>(null) }
-    val names = vm.recordings.map { it.file.name }.toSet()
-    // Si desaparece algo del histórico (p. ej. el límite de 50), no queda seleccionado en el vacío.
-    val sel = selected intersect names
-    val selecting = sel.isNotEmpty()
-    BackHandler(enabled = selecting) { selected = emptySet() }
+    val sel = rememberSelection<String>()
+    val names = vm.recordings.map { it.file.name }
+    LaunchedEffect(names) { sel.retain(names) }
+    BackHandler(enabled = sel.active) { sel.clear() }
 
-    renaming?.let { item -> RenameDialog(item.title.orEmpty(), onDismiss = { renaming = null }) { vm.renameRecording(item, it); renaming = null } }
+    var renaming by remember { mutableStateOf<History.Item?>(null) }
+    var pendingDelete by remember { mutableStateOf<List<History.Item>?>(null) }
+    renaming?.let { item ->
+        RenameDialog(item.title.orEmpty(), onDismiss = { renaming = null }) { vm.renameRecording(item, it); renaming = null }
+    }
     pendingDelete?.let { items ->
-        AlertDialog(
-            onDismissRequest = { pendingDelete = null },
-            text = {
-                Text(if (items.size == 1) stringResource(R.string.delete_one_confirm)
-                     else stringResource(R.string.delete_many_confirm, items.size))
-            },
-            confirmButton = {
-                TextButton(onClick = { vm.deleteRecordings(items); selected = emptySet(); pendingDelete = null }) {
-                    Text(stringResource(R.string.delete))
-                }
-            },
-            dismissButton = { TextButton(onClick = { pendingDelete = null }) { Text(stringResource(R.string.cancel)) } }
+        ConfirmDialog(
+            text = if (items.size == 1) stringResource(R.string.delete_one_confirm)
+                   else stringResource(R.string.delete_many_confirm, items.size),
+            confirmLabel = stringResource(R.string.delete),
+            destructive = true,
+            onConfirm = { vm.deleteRecordings(items); sel.clear(); pendingDelete = null },
+            onDismiss = { pendingDelete = null }
         )
     }
 
     val time = rememberTimeFormat()
     val dates = remember(time.locale) { DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.SHORT, time.locale) }
-    Scaffold(topBar = {
-        TopAppBar(
-            title = { Text(if (selecting) stringResource(R.string.selected_count, sel.size) else stringResource(R.string.history)) },
-            navigationIcon = {
-                if (selecting) IconButton(onClick = { selected = emptySet() }) { Icon(Icons.Filled.Close, stringResource(R.string.cancel)) }
-                else IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Filled.ArrowBack, stringResource(R.string.back)) }
-            },
-            actions = {
-                IconButton(onClick = { selected = names }, enabled = names.isNotEmpty() && sel.size < names.size) {
-                    Icon(AppIcons.SelectAll, stringResource(R.string.select_all))
-                }
-                if (selecting) {
-                    IconButton(onClick = { pendingDelete = vm.recordings.filter { it.file.name in sel } }) {
-                        Icon(Icons.Filled.Delete, stringResource(R.string.delete))
-                    }
-                }
-            }
-        )
-    }) { padding ->
+    SubScreen(
+        title = if (sel.active) stringResource(R.string.selected_count, sel.keys.size) else stringResource(R.string.history),
+        onBack = if (sel.active) sel::clear else onBack,
+        closeIcon = sel.active,
+        actions = {
+            if (sel.active) SelectionActions(
+                allSelected = sel.keys.size >= names.size,
+                onSelectAll = { sel.selectAll(names) },
+                onDelete = { pendingDelete = vm.recordings.filter { it.file.name in sel.keys } }
+            )
+        }
+    ) { padding ->
         if (vm.recordings.isEmpty()) {
             Text(stringResource(R.string.history_empty), Modifier.padding(padding).padding(24.dp))
         }
         LazyColumn(contentPadding = padding) {
             items(vm.recordings, key = { it.file.name }) { item ->
+                val key = item.file.name
                 val date = dates.format(Date(item.file.lastModified()))
-                val checked = item.file.name in sel
-                fun toggle() { selected = if (checked) sel - item.file.name else sel + item.file.name }
                 ListItem(
                     headlineContent = { Text(item.title ?: date) },
                     supportingContent = { Text(if (item.title != null) "$date · ${time.clock(item.seconds)}" else time.clock(item.seconds)) },
-                    leadingContent = if (selecting) ({ Checkbox(checked = checked, onCheckedChange = null) }) else null,
-                    trailingContent = if (selecting) null else ({
+                    leadingContent = if (sel.active) ({ Checkbox(checked = key in sel, onCheckedChange = null) }) else null,
+                    trailingContent = if (sel.active) null else ({
                         Row {
                             IconButton(onClick = { renaming = item }) {
                                 Icon(Icons.Filled.Edit, stringResource(R.string.rename))
@@ -456,10 +403,9 @@ private fun HistoryScreen(vm: MainViewModel, onBack: () -> Unit) {
                             }
                         }
                     }),
-                    // Toque largo = empezar a seleccionar; con la selección activa, el toque marca/desmarca.
                     modifier = Modifier.combinedClickable(
-                        onClick = { if (selecting) toggle() else { vm.loadRecording(item); onBack() } },
-                        onLongClick = { toggle() }
+                        onClick = { if (sel.active) sel.toggle(key) else { vm.loadRecording(item); onBack() } },
+                        onLongClick = { sel.toggle(key) }
                     )
                 )
             }
@@ -469,41 +415,78 @@ private fun HistoryScreen(vm: MainViewModel, onBack: () -> Unit) {
 
 @Composable
 private fun PhrasesScreen(vm: MainViewModel, onBack: () -> Unit) {
+    val phrases = vm.phrases
+    val sel = rememberSelection<String>()
+    LaunchedEffect(phrases) { sel.retain(phrases) }
+    BackHandler(enabled = sel.active) { sel.clear() }
+
     var text by rememberSaveable { mutableStateOf("") }
-    fun add() { vm.addPhrase(text); text = "" }
-    SubScreen(stringResource(R.string.phrases), onBack) { padding ->
+    var pendingDelete by remember { mutableStateOf<List<String>?>(null) }
+    pendingDelete?.let { items ->
+        ConfirmDialog(
+            text = if (items.size == 1) stringResource(R.string.delete_phrase_confirm)
+                   else stringResource(R.string.delete_phrases_confirm, items.size),
+            confirmLabel = stringResource(R.string.delete),
+            destructive = true,
+            onConfirm = { vm.removePhrases(items); sel.clear(); pendingDelete = null },
+            onDismiss = { pendingDelete = null }
+        )
+    }
+
+    SubScreen(
+        title = if (sel.active) stringResource(R.string.selected_count, sel.keys.size) else stringResource(R.string.phrases),
+        onBack = if (sel.active) sel::clear else onBack,
+        closeIcon = sel.active,
+        actions = {
+            if (sel.active) SelectionActions(
+                allSelected = sel.keys.size >= phrases.size,
+                onSelectAll = { sel.selectAll(phrases) },
+                onDelete = { pendingDelete = phrases.filter { it in sel } }
+            )
+        }
+    ) { padding ->
         Column(Modifier.padding(padding)) {
             Column(Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) {
                 DirectionChoice(vm.reverse) { vm.reverse = it }
                 Spacer(Modifier.height(8.dp))
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     OutlinedTextField(
-                        value = text, onValueChange = { text = it.take(Phrases.MAX_LENGTH) },
-                        label = { Text(stringResource(R.string.new_phrase)) }, singleLine = true,
+                        value = text,
+                        onValueChange = { text = it.take(Phrases.MAX_LENGTH) },
+                        label = { Text(stringResource(R.string.new_phrase)) },
+                        singleLine = true,
                         modifier = Modifier.weight(1f)
                     )
                     Spacer(Modifier.size(8.dp))
-                    Button(onClick = { add() }, enabled = text.isNotBlank()) { Text(stringResource(R.string.add)) }
+                    Button(onClick = { vm.addPhrase(text); text = "" }, enabled = text.isNotBlank()) {
+                        Text(stringResource(R.string.add))
+                    }
                 }
             }
-            if (vm.phrases.isEmpty()) Text(stringResource(R.string.phrases_empty), Modifier.padding(24.dp))
+            if (phrases.isEmpty()) Text(stringResource(R.string.phrases_empty), Modifier.padding(24.dp))
             LazyColumn {
-                items(vm.phrases, key = { it }) { phrase ->
+                items(phrases, key = { it }) { phrase ->
                     ListItem(
-                        // Al revés se ve la frase invertida ("olleH"); en normal, tal cual ("Hello").
-                        headlineContent = { Text(if (vm.reverse) StringBuilder(phrase).reverse().toString() else phrase) },
-                        leadingContent = {
-                            // El icono muestra en qué sentido sonará al tocar.
-                            IconButton(onClick = { vm.playPhrase(phrase); onBack() }) {
-                                Icon(if (vm.reverse) AppIcons.PlayReverse else Icons.Filled.PlayArrow, stringResource(R.string.play_phrase))
-                            }
-                        },
-                        trailingContent = {
-                            IconButton(onClick = { vm.removePhrase(phrase) }) {
+                        // En reversed se ve la frase invertida ("olleH"); en normal, tal cual.
+                        headlineContent = { Text(if (vm.reverse) reverseText(phrase) else phrase) },
+                        leadingContent = if (sel.active) ({ Checkbox(checked = phrase in sel, onCheckedChange = null) })
+                            else ({
+                                IconButton(onClick = { vm.playPhrase(phrase); onBack() }) {
+                                    Icon(
+                                        if (vm.reverse) AppIcons.PlayReverse else Icons.Filled.PlayArrow,
+                                        stringResource(R.string.play_phrase)
+                                    )
+                                }
+                            }),
+                        trailingContent = if (sel.active) null else ({
+                            IconButton(onClick = { pendingDelete = listOf(phrase) }) {
                                 Icon(Icons.Filled.Delete, stringResource(R.string.delete))
                             }
-                        },
-                        modifier = Modifier.clickable { vm.playPhrase(phrase); onBack() }
+                        }),
+                        modifier = Modifier.combinedClickable(
+                            onClick = { if (sel.active) sel.toggle(phrase) else { vm.playPhrase(phrase); onBack() } },
+                            onLongClick = { sel.toggle(phrase) }
+                        )
                     )
                 }
             }
@@ -519,37 +502,32 @@ private fun SettingsScreen(vm: MainViewModel, onBack: () -> Unit) {
     val seconds = { n: Int -> activity.getString(R.string.seconds_short, n) }
 
     SubScreen(stringResource(R.string.settings), onBack) { padding ->
+        // De más a menos uso: duración (se toca en cada grabación), tema, idioma (se cambia una vez).
         Column(Modifier.padding(padding).verticalScroll(rememberScrollState()).padding(16.dp)) {
-            // De más a menos uso: duración (cada grabación), tema, idioma (se cambia una vez).
-            Section(stringResource(R.string.max_length))
-            Choice(listOf(30 to seconds(30), 60 to seconds(60), 120 to seconds(120)), s.maxSeconds,
-                onSelect = s::updateMaxSeconds)
-
-            Section(stringResource(R.string.theme))
-            Choice(
-                listOf(0 to stringResource(R.string.theme_system), 1 to stringResource(R.string.theme_light),
-                    2 to stringResource(R.string.theme_dark)),
-                s.theme, onSelect = s::updateTheme
+            SectionTitle(stringResource(R.string.max_length))
+            SegmentedChoice(
+                listOf(30 to seconds(30), 60 to seconds(60), 120 to seconds(120)),
+                s.maxSeconds,
+                onSelect = s::updateMaxSeconds
             )
 
-            Section(stringResource(R.string.language))
-            val languages = listOf("" to stringResource(R.string.system_default)) + Settings.LANGUAGES
-            var open by remember { mutableStateOf(false) }
-            ExposedDropdownMenuBox(expanded = open, onExpandedChange = { open = it }) {
-                OutlinedTextField(
-                    value = languages.firstOrNull { it.first == s.language }?.second.orEmpty(),
-                    onValueChange = {}, readOnly = true, singleLine = true,
-                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(open) },
-                    modifier = Modifier.menuAnchor().fillMaxWidth()
-                )
-                ExposedDropdownMenu(expanded = open, onDismissRequest = { open = false }) {
-                    languages.forEach { (code, name) ->
-                        DropdownMenuItem(text = { Text(name) }, onClick = {
-                            open = false
-                            if (s.language != code) { s.updateLanguage(code); activity.recreate() }
-                        })
-                    }
-                }
+            SectionTitle(stringResource(R.string.theme))
+            SegmentedChoice(
+                listOf(
+                    0 to stringResource(R.string.theme_system),
+                    1 to stringResource(R.string.theme_light),
+                    2 to stringResource(R.string.theme_dark)
+                ),
+                s.theme,
+                onSelect = s::updateTheme
+            )
+
+            SectionTitle(stringResource(R.string.language))
+            ChoiceDropdown(
+                options = listOf("" to stringResource(R.string.system_default)) + Settings.LANGUAGES,
+                selected = s.language
+            ) { code ->
+                if (s.language != code) { s.updateLanguage(code); activity.recreate() }
             }
 
             Spacer(Modifier.height(24.dp))
@@ -568,23 +546,12 @@ private fun SettingsScreen(vm: MainViewModel, onBack: () -> Unit) {
         }
     }
 
-    if (confirmClear) AlertDialog(
-        onDismissRequest = { confirmClear = false },
-        text = { Text(stringResource(R.string.clear_history) + "?") },
-        confirmButton = {
-            TextButton(onClick = { vm.clearHistory(); confirmClear = false }) { Text(stringResource(R.string.delete)) }
-        },
-        dismissButton = { TextButton(onClick = { confirmClear = false }) { Text(stringResource(R.string.back)) } }
-    )
-}
-
-@Composable
-private fun Section(title: String) {
-    Text(
-        title,
-        style = MaterialTheme.typography.titleSmall,
-        color = MaterialTheme.colorScheme.primary,
-        modifier = Modifier.padding(top = 20.dp, bottom = 8.dp)
+    if (confirmClear) ConfirmDialog(
+        text = stringResource(R.string.clear_history_confirm),
+        confirmLabel = stringResource(R.string.delete),
+        destructive = true,
+        onConfirm = { vm.clearHistory(); confirmClear = false },
+        onDismiss = { confirmClear = false }
     )
 }
 
@@ -601,6 +568,6 @@ private fun RenameDialog(initial: String, onDismiss: () -> Unit, onConfirm: (Str
             )
         },
         confirmButton = { TextButton(onClick = { onConfirm(text) }) { Text(stringResource(R.string.save)) } },
-        dismissButton = { TextButton(onClick = onDismiss) { Text(stringResource(R.string.back)) } }
+        dismissButton = { TextButton(onClick = onDismiss) { Text(stringResource(R.string.cancel)) } }
     )
 }

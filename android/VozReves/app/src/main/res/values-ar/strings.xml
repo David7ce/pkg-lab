@@ -55,4 +55,7 @@
         <item>شكرًا جزيلًا</item>
         <item>أتعلم الكلام بالعكس</item>
     </string-array>
+    <string name="delete_phrase_confirm">حذف هذه العبارة؟</string>
+    <string name="delete_phrases_confirm">حذف %1$d عبارات؟</string>
+    <string name="clear_history_confirm">حذف كل التسجيلات؟</string>
 </resources>

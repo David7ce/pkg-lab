@@ -20,7 +20,12 @@ class Phrases(private val file: File) {
         return true
     }
 
-    fun remove(text: String) = write(list().filter { it != text })
+    fun remove(text: String) = removeAll(listOf(text))
+
+    fun removeAll(items: Collection<String>) {
+        val drop = items.toSet()
+        write(list().filterNot { it in drop })
+    }
 
     private fun write(lines: List<String>) {
         file.parentFile?.mkdirs()

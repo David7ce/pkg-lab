@@ -55,4 +55,7 @@
         <item>Thank you very much</item>
         <item>I am learning to speak backwards</item>
     </string-array>
+    <string name="delete_phrase_confirm">Delete this phrase?</string>
+    <string name="delete_phrases_confirm">Delete %1$d phrases?</string>
+    <string name="clear_history_confirm">Delete all recordings?</string>
 </resources>

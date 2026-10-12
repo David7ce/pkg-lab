@@ -136,8 +136,8 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
         phrases = withContext(Dispatchers.IO) { phrasesStore.list() }
     }
 
-    fun removePhrase(text: String) = viewModelScope.launch {
-        withContext(Dispatchers.IO) { phrasesStore.remove(text) }
+    fun removePhrases(texts: Collection<String>) = viewModelScope.launch {
+        withContext(Dispatchers.IO) { phrasesStore.removeAll(texts) }
         phrases = withContext(Dispatchers.IO) { phrasesStore.list() }
     }
 

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="shared_cancel">Cancelar</string>
+    <string name="shared_back">Atrás</string>
+    <string name="shared_close">Cerrar</string>
+    <string name="shared_delete">Borrar</string>
+    <string name="shared_select_all">Seleccionar todo</string>
+</resources>

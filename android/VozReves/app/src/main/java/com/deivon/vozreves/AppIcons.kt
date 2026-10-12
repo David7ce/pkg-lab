@@ -32,12 +32,5 @@ object AppIcons {
     val Rewind = icon("Rewind", "M11,18V6l-8.5,6 8.5,6zM11.5,12l8.5,6V6l-8.5,6z")
     val Forward = icon("Forward", "M4,18l8.5,-6L4,6v12zM13,6v12l8.5,-6L13,6z")
     val PlayReverse = icon("PlayReverse", "M16,5v14l-11,-7z")
-    val SelectAll = icon(
-        "SelectAll",
-        "M3,5h2L5,3c-1.1,0 -2,0.9 -2,2zM3,13h2v-2L3,11v2zM7,21h2v-2L7,19v2zM3,9h2L5,7L3,7v2zM13,3h-2v2h2L13,3z" +
-            "M19,3v2h2c0,-1.1 -0.9,-2 -2,-2zM5,21v-2L3,19c0,1.1 0.9,2 2,2zM3,17h2v-2L3,15v2zM9,3L7,3v2h2L9,3z" +
-            "M11,21h2v-2h-2v2zM19,13h2v-2h-2v2zM19,21c1.1,0 2,-0.9 2,-2h-2v2zM19,9h2L21,7h-2v2zM19,17h2v-2h-2v2z" +
-            "M15,21h2v-2h-2v2zM15,5h2L17,3h-2v2zM7,17h10L17,7L7,7v10zM9,9h6v6L9,15L9,9z"
-    )
     val Quote = icon("Quote", "M6,17h3l2,-4V7H5v6h3zM14,17h3l2,-4V7h-6v6h3z")
 }
