@@ -31,6 +31,9 @@ data class Recipe(
     val sourceUrl: String? = null,
     /** Free text: description, tips, anything that has no field of its own. */
     val notes: String? = null,
+    /** 1–5 stars; null = not rated. */
+    val rating: Int? = null,
+    val favorite: Boolean = false,
     val createdAt: Long,
     val updatedAt: Long,
 ) {

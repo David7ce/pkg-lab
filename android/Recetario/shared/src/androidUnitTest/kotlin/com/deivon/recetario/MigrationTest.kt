@@ -25,7 +25,7 @@ class MigrationTest {
             "INSERT INTO step VALUES ('a', 0, 'Remover.')",
         ).forEach { driver.execute(null, it, 0) }
 
-        assertEquals(2L, RecipeDatabase.Schema.version)
+        assertEquals(3L, RecipeDatabase.Schema.version)
         RecipeDatabase.Schema.migrate(driver, 1, RecipeDatabase.Schema.version)
 
         val repo = RecipeRepository(RecipeDatabase(driver), MemoryImageStore(), { 0L }, { "n" })
@@ -34,9 +34,17 @@ class MigrationTest {
         assertEquals(15, old.cookMinutes)
         assertEquals(listOf("Remover."), old.steps)
         assertNull(old.notes)
+        assertNull(old.rating)
+        assertEquals(false, old.favorite)
 
         repo.save(old.copy(notes = "Nota nueva"), ImageChange.Keep)
         assertEquals("Nota nueva", repo.loadAll().single().notes)
         assertEquals(2L, repo.loadAll().single().updatedAt)
+        repo.setRating("a", 4)
+        repo.setFavorite("a", true)
+        val rated = repo.get("a")!!
+        assertEquals(4, rated.rating)
+        assertEquals(true, rated.favorite)
+        assertEquals("Nota nueva", rated.notes, "columns added by different migrations are read in the right order")
     }
 }

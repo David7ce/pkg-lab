@@ -1,0 +1,3 @@
+-- Version 2 → 3: star rating and favourite flag.
+ALTER TABLE recipe ADD COLUMN rating INTEGER;
+ALTER TABLE recipe ADD COLUMN favorite INTEGER NOT NULL DEFAULT 0;

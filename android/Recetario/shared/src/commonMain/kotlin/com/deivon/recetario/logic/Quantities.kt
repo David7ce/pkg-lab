@@ -69,6 +69,12 @@ object Quantities {
         return if (decimals.isEmpty()) intPart.toString() else "$intPart$decimalSeparator$decimals"
     }
 
+    /** Multiplies numeric quantities by [factor]. Text-only ingredients are returned unchanged. */
+    fun scale(ingredients: List<Ingredient>, factor: Double): List<Ingredient> {
+        if (factor == 1.0 || factor <= 0 || !factor.isFinite()) return ingredients
+        return ingredients.map { ing -> ing.quantity?.let { ing.copy(quantity = it * factor) } ?: ing }
+    }
+
     /** Scales numeric quantities by to/from servings. Text-only ingredients are returned unchanged. */
     fun scale(ingredients: List<Ingredient>, fromServings: Int, toServings: Int): List<Ingredient> {
         if (fromServings <= 0 || toServings <= 0 || fromServings == toServings) return ingredients

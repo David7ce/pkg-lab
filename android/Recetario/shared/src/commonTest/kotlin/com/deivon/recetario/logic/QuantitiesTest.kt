@@ -60,6 +60,16 @@ class QuantitiesTest {
     }
 
     @Test
+    fun scalesByAnyFactor() {
+        val ingredients = listOf(Ingredient("harina", 200.0, "g"), Ingredient("sal", note = "al gusto"))
+        val scaled = Quantities.scale(ingredients, 1.5)
+        assertEquals(300.0, scaled[0].quantity)
+        assertEquals(ingredients[1], scaled[1])
+        assertSame(ingredients, Quantities.scale(ingredients, 1.0))
+        assertSame(ingredients, Quantities.scale(ingredients, 0.0))
+    }
+
+    @Test
     fun scalingToTheSameOrInvalidServingsChangesNothing() {
         val ingredients = listOf(Ingredient("harina", 200.0, "g"))
         assertSame(ingredients, Quantities.scale(ingredients, 4, 4))

@@ -1,4 +1,4 @@
--- Schema version 2 (1.sqm adds recipe.notes). Children are always replaced as a whole when a recipe is saved,
+-- Schema version 3 (1.sqm adds recipe.notes; 2.sqm adds rating and favorite). Children are always replaced as a whole when a recipe is saved,
 -- inside one transaction (see RecipeRepository), so positions stay dense (0..n-1).
 
 CREATE TABLE recipe (
@@ -11,7 +11,10 @@ CREATE TABLE recipe (
     source_url TEXT,
     created_at INTEGER NOT NULL,     -- epoch millis
     updated_at INTEGER NOT NULL,
-    notes TEXT                       -- v2, last: ALTER TABLE in 1.sqm appends it, and SELECT * reads by position
+    -- Columns added by migrations go last, in migration order: ALTER TABLE appends, and SELECT * reads by position.
+    notes TEXT,                      -- v2
+    rating INTEGER,                  -- v3: 1..5, NULL = not rated
+    favorite INTEGER NOT NULL DEFAULT 0 -- v3: 0/1
 );
 
 CREATE TABLE ingredient (
@@ -71,8 +74,14 @@ selectImageFiles:
 SELECT image_file FROM recipe WHERE image_file IS NOT NULL;
 
 upsertRecipe:
-INSERT OR REPLACE INTO recipe(id, title, image_file, servings, prep_minutes, cook_minutes, source_url, notes, created_at, updated_at)
-VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+INSERT OR REPLACE INTO recipe(id, title, image_file, servings, prep_minutes, cook_minutes, source_url, notes, rating, favorite, created_at, updated_at)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+
+setFavorite:
+UPDATE recipe SET favorite = ? WHERE id = ?;
+
+setRating:
+UPDATE recipe SET rating = ? WHERE id = ?;
 
 insertIngredient:
 INSERT INTO ingredient(recipe_id, position, name, quantity, unit, note) VALUES (?, ?, ?, ?, ?, ?);

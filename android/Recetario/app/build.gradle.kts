@@ -23,7 +23,7 @@ android {
     }
 
     androidResources {
-        localeFilters += listOf("en", "es")
+        localeFilters += listOf("en", "es", "fr", "de", "pt", "it")
     }
 
     splits {

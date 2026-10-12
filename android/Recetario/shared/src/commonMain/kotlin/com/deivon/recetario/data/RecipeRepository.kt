@@ -59,6 +59,8 @@ class RecipeRepository(
         tags = tags,
         sourceUrl = source_url,
         notes = notes,
+        rating = rating?.toInt(),
+        favorite = favorite != 0L,
         createdAt = created_at,
         updatedAt = updated_at,
     )
@@ -132,13 +134,17 @@ class RecipeRepository(
         return images.list().filter { it !in referenced }.count { images.delete(it) }
     }
 
+    /** Favourite and rating are quick toggles from the recipe page: they don't count as an edit (no updatedAt change). */
+    fun setFavorite(id: String, favorite: Boolean) = q.setFavorite(if (favorite) 1L else 0L, id)
+    fun setRating(id: String, rating: Int?) = q.setRating(rating?.takeIf { it in 1..5 }?.toLong(), id)
+
     fun setting(name: String): String? = q.selectSetting(name).executeAsOneOrNull()
     fun setSetting(name: String, value: String) = q.upsertSetting(name, value)
 
     private fun writeRows(r: Recipe) {
         q.upsertRecipe(
             r.id, r.title, r.imageFile, r.servings?.toLong(), r.prepMinutes?.toLong(), r.cookMinutes?.toLong(),
-            r.sourceUrl, r.notes, r.createdAt, r.updatedAt,
+            r.sourceUrl, r.notes, r.rating?.toLong(), if (r.favorite) 1L else 0L, r.createdAt, r.updatedAt,
         )
         q.deleteIngredients(r.id)
         q.deleteSteps(r.id)

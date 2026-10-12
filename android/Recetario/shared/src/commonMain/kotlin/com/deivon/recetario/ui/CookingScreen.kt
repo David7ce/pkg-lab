@@ -91,18 +91,21 @@ fun CookingScreen(app: AppState, screen: Screen.Cooking) {
 
     if (screen.showIngredients) {
         ModalBottomSheet(onDismissRequest = { screen.showIngredients = false }) {
-            val servings = screen.servings
-            val shown = if (recipe.servings != null && servings != null) {
-                Quantities.scale(recipe.ingredients, recipe.servings, servings)
-            } else {
-                recipe.ingredients
-            }
+            val shown = Quantities.scale(recipe.ingredients, screen.factor)
             Column(Modifier.padding(horizontal = 24.dp).padding(bottom = 32.dp).verticalScroll(rememberScrollState())) {
-                Text(
-                    if (servings != null) "${s.ingredients} · ${s.pdfServings(servings)}" else s.ingredients,
-                    style = MaterialTheme.typography.titleMedium,
-                    modifier = Modifier.padding(bottom = 8.dp),
+                SectionTitle(s.ingredients, icon = AppIcons.Checklist)
+                val details = listOfNotNull(
+                    recipe.servings?.let { "${s.servings}: ${Quantities.format(it * screen.factor, s.decimalSeparator)}" },
+                    s.scaledBy(Quantities.format(screen.factor, s.decimalSeparator)).takeIf { screen.factor != 1.0 },
                 )
+                if (details.isNotEmpty()) {
+                    Text(
+                        details.joinToString(" · "),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.padding(bottom = 8.dp),
+                    )
+                }
                 if (shown.isEmpty()) Text(s.noIngredients)
                 shown.forEach { IngredientRow(it, s) }
             }

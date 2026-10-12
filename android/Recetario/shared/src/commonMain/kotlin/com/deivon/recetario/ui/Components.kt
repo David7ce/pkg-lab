@@ -16,6 +16,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.produceState
@@ -31,6 +33,7 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.deivon.recetario.logic.Quantities
 import com.deivon.recetario.model.Ingredient
@@ -73,13 +76,58 @@ fun BackButton(app: AppState, icon: ImageVector = AppIcons.Back) {
 }
 
 @Composable
-fun SectionTitle(text: String, modifier: Modifier = Modifier) {
-    Text(
-        text,
-        style = MaterialTheme.typography.titleMedium,
-        color = MaterialTheme.colorScheme.primary,
-        modifier = modifier.padding(top = 20.dp, bottom = 8.dp),
+fun SectionTitle(text: String, modifier: Modifier = Modifier, icon: ImageVector? = null) {
+    Row(modifier.padding(top = 20.dp, bottom = 8.dp), verticalAlignment = Alignment.CenterVertically) {
+        if (icon != null) {
+            Icon(icon, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(20.dp))
+            Spacer(Modifier.width(8.dp))
+        }
+        Text(text, style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.primary)
+    }
+}
+
+/** Menu entry with its icon in front of the text. */
+@Composable
+fun MenuItem(label: String, icon: ImageVector, onClick: () -> Unit) {
+    DropdownMenuItem(
+        text = { Text(label) },
+        onClick = onClick,
+        leadingIcon = { Icon(icon, contentDescription = null) },
     )
+}
+
+/** Text button with an icon in front, the app's standard for secondary actions. */
+@Composable
+fun IconTextButton(label: String, icon: ImageVector, onClick: () -> Unit, modifier: Modifier = Modifier, enabled: Boolean = true) {
+    TextButton(onClick = onClick, modifier = modifier, enabled = enabled) {
+        Icon(icon, contentDescription = null, modifier = Modifier.size(18.dp))
+        Spacer(Modifier.width(8.dp))
+        Text(label)
+    }
+}
+
+/**
+ * Five stars. With [onRate] each star is a 48 dp touch target that sets that rating (tapping the
+ * current one clears it); without it, a compact read-only display.
+ */
+@Composable
+fun StarRating(rating: Int?, modifier: Modifier = Modifier, starSize: Dp = 16.dp, onRate: ((Int) -> Unit)? = null) {
+    val s = LocalStrings.current
+    val value = rating ?: 0
+    Row(modifier, verticalAlignment = Alignment.CenterVertically) {
+        for (star in 1..5) {
+            val filled = star <= value
+            val icon = if (filled) AppIcons.Star else AppIcons.StarOutline
+            val tint = if (filled) MaterialTheme.colorScheme.tertiary else MaterialTheme.colorScheme.outline
+            if (onRate != null) {
+                IconButton(onClick = { onRate(star) }) {
+                    Icon(icon, contentDescription = s.rateAs(star), tint = tint, modifier = Modifier.size(starSize))
+                }
+            } else {
+                Icon(icon, contentDescription = null, tint = tint, modifier = Modifier.size(starSize))
+            }
+        }
+    }
 }
 
 /** Empty, no-results and similar states: a short title, an explanation and optional actions. */

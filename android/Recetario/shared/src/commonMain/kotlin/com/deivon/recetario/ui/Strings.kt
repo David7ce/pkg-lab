@@ -8,8 +8,9 @@ import com.deivon.recetario.logic.RecipePage
 import com.deivon.recetario.platform.WebException
 
 /**
- * UI text. English is the base; [EsStrings] overrides it. Plain Kotlin instead of a resources
- * library: two languages, no code generation, identical on every platform.
+ * UI text. English is the base; each language overrides it (Spanish here, the others in
+ * Translations.kt). Plain Kotlin instead of a resources library: no code generation, identical on
+ * every platform, and a missing translation falls back to English instead of crashing.
  */
 open class Strings {
     open val decimalSeparator = '.'
@@ -22,11 +23,17 @@ open class Strings {
     open val sort = "Sort"
     open val sortByName = "Name"
     open val sortByModified = "Recently edited"
+    open val sortByRating = "Rating"
+    open val filters = "Filters"
+    open val favoritesOnly = "Show only favourites"
+    open val minRating = "Minimum rating"
+    open val anyRating = "Any"
     open val emptyTitle = "No recipes yet"
     open val emptyBody = "Add your first recipe, or import one from a web page or a backup."
     open val noMatches = "No recipes match"
     open val clearFilters = "Clear filters"
-    open val importFromUrl = "Import from web page"
+    open val addManually = "Add manually"
+    open val importFromUrl = "Import from URL (web scraper)"
     open val importFile = "Import file (Recetario, RecipeSage, My RecipeBox)"
     open val exportLibrary = "Export all (JSON)"
     open val backup = "Back up with photos"
@@ -40,7 +47,6 @@ open class Strings {
     open val edit = "Edit"
     open val delete = "Delete"
     open val duplicate = "Duplicate"
-    open val exportJson = "Export JSON"
     open val exportPdf = "Export PDF"
     open val startCooking = "Start cooking"
     open val servings = "Servings"
@@ -68,6 +74,18 @@ open class Strings {
             else -> "$h h $m min"
         }
     }
+    open val addFavorite = "Add to favourites"
+    open val removeFavorite = "Remove from favourites"
+    open val rating = "Rating"
+    open fun rateAs(stars: Int) = "Rate $stars of 5"
+    open val adjustQuantities = "Adjust quantities"
+    open val adjustHint = "Every numeric quantity is multiplied; text such as “salt to taste” stays as written."
+    open val factor = "Multiplier"
+    open val otherFactor = "Other multiplier"
+    open val factorInvalid = "Enter a number greater than 0, such as 1.5"
+    open val originalQuantities = "Original quantities"
+    open val apply = "Apply"
+    open fun scaledBy(factor: String) = "Quantities ×$factor"
     open val deleted = "Recipe deleted"
     open val duplicated = "Copy created"
 
@@ -119,6 +137,7 @@ open class Strings {
         Problem.ImageNameInvalid -> "The image reference is not valid."
         Problem.StepEmpty -> "A step is empty."
         Problem.TooLarge -> "The recipe is too large."
+        Problem.RatingInvalid -> "The rating must be from 1 to 5 stars."
     }
 
     open fun warning(w: RecipePage.Warning, totalMinutes: Int?): String = when (w) {
@@ -179,7 +198,7 @@ open class Strings {
     open val noRecipeOnPage = "No recipe data found on that page (it has no schema.org Recipe). You can still add it by hand."
 
     open fun failure(f: ImportFailure): String = when (f) {
-        ImportFailure.NotRecognized -> "This is not a Recetario JSON file or backup."
+        ImportFailure.NotRecognized -> "This file is not supported (Recetario, RecipeSage or My RecipeBox)."
         is ImportFailure.UnsupportedVersion -> "This file was made by a newer version (format ${f.version}). Update the app to import it."
         is ImportFailure.Malformed -> "The file is damaged (${f.detail})."
         is ImportFailure.DuplicateIds -> "The file contains the same recipe id more than once; nothing was imported."
@@ -191,6 +210,11 @@ open class Strings {
     }
 
     // Settings
+    open val appearance = "Appearance"
+    open val language = "Language"
+    open val languageSystem = "Device language"
+    open val data = "Data"
+    open val about = "About"
     open val theme = "Theme"
     open val themeSystem = "System"
     open val themeLight = "Light"
@@ -211,11 +235,17 @@ object EsStrings : Strings() {
     override val sort = "Ordenar"
     override val sortByName = "Nombre"
     override val sortByModified = "Editadas recientemente"
+    override val sortByRating = "Valoración"
+    override val filters = "Filtros"
+    override val favoritesOnly = "Mostrar solo favoritos"
+    override val minRating = "Valoración mínima"
+    override val anyRating = "Cualquiera"
     override val emptyTitle = "Aún no hay recetas"
     override val emptyBody = "Añade tu primera receta o impórtala desde una página web o una copia de seguridad."
     override val noMatches = "Ninguna receta coincide"
     override val clearFilters = "Quitar filtros"
-    override val importFromUrl = "Importar desde página web"
+    override val addManually = "Añadir manualmente"
+    override val importFromUrl = "Importar desde URL (web scraper)"
     override val importFile = "Importar archivo (Recetario, RecipeSage, My RecipeBox)"
     override val exportLibrary = "Exportar todo (JSON)"
     override val backup = "Copia de seguridad con fotos"
@@ -228,7 +258,6 @@ object EsStrings : Strings() {
     override val edit = "Editar"
     override val delete = "Eliminar"
     override val duplicate = "Duplicar"
-    override val exportJson = "Exportar JSON"
     override val exportPdf = "Exportar PDF"
     override val startCooking = "Empezar a cocinar"
     override val servings = "Raciones"
@@ -247,6 +276,18 @@ object EsStrings : Strings() {
     override fun deleteBody(title: String) = "Se eliminarán «$title» y su foto. No se puede deshacer."
     override val cancel = "Cancelar"
     override fun copyTitle(title: String) = "$title (copia)"
+    override val addFavorite = "Añadir a favoritos"
+    override val removeFavorite = "Quitar de favoritos"
+    override val rating = "Valoración"
+    override fun rateAs(stars: Int) = "Valorar con $stars de 5"
+    override val adjustQuantities = "Ajustar cantidades"
+    override val adjustHint = "Se multiplican todas las cantidades numéricas; los textos como «sal al gusto» no cambian."
+    override val factor = "Multiplicador"
+    override val otherFactor = "Otro multiplicador"
+    override val factorInvalid = "Introduce un número mayor que 0, como 1,5"
+    override val originalQuantities = "Cantidades originales"
+    override val apply = "Aplicar"
+    override fun scaledBy(factor: String) = "Cantidades ×$factor"
     override val deleted = "Receta eliminada"
     override val duplicated = "Copia creada"
 
@@ -297,6 +338,7 @@ object EsStrings : Strings() {
         Problem.ImageNameInvalid -> "La referencia a la imagen no es válida."
         Problem.StepEmpty -> "Hay un paso vacío."
         Problem.TooLarge -> "La receta es demasiado grande."
+        Problem.RatingInvalid -> "La valoración debe ser de 1 a 5 estrellas."
     }
 
     override fun warning(w: RecipePage.Warning, totalMinutes: Int?): String = when (w) {
@@ -354,7 +396,7 @@ object EsStrings : Strings() {
     override val noRecipeOnPage = "No hay datos de receta en esa página (no tiene schema.org Recipe). Puedes añadirla a mano."
 
     override fun failure(f: ImportFailure): String = when (f) {
-        ImportFailure.NotRecognized -> "No es un archivo JSON ni una copia de Recetario."
+        ImportFailure.NotRecognized -> "Este archivo no es compatible (Recetario, RecipeSage o My RecipeBox)."
         is ImportFailure.UnsupportedVersion -> "El archivo es de una versión más nueva (formato ${f.version}). Actualiza la app para importarlo."
         is ImportFailure.Malformed -> "El archivo está dañado (${f.detail})."
         is ImportFailure.DuplicateIds -> "El archivo repite el identificador de una receta; no se importó nada."
@@ -365,6 +407,11 @@ object EsStrings : Strings() {
         ImportFailure.Empty -> "El archivo no contiene recetas."
     }
 
+    override val appearance = "Apariencia"
+    override val language = "Idioma"
+    override val languageSystem = "Idioma del dispositivo"
+    override val data = "Datos"
+    override val about = "Acerca de"
     override val theme = "Tema"
     override val themeSystem = "Sistema"
     override val themeLight = "Claro"
@@ -374,7 +421,5 @@ object EsStrings : Strings() {
     override fun pdfServings(n: Int) = "$n raciones"
     override fun pdfCount(n: Int) = "$n recetas"
 }
-
-fun stringsFor(languageTag: String): Strings = if (languageTag.lowercase().startsWith("es")) EsStrings else Strings()
 
 val LocalStrings = staticCompositionLocalOf<Strings> { Strings() }

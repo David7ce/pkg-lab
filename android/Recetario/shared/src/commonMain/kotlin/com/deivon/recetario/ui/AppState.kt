@@ -1,6 +1,7 @@
 package com.deivon.recetario.ui
 
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableDoubleStateOf
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
@@ -43,14 +44,15 @@ sealed interface Screen {
     data object Settings : Screen
 
     class Detail(val id: String) : Screen {
-        /** Servings chosen for scaling; null = the recipe's own. */
-        var servings by mutableStateOf<Int?>(null)
+        /** Multiplier applied to every numeric quantity ("Adjust quantities"); 1 = as written. */
+        var factor by mutableDoubleStateOf(1.0)
+        var showAdjust by mutableStateOf(false)
         var confirmDelete by mutableStateOf(false)
     }
 
     class Editor(val state: EditorState) : Screen
 
-    class Cooking(val id: String, val servings: Int?) : Screen {
+    class Cooking(val id: String, val factor: Double) : Screen {
         var step by mutableIntStateOf(0)
         var showIngredients by mutableStateOf(false)
     }
@@ -91,10 +93,13 @@ class AppState(
     internal val services: Services,
     internal val repo: RecipeRepository,
     private val scope: CoroutineScope,
-    strings: Strings,
+    systemLanguage: String,
 ) {
-    /** Replaced by the platform when the system language changes. */
-    var strings by mutableStateOf(strings)
+    /** The device language (ISO 639 code), updated by the platform; used when [language] is System. */
+    var systemLanguage by mutableStateOf(systemLanguage)
+    var language by mutableStateOf(AppLanguage.System)
+        private set
+    val strings: Strings get() = stringsFor(language.code ?: systemLanguage)
 
     @OptIn(ExperimentalCoroutinesApi::class)
     internal val io: CoroutineDispatcher = Dispatchers.Default.limitedParallelism(1)
@@ -121,12 +126,13 @@ class AppState(
     init {
         launch {
             try {
-                val (list, theme) = withContext(io) {
+                val (list, settings) = withContext(io) {
                     repo.deleteOrphanImages()
-                    repo.loadAll() to repo.setting(THEME)
+                    repo.loadAll() to (repo.setting(THEME) to repo.setting(LANGUAGE))
                 }
                 recipes = list
-                themeMode = ThemeMode.entries.firstOrNull { it.name == theme } ?: ThemeMode.System
+                themeMode = ThemeMode.entries.firstOrNull { it.name == settings.first } ?: ThemeMode.System
+                language = AppLanguage.entries.firstOrNull { it.name == settings.second } ?: AppLanguage.System
             } finally {
                 loaded = true
             }
@@ -141,7 +147,8 @@ class AppState(
     fun openSettings() { stack.add(Screen.Settings) }
     fun newRecipe() { stack.add(Screen.Editor(EditorState(RecipeDraft.blank()))) }
     fun edit(id: String) { recipe(id)?.let { stack.add(Screen.Editor(EditorState(RecipeDraft.from(it)))) } }
-    fun startCooking(id: String, servings: Int?) { stack.add(Screen.Cooking(id, servings)) }
+    fun newFromUrl() { transfer.startUrlImport() }
+    fun startCooking(id: String, factor: Double) { stack.add(Screen.Cooking(id, factor)) }
     internal fun review(state: EditorState) { stack.add(Screen.Editor(state)) }
 
     /** System back / toolbar back. An editor with changes asks before leaving. */
@@ -218,6 +225,30 @@ class AppState(
         launch { withContext(io) { repo.setSetting(THEME, mode.name) } }
     }
 
+    fun setLanguage(value: AppLanguage) {
+        language = value
+        launch { withContext(io) { repo.setSetting(LANGUAGE, value.name) } }
+    }
+
+    /** Quick toggles from the recipe page: the list updates at once, the database right after. */
+    fun toggleFavorite(id: String) {
+        val r = recipe(id) ?: return
+        replaceLocal(r.copy(favorite = !r.favorite))
+        launch { withContext(io) { repo.setFavorite(id, !r.favorite) } }
+    }
+
+    /** Tapping the current rating again clears it. */
+    fun rate(id: String, stars: Int) {
+        val r = recipe(id) ?: return
+        val value = if (r.rating == stars) null else stars.coerceIn(1, 5)
+        replaceLocal(r.copy(rating = value))
+        launch { withContext(io) { repo.setRating(id, value) } }
+    }
+
+    private fun replaceLocal(updated: Recipe) {
+        recipes = recipes.map { if (it.id == updated.id) updated else it }
+    }
+
     fun pickImage(editor: EditorState, platform: PlatformUi) {
         platform.pickImage { result ->
             if (result != null) launch {
@@ -282,5 +313,6 @@ class AppState(
 
     private companion object {
         const val THEME = "theme"
+        const val LANGUAGE = "language"
     }
 }

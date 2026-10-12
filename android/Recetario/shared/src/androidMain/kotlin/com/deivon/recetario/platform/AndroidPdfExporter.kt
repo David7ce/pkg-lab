@@ -54,6 +54,7 @@ private class PageWriter(private val doc: PdfDocument) {
         r.imageFile?.let(image)?.let(::photo)
         write(r.title, title, after = 8f)
         val meta = listOfNotNull(
+            r.rating?.let { "★".repeat(it) + "☆".repeat(5 - it) },
             r.servings?.let(s::pdfServings),
             r.prepMinutes?.let { "${s.prep}: ${s.duration(it)}" },
             r.cookMinutes?.let { "${s.cook}: ${s.duration(it)}" },

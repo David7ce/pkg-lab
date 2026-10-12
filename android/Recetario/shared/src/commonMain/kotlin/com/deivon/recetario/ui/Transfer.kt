@@ -278,11 +278,6 @@ class Transfer(private val app: AppState) {
 
     // Export
 
-    fun exportRecipe(recipe: Recipe, platform: PlatformUi) =
-        saveFile(platform, "${Text.slug(recipe.title)}.json", JSON) {
-            RecipeJson.encode(listOf(recipe), services.clock()).encodeToByteArray() to null
-        }
-
     fun exportRecipePdf(recipe: Recipe, platform: PlatformUi) {
         val pdf = services.pdf ?: return
         saveFile(platform, "${Text.slug(recipe.title)}.pdf", PDF) {

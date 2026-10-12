@@ -39,6 +39,9 @@ data class RecipeDraft(
     val tags: String = "",
     val sourceUrl: String = "",
     val notes: String = "",
+    /** Not edited in the form (set from the recipe page) but kept through an edit. */
+    val rating: Int? = null,
+    val favorite: Boolean = false,
     val ingredients: List<IngredientDraft> = emptyList(),
     val steps: List<StepDraft> = emptyList(),
     val createdAt: Long? = null,
@@ -93,6 +96,8 @@ data class RecipeDraft(
             tags = RecipeRules.parseTags(tags),
             sourceUrl = url,
             notes = notes.trim().ifEmpty { null },
+            rating = rating,
+            favorite = favorite,
             createdAt = createdAt ?: now,
             updatedAt = now,
         )
@@ -123,6 +128,8 @@ data class RecipeDraft(
                 tags = r.tags.joinToString(", "),
                 sourceUrl = r.sourceUrl.orEmpty(),
                 notes = r.notes.orEmpty(),
+                rating = if (keepIdentity) r.rating else null,
+                favorite = keepIdentity && r.favorite,
                 ingredients = r.ingredients.map {
                     IngredientDraft(
                         key = key++,

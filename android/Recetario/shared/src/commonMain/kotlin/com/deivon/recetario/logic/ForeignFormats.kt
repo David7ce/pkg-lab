@@ -33,7 +33,7 @@ class ForeignImport(
 
 /**
  * Labels for information that has no field in Recetario and is kept, labelled, in the notes
- * (in the user's language). Nothing from the source is dropped silently except ratings and favourites.
+ * (in the user's language). Not imported: RecipeBox meal plans and shopping lists.
  */
 class NoteLabels(
     val prep: String,
@@ -93,6 +93,7 @@ object RecipeSageFormat {
                 tags = RecipePage.strings(o["recipeCategory"]) + RecipePage.strings(o["recipeCuisine"]),
                 sourceUrl = RecipePage.text(o["isBasedOn"]) ?: RecipePage.text(o["url"]),
                 timestamp = Text.parseDateTime(RecipePage.text(o["dateModified"]) ?: RecipePage.text(o["datePublished"])),
+                rating = stars(RecipePage.text((o["aggregateRating"] as? JsonObject)?.get("ratingValue"))?.toDoubleOrNull()),
             )?.also { r -> RecipePage.imageUrl(o["image"])?.let { photos[r.id] = PhotoSource.Url(it) } }
         }
         if (recipes.isEmpty()) throw ImportException(ImportFailure.Empty)
@@ -165,6 +166,8 @@ object RecipeBoxFormat {
                 tags = titles(o["categories"]) + titles(o["tags"]),
                 sourceUrl = str("url"),
                 timestamp = Text.parseDateTime(str("lastModifiedDate")) ?: (o["lastModifiedDate"] as? JsonPrimitive)?.longOrNull,
+                rating = stars(str("rating")?.toDoubleOrNull()),
+                favorite = str("favorite")?.toBooleanStrictOrNull() ?: false,
             )?.also { r ->
                 val local = (o["pictures"] as? JsonArray)?.firstNotNullOfOrNull { p ->
                     (p as? JsonPrimitive)?.contentOrNull?.substringAfterLast('/')?.let { byName[it] }
@@ -187,6 +190,10 @@ object RecipeBoxFormat {
         return if (blocks.size > 1) blocks else text.lines().map { it.trim() }.filter { it.isNotEmpty() }
     }
 }
+
+/** A 0–5 score from another app as 1–5 whole stars; 0 or missing means not rated. */
+internal fun stars(value: Double?): Int? =
+    value?.takeIf { it.isFinite() }?.let { kotlin.math.round(it).toInt() }?.takeIf { it in 1..5 }
 
 /** Times without a field of their own, or not understood, as labelled note lines. */
 internal fun timeNotes(labels: NoteLabels, prep: Timed, cook: Timed, total: Timed, inactive: Timed? = null): List<String> = buildList {
@@ -229,6 +236,8 @@ internal class ForeignRecipeBuilder(private val newId: () -> String, private val
         tags: List<String>,
         sourceUrl: String?,
         timestamp: Long?,
+        rating: Int? = null,
+        favorite: Boolean = false,
     ): Recipe? {
         val cleanTitle = title?.trim()?.take(RecipeRules.MAX_TITLE).orEmpty()
         if (cleanTitle.isEmpty()) {
@@ -262,6 +271,8 @@ internal class ForeignRecipeBuilder(private val newId: () -> String, private val
             sourceUrl = sourceUrl?.trim()?.takeIf(RecipeRules::isValidUrl),
             notes = notes.map { it.trim() }.filter { it.isNotEmpty() }.distinct()
                 .joinToString("\n\n").take(RecipeRules.MAX_NOTES).ifEmpty { null },
+            rating = rating,
+            favorite = favorite,
             createdAt = timestamp ?: now,
             updatedAt = timestamp ?: now,
         )

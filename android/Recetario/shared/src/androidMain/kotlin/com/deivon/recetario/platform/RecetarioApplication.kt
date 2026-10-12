@@ -5,7 +5,6 @@ import app.cash.sqldelight.driver.android.AndroidSqliteDriver
 import com.deivon.recetario.data.RecipeRepository
 import com.deivon.recetario.db.RecipeDatabase
 import com.deivon.recetario.ui.AppState
-import com.deivon.recetario.ui.stringsFor
 import kotlinx.coroutines.MainScope
 import java.io.File
 import java.util.Locale
@@ -24,6 +23,6 @@ class RecetarioApplication : Application() {
         // The driver opens the database lazily, on the first query (a background thread).
         val database = RecipeDatabase(AndroidSqliteDriver(RecipeDatabase.Schema, this, "recetario.db"))
         val repository = RecipeRepository(database, services.images, services.clock, services.newId)
-        AppState(services, repository, MainScope(), stringsFor(Locale.getDefault().language))
+        AppState(services, repository, MainScope(), Locale.getDefault().language)
     }
 }

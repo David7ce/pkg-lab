@@ -62,6 +62,8 @@ class ForeignFormatsTest {
         assertEquals("https://example.com/acelgas", acelgas.sourceUrl)
         assertEquals("Mejor del día anterior.\nCon pan.\n\nTotal: 1 h", acelgas.notes)
         assertEquals(1_747_121_454_009, acelgas.createdAt)
+        assertEquals(4, acelgas.rating)
+        assertEquals(false, acelgas.favorite)
         assertNull(acelgas.imageFile)
         assertEquals("https://example.com/a", assertIs<PhotoSource.Url>(result.photos[acelgas.id]).url)
 
@@ -123,6 +125,8 @@ class ForeignFormatsTest {
             gazpacho.notes,
         )
         assertEquals(1_772_456_006_000, gazpacho.updatedAt)
+        assertEquals(5, gazpacho.rating)
+        assertEquals(true, gazpacho.favorite)
         assertContentEquals(fakeJpeg(5), assertIs<PhotoSource.Bytes>(result.photos[gazpacho.id]).bytes)
 
         assertEquals("new-1", other.id)

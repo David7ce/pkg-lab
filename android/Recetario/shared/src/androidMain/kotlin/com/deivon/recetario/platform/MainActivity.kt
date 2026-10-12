@@ -12,13 +12,12 @@ import androidx.compose.runtime.DisposableEffect
 import com.deivon.recetario.RecetarioApp
 import com.deivon.recetario.ui.Screen
 import com.deivon.recetario.ui.isDark
-import com.deivon.recetario.ui.stringsFor
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val app = (application as RecetarioApplication).state
-        app.strings = stringsFor(resources.configuration.locales[0].language)
+        app.systemLanguage = resources.configuration.locales[0].language
         enableEdgeToEdge()
         setContent {
             // System bar icons follow the app theme, which can differ from the system one.

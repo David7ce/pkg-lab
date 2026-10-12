@@ -108,6 +108,20 @@ class RecipeRepositoryTest {
     }
 
     @Test
+    fun favouriteAndRatingAreQuickTogglesThatSurviveEdits() {
+        repo.save(recipe("a"), ImageChange.Keep)
+        repo.setFavorite("a", true)
+        repo.setRating("a", 3)
+        repo.setRating("b-missing", 5)
+        val r = repo.get("a")!!
+        assertEquals(true, r.favorite)
+        assertEquals(3, r.rating)
+        assertEquals(2L, r.updatedAt, "toggles are not edits")
+        repo.setRating("a", 9) // out of range clears
+        assertNull(repo.get("a")!!.rating)
+    }
+
+    @Test
     fun settings() {
         assertNull(repo.setting("theme"))
         repo.setSetting("theme", "Dark")

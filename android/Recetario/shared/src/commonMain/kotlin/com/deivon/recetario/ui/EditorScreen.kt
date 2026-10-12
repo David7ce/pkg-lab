@@ -9,6 +9,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -62,7 +65,11 @@ fun EditorScreen(app: AppState, state: EditorState) {
                 },
                 navigationIcon = { BackButton(app, AppIcons.Close) },
                 actions = {
-                    TextButton(onClick = { app.save(state) }, enabled = !state.saving) { Text(s.save) }
+                    TextButton(onClick = { app.save(state) }, enabled = !state.saving) {
+                        Icon(AppIcons.Check, contentDescription = null, modifier = Modifier.size(18.dp))
+                        Spacer(Modifier.width(8.dp))
+                        Text(s.save)
+                    }
                 },
             )
         },
@@ -110,7 +117,7 @@ fun EditorScreen(app: AppState, state: EditorState) {
                     modifier = Modifier.fillMaxWidth(),
                 )
 
-                SectionTitle(s.ingredients)
+                SectionTitle(s.ingredients, icon = AppIcons.Checklist)
                 draft.ingredients.forEachIndexed { index, row ->
                     IngredientEditor(
                         row = row,
@@ -128,7 +135,7 @@ fun EditorScreen(app: AppState, state: EditorState) {
                     Text(s.addIngredient, Modifier.padding(start = 8.dp))
                 }
 
-                SectionTitle(s.steps)
+                SectionTitle(s.steps, icon = AppIcons.Play)
                 draft.steps.forEachIndexed { index, step ->
                     Row(verticalAlignment = Alignment.Top) {
                         OutlinedTextField(

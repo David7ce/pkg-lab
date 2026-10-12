@@ -38,7 +38,7 @@ class RecipeJsonTest {
     fun rejectsOtherFilesAndNewerVersions() {
         assertEquals(ImportFailure.NotRecognized, failure("not json at all"))
         assertEquals(ImportFailure.NotRecognized, failure("""{"format":"other","version":1}"""))
-        assertEquals(ImportFailure.UnsupportedVersion(3), failure("""{"format":"recetario","version":3,"exportedAt":1,"recipes":[]}"""))
+        assertEquals(ImportFailure.UnsupportedVersion(4), failure("""{"format":"recetario","version":4,"exportedAt":1,"recipes":[]}"""))
         assertEquals(ImportFailure.Empty, failure("""{"format":"recetario","version":1,"exportedAt":1,"recipes":[]}"""))
         assertIs<ImportFailure.Malformed>(failure("""{"format":"recetario","version":1,"exportedAt":1,"recipes":[{"id":"a"}]}"""))
     }

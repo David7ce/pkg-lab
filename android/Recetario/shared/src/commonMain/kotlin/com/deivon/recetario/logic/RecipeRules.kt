@@ -19,6 +19,7 @@ sealed interface Problem {
     data object ImageNameInvalid : Problem
     data object StepEmpty : Problem
     data object TooLarge : Problem
+    data object RatingInvalid : Problem
 }
 
 /** Limits and checks shared by the editor, JSON import and backup restore. */
@@ -57,6 +58,7 @@ object RecipeRules {
         addAll(tagProblems(r.tags))
         r.sourceUrl?.let { if (!isValidUrl(it)) add(Problem.SourceUrlInvalid) }
         if ((r.notes?.length ?: 0) > MAX_NOTES) add(Problem.TooLarge)
+        r.rating?.let { if (it !in 1..5) add(Problem.RatingInvalid) }
     }
 
     private fun problems(ing: Ingredient, index: Int): List<Problem> = buildList {

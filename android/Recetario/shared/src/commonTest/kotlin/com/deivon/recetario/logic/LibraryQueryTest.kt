@@ -35,6 +35,18 @@ class LibraryQueryTest {
     }
 
     @Test
+    fun favouritesMinimumRatingAndRatingOrder() {
+        val rated = listOf(noquis.copy(rating = 5, favorite = true), gazpacho.copy(rating = 3), arroz)
+        fun ids(q: LibraryQuery) = q.apply(rated).map { it.id }
+        assertEquals(listOf("1"), ids(LibraryQuery(favoritesOnly = true)))
+        assertEquals(listOf("2", "1"), ids(LibraryQuery(minRating = 3)))
+        assertEquals(listOf("1"), ids(LibraryQuery(minRating = 4)))
+        assertEquals(listOf("1", "2", "3"), ids(LibraryQuery(sort = SortOrder.Rating)))
+        assertEquals(1, LibraryQuery(tags = setOf("x"), favoritesOnly = true).panelFilterCount)
+        assertEquals(LibraryQuery(sort = SortOrder.Name), LibraryQuery(text = "a", minRating = 2, sort = SortOrder.Name).cleared())
+    }
+
+    @Test
     fun listsEachTagOnce() {
         assertEquals(listOf("Pasta", "Postre", "Rápida", "Verano"), LibraryQuery.allTags(all))
     }

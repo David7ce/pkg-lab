@@ -29,7 +29,7 @@ class ImportException(val failure: ImportFailure) : Exception(failure.toString()
  */
 object RecipeJson {
     const val FORMAT = "recetario"
-    const val VERSION = 2 // 2: adds "notes". Version 1 files still import.
+    const val VERSION = 3 // 2: "notes"; 3: "rating", "favorite". Older files still import.
 
     @Serializable
     private data class Header(val format: String? = null, val version: Int? = null)

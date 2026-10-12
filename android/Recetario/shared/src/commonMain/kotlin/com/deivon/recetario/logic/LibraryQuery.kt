@@ -2,26 +2,40 @@ package com.deivon.recetario.logic
 
 import com.deivon.recetario.model.Recipe
 
-enum class SortOrder { Name, Modified }
+enum class SortOrder { Modified, Name, Rating }
 
-/** What the library grid shows: free-text search, tag filters (all must match) and sort order. */
+/**
+ * What the library grid shows: free-text search, filters (tags — all must match —, favourites only,
+ * minimum stars) and sort order.
+ */
 data class LibraryQuery(
     val text: String = "",
     val tags: Set<String> = emptySet(),
+    val favoritesOnly: Boolean = false,
+    /** 0 = any; otherwise only recipes rated at least this many stars. */
+    val minRating: Int = 0,
     val sort: SortOrder = SortOrder.Modified,
 ) {
-    val isFiltering: Boolean get() = text.isNotBlank() || tags.isNotEmpty()
+    /** Filters in the filter panel (search and the favourites button are shown on their own). */
+    val panelFilterCount: Int get() = tags.size + (if (minRating > 0) 1 else 0)
+    val isFiltering: Boolean get() = text.isNotBlank() || tags.isNotEmpty() || favoritesOnly || minRating > 0
+
+    fun cleared(): LibraryQuery = LibraryQuery(sort = sort)
 
     fun apply(recipes: List<Recipe>): List<Recipe> {
         val words = Text.fold(text).split(' ').filter { it.isNotBlank() }
         val wanted = tags.map(Text::fold).toSet()
         val matching = recipes.filter { r ->
             val recipeTags = r.tags.map(Text::fold).toSet()
-            recipeTags.containsAll(wanted) && (words.isEmpty() || searchText(r).let { hay -> words.all { hay.contains(it) } })
+            (!favoritesOnly || r.favorite) && (r.rating ?: 0) >= minRating &&
+                recipeTags.containsAll(wanted) && (words.isEmpty() || searchText(r).let { hay -> words.all { hay.contains(it) } })
         }
         return when (sort) {
             SortOrder.Name -> matching.sortedWith(compareBy<Recipe> { Text.fold(it.title) }.thenBy { it.id })
             SortOrder.Modified -> matching.sortedWith(compareByDescending<Recipe> { it.updatedAt }.thenBy { it.id })
+            SortOrder.Rating -> matching.sortedWith(
+                compareByDescending<Recipe> { it.rating ?: 0 }.thenBy { Text.fold(it.title) }.thenBy { it.id },
+            )
         }
     }
 
