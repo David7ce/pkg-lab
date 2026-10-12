@@ -1,27 +1,34 @@
-package com.deivon.recetario.platform
+package com.david7ce.recetario.platform
 
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.rememberWindowState
 import app.cash.sqldelight.driver.jdbc.sqlite.JdbcSqliteDriver
-import com.deivon.recetario.RecetarioApp
-import com.deivon.recetario.data.RecipeRepository
-import com.deivon.recetario.db.RecipeDatabase
-import com.deivon.recetario.ui.AppState
+import com.david7ce.recetario.RecetarioApp
+import com.david7ce.recetario.data.RecipeRepository
+import com.david7ce.recetario.db.RecipeDatabase
+import com.david7ce.recetario.ui.AppState
+import com.david7ce.recetario.ui.isDark
 import kotlinx.coroutines.MainScope
 import java.io.File
 import java.util.Locale
 
+private const val WINDOW_TITLE = "Recetario"
+
 fun main() {
     val state = createAppState()
+    state.checkForUpdates("desktop-recetario-latest", DESKTOP_VERSION)
     application {
         Window(
             onCloseRequest = ::exitApplication,
-            title = "Recetario",
+            title = WINDOW_TITLE,
             state = rememberWindowState(size = DpSize(1100.dp, 800.dp)),
         ) {
+            val dark = isDark(state.themeMode)
+            LaunchedEffect(dark) { applyWindowsTitleBarTheme(WINDOW_TITLE, dark) }
             RecetarioApp(state, rememberPlatformUi())
         }
     }

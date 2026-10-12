@@ -1,10 +1,10 @@
-package com.deivon.shared.ui
+package com.david7ce.shared.ui
 
 import androidx.compose.runtime.staticCompositionLocalOf
 
 /**
- * Textos comunes que usan los componentes. Cada app los rellena con sus recursos traducidos
- * (CompositionLocalProvider) en su raíz. Los valores por defecto son inglés, por si falta alguno.
+ * Common text used by the components. Each app fills it in with its own translated resources
+ * (CompositionLocalProvider) at its root. The defaults are English, in case one is missing.
  */
 data class SharedStrings(
     val cancel: String,

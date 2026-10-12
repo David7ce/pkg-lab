@@ -1,4 +1,4 @@
-package com.deivon.shared.ui
+package com.david7ce.shared.ui
 
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ButtonDefaults
@@ -8,8 +8,8 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 
 /**
- * Confirmación antes de una acción que no se puede deshacer. [destructive] pinta el botón de
- * confirmar en color de error. Siempre hay botón de cancelar y se cierra al tocar fuera.
+ * Confirmation before an action that can't be undone. [destructive] paints the confirm
+ * button in the error color. There's always a cancel button, and it closes when tapped outside.
  */
 @Composable
 fun ConfirmDialog(

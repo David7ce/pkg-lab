@@ -1,8 +1,8 @@
-# Compila las apps de android/<App>/ en GitHub (no hace falta PC).
-# - Push a main: compila solo las apps cuya carpeta ha cambiado.
-# - Manual (Actions -> Android -> Run workflow): una app concreta o todas.
-# Cada app se compila EN PARALELO para arm64-v8a, armeabi-v7a y universal,
-# y se publica en su release "android-<App>-latest" con las tres APKs.
+# Builds the apps under android/<App>/ on GitHub (no PC needed).
+# - Push to main: builds only the apps whose folder changed.
+# - Manual (Actions -> Android -> Run workflow): one specific app, or all of them.
+# Each app builds IN PARALLEL for arm64-v8a, armeabi-v7a and universal,
+# and publishes to its "android-<App>-latest" release with all three APKs.
 name: Android
 
 on:
@@ -37,13 +37,13 @@ jobs:
           INPUT_APP: ${{ github.event.inputs.app }}
           BEFORE: ${{ github.event.before }}
         run: |
-          all() { for d in android/*/; do [ -f "$d/gradlew" ] && basename "$d"; done; return 0; }  # carpetas sin gradlew (shared) no cuentan
+          all() { for d in android/*/; do [ -f "$d/gradlew" ] && basename "$d"; done; return 0; }  # folders without gradlew (shared) don't count
 
           if [ "$EVENT" = "workflow_dispatch" ]; then
             if [ -n "$INPUT_APP" ]; then apps="$INPUT_APP"; else apps=$(all); fi
           elif [ -z "$BEFORE" ] || [ "$BEFORE" = "0000000000000000000000000000000000000000" ] \
                || ! git cat-file -e "$BEFORE^{commit}" 2>/dev/null; then
-            apps=$(all)   # primer push o historial reescrito
+            apps=$(all)   # first push, or rewritten history
           else
             changed=$(git diff --name-only "$BEFORE" HEAD)
             if echo "$changed" | grep -qE '^(\.github/workflows/android\.yml|android/shared/)'; then
@@ -53,7 +53,7 @@ jobs:
             fi
           fi
 
-          # Solo carpetas que existen y son proyectos Gradle
+          # Only folders that exist and are Gradle projects
           json=$(for a in $apps; do [ -f "android/$a/gradlew" ] && echo "$a"; done | jq -R . | jq -sc .)
           echo "Apps a compilar: $json"
           echo "apps=$json" >> "$GITHUB_OUTPUT"
@@ -81,9 +81,9 @@ jobs:
 
       - uses: gradle/actions/setup-gradle@v5
 
-      # El keystore va cifrado (AES-256) en .github/signing/; solo la contraseña es secret.
-      # La misma clave firma todas las apps, así cada versión nueva se instala encima.
-      - name: Preparar keystore
+      # The keystore is encrypted (AES-256) in .github/signing/; only the password is a secret.
+      # The same key signs every app, so each new version installs over the previous one.
+      - name: Prepare keystore
         working-directory: .
         env:
           KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
@@ -94,10 +94,10 @@ jobs:
               -pass env:KEYSTORE_PASSWORD
             echo "SIGNING_KEYSTORE=$RUNNER_TEMP/release.jks" >> "$GITHUB_ENV"
           else
-            echo "::warning::Falta el secret ANDROID_KEYSTORE_PASSWORD: se firma con clave debug (para actualizar habrá que desinstalar)."
+            echo "::warning::Missing secret ANDROID_KEYSTORE_PASSWORD: signing with the debug key (updating over it will need an uninstall)."
           fi
 
-      - name: Compilar APK (${{ matrix.abi }})
+      - name: Build APK (${{ matrix.abi }})
         env:
           SIGNING_STORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
           SIGNING_KEY_ALIAS: pkglab
@@ -116,7 +116,7 @@ jobs:
           ls -lh "$name"
 
       # Unit tests once per app (not per ABI). Apps without tests pass with nothing to run.
-      - name: Tests unitarios
+      - name: Unit tests
         if: matrix.abi == 'universal'
         run: |
           set -o pipefail
@@ -124,11 +124,11 @@ jobs:
           # Summary visible on the run page: proves the tests ran, not just that nothing failed.
           sum() { find . -path '*/build/test-results/*' -name 'TEST-*.xml' -exec grep -ho "<testsuite [^>]*" {} + \
                     | grep -o " $1=\"[0-9]*\"" | grep -o '[0-9]*' | awk '{s+=$1} END {print s+0}'; }
-          echo "::notice title=Tests unitarios::$(sum tests) tests, $(sum failures) fallos, $(sum errors) errores, $(sum skipped) omitidos"
+          echo "::notice title=Unit tests::$(sum tests) tests, $(sum failures) failures, $(sum errors) errors, $(sum skipped) skipped"
 
       # On failure, compiler errors, Gradle's summary and failed tests become annotations,
       # visible on the run page (and through the API) without opening the full log.
-      - name: Errores como anotaciones
+      - name: Errors as annotations
         if: failure()
         run: |
           log="$RUNNER_TEMP/gradle.log"
@@ -167,7 +167,7 @@ jobs:
           merge-multiple: true
           path: apks
 
-      - name: Publicar en Releases
+      - name: Publish to Releases
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GH_REPO: ${{ github.repository }}
@@ -181,8 +181,8 @@ jobs:
           gh release create "$TAG" apks/*.apk \
             --target "$GITHUB_SHA" \
             --title "$APP ${version} (Android)" \
-            --notes "Compilada automáticamente desde ${GITHUB_SHA::7}.
+            --notes "Built automatically from ${GITHUB_SHA::7}.
 
-          - **…-arm64-v8a.apk**: la mayoría de móviles (64 bits).
-          - **…-armeabi-v7a.apk**: móviles antiguos de 32 bits.
-          - **…-universal.apk**: funciona en cualquiera."
+          - **…-arm64-v8a.apk**: most phones (64-bit).
+          - **…-armeabi-v7a.apk**: older 32-bit phones.
+          - **…-universal.apk**: works on any of them."

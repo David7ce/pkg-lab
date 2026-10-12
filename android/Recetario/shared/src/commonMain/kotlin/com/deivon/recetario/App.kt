@@ -1,4 +1,4 @@
-package com.deivon.recetario
+package com.david7ce.recetario
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -25,8 +25,8 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import com.deivon.shared.ui.LocalSharedStrings
-import com.deivon.shared.ui.SharedStrings
+import com.david7ce.shared.ui.LocalSharedStrings
+import com.david7ce.shared.ui.SharedStrings
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -34,21 +34,21 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import com.deivon.recetario.logic.ConflictPolicy
-import com.deivon.recetario.logic.ForeignImport
-import com.deivon.recetario.ui.AppState
-import com.deivon.recetario.ui.CookingScreen
-import com.deivon.recetario.ui.DetailScreen
-import com.deivon.recetario.ui.EditorScreen
-import com.deivon.recetario.ui.LibraryScreen
-import com.deivon.recetario.ui.LocalPlatform
-import com.deivon.recetario.ui.LocalStrings
-import com.deivon.recetario.ui.PlatformUi
-import com.deivon.recetario.ui.RecetarioTheme
-import com.deivon.recetario.ui.Screen
-import com.deivon.recetario.ui.SettingsScreen
-import com.deivon.recetario.ui.Transfer
-import com.deivon.recetario.ui.isDark
+import com.david7ce.recetario.logic.ConflictPolicy
+import com.david7ce.recetario.logic.ForeignImport
+import com.david7ce.recetario.ui.AppState
+import com.david7ce.recetario.ui.CookingScreen
+import com.david7ce.recetario.ui.DetailScreen
+import com.david7ce.recetario.ui.EditorScreen
+import com.david7ce.recetario.ui.LibraryScreen
+import com.david7ce.recetario.ui.LocalPlatform
+import com.david7ce.recetario.ui.LocalStrings
+import com.david7ce.recetario.ui.PlatformUi
+import com.david7ce.recetario.ui.RecetarioTheme
+import com.david7ce.recetario.ui.Screen
+import com.david7ce.recetario.ui.SettingsScreen
+import com.david7ce.recetario.ui.Transfer
+import com.david7ce.recetario.ui.isDark
 
 /** Root of the shared UI. Each platform provides [PlatformUi] and back handling, and calls this. */
 @Composable
@@ -56,10 +56,10 @@ fun RecetarioApp(app: AppState, platform: PlatformUi) {
     CompositionLocalProvider(
         LocalStrings provides app.strings,
         LocalPlatform provides platform,
-        // Textos de los componentes compartidos (android/shared), en el idioma elegido en la app.
+        // Text for the shared components (android/shared), in the app's chosen language.
         LocalSharedStrings provides SharedStrings(
             cancel = app.strings.cancel, back = app.strings.back, close = app.strings.close,
-            delete = app.strings.delete, selectAll = "Select all", // Recetario no tiene selección múltiple
+            delete = app.strings.delete, selectAll = "Select all", // Recetario has no multi-select
         ),
     ) {
         RecetarioTheme(isDark(app.themeMode)) {

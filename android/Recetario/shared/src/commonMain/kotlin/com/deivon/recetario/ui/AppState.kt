@@ -1,4 +1,4 @@
-package com.deivon.recetario.ui
+package com.david7ce.recetario.ui
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableDoubleStateOf
@@ -8,15 +8,18 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.ImageBitmap
-import com.deivon.recetario.data.RecipeRepository
-import com.deivon.recetario.logic.ImageChange
-import com.deivon.recetario.logic.ImportException
-import com.deivon.recetario.logic.LibraryQuery
-import com.deivon.recetario.logic.Problem
-import com.deivon.recetario.logic.RecipeDraft
-import com.deivon.recetario.model.Recipe
-import com.deivon.recetario.platform.Services
-import com.deivon.recetario.platform.WebException
+import com.david7ce.recetario.data.RecipeRepository
+import com.david7ce.recetario.logic.ImageChange
+import com.david7ce.recetario.logic.ImportException
+import com.david7ce.recetario.logic.LibraryQuery
+import com.david7ce.recetario.logic.MAX_RELEASE_JSON_BYTES
+import com.david7ce.recetario.logic.Problem
+import com.david7ce.recetario.logic.RecipeDraft
+import com.david7ce.recetario.logic.UpdateInfo
+import com.david7ce.recetario.logic.parseUpdateCheck
+import com.david7ce.recetario.model.Recipe
+import com.david7ce.recetario.platform.Services
+import com.david7ce.recetario.platform.WebException
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
@@ -112,6 +115,8 @@ class AppState(
     var themeMode by mutableStateOf(ThemeMode.System)
         private set
     var busy by mutableStateOf(false)
+        private set
+    var updateInfo by mutableStateOf<UpdateInfo?>(null)
         private set
 
     private val _messages = MutableSharedFlow<String>(extraBufferCapacity = 8)
@@ -229,6 +234,27 @@ class AppState(
         language = value
         launch { withContext(io) { repo.setSetting(LANGUAGE, value.name) } }
     }
+
+    /**
+     * Checks GitHub Releases (no token: public repo, public releases) for a build newer than
+     * [currentVersion] under [releaseTag] ("android-Recetario-latest" or "desktop-recetario-latest").
+     * Silent on failure (offline, rate limit): this is a background check, not a user action.
+     */
+    fun checkForUpdates(releaseTag: String, currentVersion: String) {
+        launch {
+            val url = "https://api.github.com/repos/David7ce/pkg-lab/releases/tags/$releaseTag"
+            val json = try {
+                services.web.getText(url, MAX_RELEASE_JSON_BYTES)
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                return@launch
+            }
+            updateInfo = parseUpdateCheck(json, currentVersion)
+        }
+    }
+
+    fun dismissUpdate() { updateInfo = null }
 
     /** Quick toggles from the recipe page: the list updates at once, the database right after. */
     fun toggleFavorite(id: String) {

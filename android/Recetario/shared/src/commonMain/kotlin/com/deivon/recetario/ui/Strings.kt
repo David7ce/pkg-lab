@@ -1,11 +1,11 @@
-package com.deivon.recetario.ui
+package com.david7ce.recetario.ui
 
 import androidx.compose.runtime.staticCompositionLocalOf
-import com.deivon.recetario.logic.ImportFailure
-import com.deivon.recetario.logic.NoteLabels
-import com.deivon.recetario.logic.Problem
-import com.deivon.recetario.logic.RecipePage
-import com.deivon.recetario.platform.WebException
+import com.david7ce.recetario.logic.ImportFailure
+import com.david7ce.recetario.logic.NoteLabels
+import com.david7ce.recetario.logic.Problem
+import com.david7ce.recetario.logic.RecipePage
+import com.david7ce.recetario.platform.WebException
 
 /**
  * UI text. English is the base; each language overrides it (Spanish here, the others in
@@ -220,6 +220,8 @@ open class Strings {
     open val themeLight = "Light"
     open val themeDark = "Dark"
     open val aboutData = "Your recipes and photos are stored only on this device. Use “Back up with photos” to keep a copy."
+    open fun updateAvailable(version: String) = "Version $version is available"
+    open val viewUpdate = "View"
 
     // PDF
     open fun pdfServings(n: Int) = "$n servings"
@@ -417,6 +419,8 @@ object EsStrings : Strings() {
     override val themeLight = "Claro"
     override val themeDark = "Oscuro"
     override val aboutData = "Tus recetas y fotos se guardan solo en este dispositivo. Usa «Copia de seguridad con fotos» para conservar una copia."
+    override fun updateAvailable(version: String) = "La versión $version está disponible"
+    override val viewUpdate = "Ver"
 
     override fun pdfServings(n: Int) = "$n raciones"
     override fun pdfCount(n: Int) = "$n recetas"

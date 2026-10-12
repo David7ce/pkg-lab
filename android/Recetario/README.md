@@ -158,29 +158,31 @@ RecipeSage export and a real `.rtk`, in `androidUnitTest/resources`), backup lay
 planning, search/filter/sort, the v1 → v2 migration, and the repository and full backup → ZIP → restore path
 against real SQLite.
 
-## Escritorio (Windows y Linux)
+## Desktop (Windows and Linux)
 
-Mismo código y misma interfaz que Android: `commonMain` es Compose puro. Compose Multiplatform dibuja la UI
-igual en todos los sistemas (estilo Material 3, no widgets nativos del sistema).
+Same code and same UI as Android: `commonMain` is plain Compose. Compose Multiplatform draws the UI
+the same way on every OS (Material 3 style, no native system widgets).
 
-- `shared/src/jvmCommonMain`: zip, descargas web y almacenamiento de imágenes (JVM, compartido con Android).
-- `shared/src/desktopMain`: `DesktopMain.kt` (ventana y arranque), `DesktopImageCodec` (Skia), `DesktopPlatformUi`
-  (diálogos nativos AWT y enlaces), SQLite por JDBC. Sin PDF por ahora (`Services.pdf = null`, la opción se oculta).
-- Datos: `%APPDATA%\Recetario` en Windows, `~/.recetario` en Linux.
-- Compilar en local: `./gradlew :shared:desktopRun` (ejecuta la app), `:shared:desktopTest` (tests).
-  Instaladores: `:shared:packageMsi` (Windows), `:shared:packageDmg` (macOS), `:shared:createDistributable` (Linux: carpeta de la app, que se empaqueta en tar.gz).
-- CI: `.github/workflows/desktop.yml`: `.msi` en `windows-latest` (x64), `.tar.gz` en `ubuntu-latest` (x64) y
-  `.dmg` en `macos-14` (Apple Silicon). Publica los tres en el release `desktop-recetario-latest`.
-  Fuera por ahora: Linux arm64 (poco común) e iOS (necesita cuenta de Apple Developer para instalar en un iPhone).
+- `shared/src/jvmCommonMain`: zip, web downloads and image storage (JVM, shared with Android).
+- `shared/src/desktopMain`: `DesktopMain.kt` (window and startup), `DesktopImageCodec` (Skia), `DesktopPlatformUi`
+  (native AWT dialogs and links), `WindowsTitleBar.kt` (native title bar dark/light, Windows only), SQLite over JDBC.
+  No PDF for now (`Services.pdf = null`, the option is hidden).
+- Data: `%APPDATA%\Recetario` on Windows, `~/.recetario` on Linux.
+- Build locally: `./gradlew :shared:run` (runs the app; `:shared:desktopRun` exists but is the
+  generic task with no `mainClass` configured and fails with "No main class specified"), `:shared:desktopTest` (tests).
+  Installers: `:shared:packageMsi` (Windows), `:shared:packageDmg` (macOS), `:shared:createDistributable` (Linux: an app folder, packaged into a tar.gz).
+- CI: `.github/workflows/desktop.yml`: `.msi` on `windows-latest` (x64), `.tar.gz` on `ubuntu-latest` (x64) and
+  `.dmg` on `macos-14` (Apple Silicon). Publishes all three to the `desktop-recetario-latest` release.
+  Left out for now: Linux arm64 (uncommon) and iOS (needs an Apple Developer account to install on an iPhone).
 
-Pendiente en escritorio:
-- Rotación EXIF de fotos de móvil (las fotos pueden salir de lado al importarlas).
-- Atajos de teclado (Escape / Alt+←) para volver atrás.
-- Exportar PDF (necesita una librería PDF para JVM, p. ej. PDFBox).
-- Migraciones de esquema de la base de datos de escritorio (hoy solo se crea la base nueva).
+Desktop pending work:
+- EXIF rotation for phone photos (photos can come out sideways when imported).
+- Keyboard shortcuts (Escape / Alt+←) to go back.
+- PDF export (needs a PDF library for the JVM, e.g. PDFBox).
+- Desktop database schema migrations (today only a fresh database is created).
 
-Actualizar Compose Multiplatform a 1.12+ exige AGP 9: `shared` pasará de `com.android.library` +
-`androidTarget()` a `com.android.kotlin.multiplatform.library`, y los tests unitarios de Android cambian de nombre.
+Updating Compose Multiplatform to 1.12+ requires AGP 9: `shared` will move from `com.android.library` +
+`androidTarget()` to `com.android.kotlin.multiplatform.library`, and the Android unit tests change name.
 
 ## Known limitations
 

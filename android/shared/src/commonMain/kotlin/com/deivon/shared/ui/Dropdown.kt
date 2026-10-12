@@ -1,4 +1,4 @@
-package com.deivon.shared.ui
+package com.david7ce.shared.ui
 
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.DropdownMenuItem
@@ -19,8 +19,8 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.style.TextOverflow
 
 /**
- * Desplegable de una sola elección (idioma, moneda, unidades). Solo lectura: se muestra la opción
- * actual y el menú marca cuál está activa. [label] y [leadingIcon] son opcionales.
+ * Dropdown for a single choice (language, currency, units). Read-only: shows the current
+ * option, and the menu marks which one is active. [label] and [leadingIcon] are optional.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

@@ -15,6 +15,6 @@ dependencyResolutionManagement {
 
 rootProject.name = "FuelLog"
 include(":app")
-// Módulo compartido por todas las apps (android/shared).
+// Module shared by every app (android/shared).
 include(":pkgshared")
 project(":pkgshared").projectDir = file("../shared")

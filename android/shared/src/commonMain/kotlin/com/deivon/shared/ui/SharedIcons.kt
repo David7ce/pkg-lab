@@ -1,4 +1,4 @@
-package com.deivon.shared.ui
+package com.david7ce.shared.ui
 
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
@@ -7,8 +7,8 @@ import androidx.compose.ui.graphics.vector.addPathNodes
 import androidx.compose.ui.unit.dp
 
 /**
- * Iconos que los componentes necesitan. Trazados Material propios para no depender de
- * material-icons (que no es multiplataforma). 24 dp, relleno negro: la app les pone el color.
+ * Icons the components need. Own Material paths so as not to depend on
+ * material-icons (which isn't multiplatform). 24 dp, black fill: the app applies the color.
  */
 object SharedIcons {
     private fun icon(name: String, path: String) =

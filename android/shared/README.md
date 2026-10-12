@@ -1,25 +1,25 @@
 # shared (`:pkgshared`)
 
-Código común de las apps Kotlin de `android/`: **multiplataforma** (commonMain = Compose puro).
-Lo usan VozReves, FuelLog y Recetario. No tiene recursos de Android: el texto se pasa desde cada app.
+Common code for the Kotlin apps under `android/`: **multiplatform** (commonMain = plain Compose).
+Used by VozReves, FuelLog and Recetario. Has no Android resources: text is passed in from each app.
 
-## Cómo se incluye
+## How to include it
 
 ```kotlin
-// settings.gradle.kts de la app (la ruta es relativa a la carpeta de la app)
+// the app's settings.gradle.kts (the path is relative to the app's folder)
 include(":pkgshared")
 project(":pkgshared").projectDir = file("../shared")
 
-// app/build.gradle.kts (Android) o shared/build.gradle.kts (KMP)
+// app/build.gradle.kts (Android) or shared/build.gradle.kts (KMP)
 implementation(project(":pkgshared"))
 ```
 
-Requisitos: Kotlin **2.4.21**, Compose Multiplatform **1.11.1**, Material 3 **1.9.0**, AGP **8.13.x**,
-`compileSdk` 36, Gradle 8.14.x. Las versiones están fijadas en `build.gradle.kts` de este módulo.
+Requirements: Kotlin **2.4.21**, Compose Multiplatform **1.11.1**, Material 3 **1.9.0**, AGP **8.13.x**,
+`compileSdk` 36, Gradle 8.14.x. Versions are pinned in this module's `build.gradle.kts`.
 
-## Textos de cada app
+## Each app's text
 
-En la raíz de cada app, envolver el contenido:
+At the root of each app, wrap the content:
 
 ```kotlin
 CompositionLocalProvider(LocalSharedStrings provides SharedStrings(
@@ -27,19 +27,19 @@ CompositionLocalProvider(LocalSharedStrings provides SharedStrings(
 )) { … }
 ```
 
-## Piezas
+## Pieces
 
-| Pieza | Para qué |
+| Piece | What for |
 |---|---|
-| `ui/SegmentedChoice` | Selector en fila con icono opcional (sin check, sin solapamientos). |
-| `ui/ChoiceDropdown` | Desplegable de una elección (idioma, moneda, unidades…). |
-| `ui/ConfirmDialog` | Confirmación antes de borrar o de cualquier acción irreversible. |
-| `ui/Selection` + `SelectionActions` | Selección múltiple: pulsación larga, seleccionar todo, borrar. |
-| `ui/SubScreen`, `SectionTitle` | Barra superior de pantalla secundaria y títulos de sección. |
-| `ui/SharedIcons` | Iconos Material propios (sin material-icons, que no es multiplataforma). |
-| `ui/SharedStrings` | Textos comunes que rellena cada app. |
-| `reverseText` | Invierte texto por puntos de código (no rompe emojis). |
+| `ui/SegmentedChoice` | Row selector with an optional icon (no check mark, no overlap). |
+| `ui/ChoiceDropdown` | Dropdown for a single choice (language, currency, units…). |
+| `ui/ConfirmDialog` | Confirmation before deleting or any irreversible action. |
+| `ui/Selection` + `SelectionActions` | Multi-select: long press, select all, delete. |
+| `ui/SubScreen`, `SectionTitle` | Top bar for a secondary screen and section titles. |
+| `ui/SharedIcons` | Own Material icons (not material-icons, which isn't multiplatform). |
+| `ui/SharedStrings` | Common text that each app fills in. |
+| `reverseText` | Reverses text by code point (doesn't break emoji). |
 
-Regla: lo que es **UX o comportamiento** (confirmar borrados, selección múltiple, selectores, idioma)
-vive aquí y es igual en todas las apps. Lo que es **identidad** (colores, icono, nombre, textos propios)
-vive en cada app. Un cambio en `android/shared/` hace que CI recompile todas las apps.
+Rule: what is **UX or behavior** (confirming deletes, multi-select, selectors, language)
+lives here and is the same across every app. What is **identity** (colors, icon, name, own text)
+lives in each app. A change in `android/shared/` makes CI rebuild every app.

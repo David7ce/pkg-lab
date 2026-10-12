@@ -1,10 +1,10 @@
-package com.deivon.recetario.platform
+package com.david7ce.recetario.platform
 
 import android.app.Application
 import app.cash.sqldelight.driver.android.AndroidSqliteDriver
-import com.deivon.recetario.data.RecipeRepository
-import com.deivon.recetario.db.RecipeDatabase
-import com.deivon.recetario.ui.AppState
+import com.david7ce.recetario.data.RecipeRepository
+import com.david7ce.recetario.db.RecipeDatabase
+import com.david7ce.recetario.ui.AppState
 import kotlinx.coroutines.MainScope
 import java.io.File
 import java.util.Locale
@@ -23,6 +23,9 @@ class RecetarioApplication : Application() {
         // The driver opens the database lazily, on the first query (a background thread).
         val database = RecipeDatabase(AndroidSqliteDriver(RecipeDatabase.Schema, this, "recetario.db"))
         val repository = RecipeRepository(database, services.images, services.clock, services.newId)
-        AppState(services, repository, MainScope(), Locale.getDefault().language)
+        AppState(services, repository, MainScope(), Locale.getDefault().language).also {
+            val versionName = packageManager.getPackageInfo(packageName, 0).versionName
+            if (versionName != null) it.checkForUpdates("android-Recetario-latest", versionName)
+        }
     }
 }

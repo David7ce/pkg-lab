@@ -1,9 +1,9 @@
-package com.deivon.recetario.ui
+package com.david7ce.recetario.ui
 
-import com.deivon.recetario.logic.ImportFailure
-import com.deivon.recetario.logic.Problem
-import com.deivon.recetario.logic.RecipePage
-import com.deivon.recetario.platform.WebException
+import com.david7ce.recetario.logic.ImportFailure
+import com.david7ce.recetario.logic.Problem
+import com.david7ce.recetario.logic.RecipePage
+import com.david7ce.recetario.platform.WebException
 
 /** Languages the app offers. [code] is the ISO 639 code; System follows the device. Names are shown in their own language. */
 enum class AppLanguage(val code: String?, val nativeName: String) {
@@ -215,6 +215,8 @@ object FrStrings : Strings() {
     override val themeLight = "Clair"
     override val themeDark = "Sombre"
     override val aboutData = "Vos recettes et photos sont stockées uniquement sur cet appareil. Utilisez « Sauvegarde avec photos » pour en garder une copie."
+    override fun updateAvailable(version: String) = "La version $version est disponible"
+    override val viewUpdate = "Voir"
     override fun pdfServings(n: Int) = "$n portions"
     override fun pdfCount(n: Int) = "$n recettes"
 }
@@ -406,6 +408,8 @@ object DeStrings : Strings() {
     override val themeLight = "Hell"
     override val themeDark = "Dunkel"
     override val aboutData = "Deine Rezepte und Fotos werden nur auf diesem Gerät gespeichert. Nutze „Sicherung mit Fotos“, um eine Kopie zu behalten."
+    override fun updateAvailable(version: String) = "Version $version ist verfügbar"
+    override val viewUpdate = "Anzeigen"
     override fun pdfServings(n: Int) = "$n Portionen"
     override fun pdfCount(n: Int) = "$n Rezepte"
 }
@@ -597,6 +601,8 @@ object PtStrings : Strings() {
     override val themeLight = "Claro"
     override val themeDark = "Escuro"
     override val aboutData = "As suas receitas e fotos são guardadas apenas neste dispositivo. Use «Cópia de segurança com fotos» para manter uma cópia."
+    override fun updateAvailable(version: String) = "A versão $version está disponível"
+    override val viewUpdate = "Ver"
     override fun pdfServings(n: Int) = "$n porções"
     override fun pdfCount(n: Int) = "$n receitas"
 }
@@ -788,6 +794,8 @@ object ItStrings : Strings() {
     override val themeLight = "Chiaro"
     override val themeDark = "Scuro"
     override val aboutData = "Le tue ricette e foto sono salvate solo su questo dispositivo. Usa «Backup con foto» per conservarne una copia."
+    override fun updateAvailable(version: String) = "La versione $version è disponibile"
+    override val viewUpdate = "Vedi"
     override fun pdfServings(n: Int) = "$n porzioni"
     override fun pdfCount(n: Int) = "$n ricette"
 }

@@ -11,11 +11,11 @@ val targetAbi: String? = (findProperty("abi") as String?)?.takeIf { it != "unive
 val abiCodes = mapOf("armeabi-v7a" to 1, "arm64-v8a" to 2)
 
 android {
-    namespace = "com.deivon.fuellog"
+    namespace = "com.david7ce.fuellog"
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "com.deivon.fuellog"
+        applicationId = "com.david7ce.fuellog"
         minSdk = 26
         targetSdk = 35
         // CI run number ×10 + ABI code: every build installs over the previous one.
@@ -73,7 +73,7 @@ android {
 
 dependencies {
     // AndroidX / Compose only. No third-party runtime libraries.
-    // Compose (runtime, ui, material3) llega desde :pkgshared (api, Compose Multiplatform 1.11.1).
+    // Compose (runtime, ui, material3) comes in through :pkgshared (api, Compose Multiplatform 1.11.1).
     implementation("androidx.compose.material:material-icons-core:1.7.8")
     implementation("androidx.activity:activity-compose:1.9.3")
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.7")

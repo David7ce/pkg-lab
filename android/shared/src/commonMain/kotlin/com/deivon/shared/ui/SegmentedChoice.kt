@@ -1,4 +1,4 @@
-package com.deivon.shared.ui
+package com.david7ce.shared.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -28,9 +28,9 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 
 /**
- * Selector de una opción en fila, con icono opcional. Sustituye a SegmentedButton, que con icono
- * dejaba el icono encima del texto. Cada segmento es una fila de altura fija: icono + texto
- * (el texto se recorta con "…" si no cabe). Sin check: el color de fondo indica la opción activa.
+ * Row selector for a single option, with an optional icon. Replaces SegmentedButton, which with
+ * an icon left it stacked above the text. Each segment is a fixed-height row: icon + text
+ * (text is truncated with "…" if it doesn't fit). No check mark: the background color shows the active option.
  */
 @Composable
 fun <T> SegmentedChoice(

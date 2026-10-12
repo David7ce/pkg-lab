@@ -14,6 +14,23 @@ plugins {
     alias(libs.plugins.sqldelight)
 }
 
+// Single source of truth for the desktop installer version, also baked into the running app
+// below (generateDesktopVersion) so it can compare itself against GitHub Releases.
+val appVersion = "1.0." + (System.getenv("GITHUB_RUN_NUMBER") ?: "1")
+
+// Desktop has no BuildConfig/PackageInfo equivalent; generate a one-constant Kotlin file instead.
+val generateDesktopVersion = tasks.register("generateDesktopVersion") {
+    val outputDir = layout.buildDirectory.dir("generated/desktopVersion/kotlin")
+    outputs.dir(outputDir)
+    doLast {
+        val file = outputDir.get().file("com/david7ce/recetario/platform/DesktopVersion.kt").asFile
+        file.parentFile.mkdirs()
+        file.writeText(
+            "package com.david7ce.recetario.platform\n\ninternal const val DESKTOP_VERSION = \"$appVersion\"\n"
+        )
+    }
+}
+
 kotlin {
     androidTarget {
         compilerOptions { jvmTarget.set(JvmTarget.JVM_17) }
@@ -27,10 +44,12 @@ kotlin {
         androidMain.get().dependsOn(jvmCommonMain)
         val desktopMain by getting {
             dependsOn(jvmCommonMain)
+            kotlin.srcDir(generateDesktopVersion)
             dependencies {
                 implementation(compose.desktop.currentOs)
                 implementation(libs.kotlinx.coroutines.swing)
                 implementation(libs.sqldelight.sqlite.driver)
+                implementation(libs.jna.platform) // Windows title bar dark/light (DwmSetWindowAttribute)
             }
         }
 
@@ -62,7 +81,7 @@ kotlin {
 }
 
 android {
-    namespace = "com.deivon.recetario.shared"
+    namespace = "com.david7ce.recetario.shared"
     compileSdk = 36
     defaultConfig { minSdk = 26 }
     compileOptions {
@@ -74,7 +93,7 @@ android {
 sqldelight {
     databases {
         create("RecipeDatabase") {
-            packageName.set("com.deivon.recetario.db")
+            packageName.set("com.david7ce.recetario.db")
         }
     }
 }
@@ -82,13 +101,13 @@ sqldelight {
 // Desktop app: packageMsi (Windows), packageDmg (macOS), createDistributable (Linux). See .github/workflows/desktop.yml.
 compose.desktop {
     application {
-        mainClass = "com.deivon.recetario.platform.DesktopMainKt"
+        mainClass = "com.david7ce.recetario.platform.DesktopMainKt"
         nativeDistributions {
-            // Solo lo que se publica: .msi (Windows) y .dmg (macOS). Linux usa createDistributable + tar.gz en CI.
+            // Only what gets published: .msi (Windows) and .dmg (macOS). Linux uses createDistributable + tar.gz in CI.
             targetFormats(TargetFormat.Msi, TargetFormat.Dmg)
             packageName = "Recetario"
             // Installers need MAJOR.MINOR.PATCH with a number in MAJOR; CI run number keeps each build newer.
-            packageVersion = "1.0." + (System.getenv("GITHUB_RUN_NUMBER") ?: "1")
+            packageVersion = appVersion
             vendor = "deivon"
             description = "Recetario: recetario personal"
             windows {

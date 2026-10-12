@@ -1,4 +1,4 @@
-package com.deivon.shared.ui
+package com.david7ce.shared.ui
 
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.material3.Icon
@@ -10,8 +10,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 
 /**
- * Selección múltiple de una lista. Se activa con pulsación larga; mientras hay algo seleccionado,
- * tocar una fila marca/desmarca en lugar de abrirla. [K] es la clave estable de cada fila.
+ * Multi-select for a list. Turned on with a long press; while something is selected,
+ * tapping a row marks/unmarks it instead of opening it. [K] is each row's stable key.
  */
 class Selection<K> {
     var keys by mutableStateOf<Set<K>>(emptySet())

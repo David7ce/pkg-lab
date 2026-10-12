@@ -1,4 +1,4 @@
-package com.deivon.recetario.ui
+package com.david7ce.recetario.ui
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -22,6 +22,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Badge
@@ -44,6 +45,7 @@ import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -57,10 +59,11 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import com.deivon.recetario.logic.LibraryQuery
-import com.deivon.recetario.logic.SortOrder
-import com.deivon.recetario.model.Recipe
-import com.deivon.recetario.logic.Text as TextUtil
+import com.david7ce.recetario.logic.LibraryQuery
+import com.david7ce.recetario.logic.SortOrder
+import com.david7ce.recetario.logic.UpdateInfo
+import com.david7ce.recetario.model.Recipe
+import com.david7ce.recetario.logic.Text as TextUtil
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -82,6 +85,7 @@ fun LibraryScreen(app: AppState) {
         floatingActionButton = { AddMenuButton(app) },
     ) { padding ->
         Column(Modifier.padding(padding).fillMaxSize()) {
+            app.updateInfo?.let { UpdateBanner(it, app) }
             if (app.recipes.isNotEmpty()) SearchRow(app, query) { showFilters = true }
 
             when {
@@ -115,6 +119,23 @@ fun LibraryScreen(app: AppState) {
     }
 
     if (showFilters) FilterSheet(app) { showFilters = false }
+}
+
+@Composable
+private fun UpdateBanner(info: UpdateInfo, app: AppState) {
+    val s = LocalStrings.current
+    val platform = LocalPlatform.current
+    Surface(
+        color = MaterialTheme.colorScheme.secondaryContainer,
+        shape = RoundedCornerShape(12.dp),
+        modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp),
+    ) {
+        Row(Modifier.padding(start = 16.dp), verticalAlignment = Alignment.CenterVertically) {
+            Text(s.updateAvailable(info.version), style = MaterialTheme.typography.bodyMedium, modifier = Modifier.weight(1f))
+            TextButton(onClick = { platform.openUrl(info.url) }) { Text(s.viewUpdate) }
+            IconButton(onClick = app::dismissUpdate) { Icon(AppIcons.Close, contentDescription = s.close) }
+        }
+    }
 }
 
 /** Search field, filter panel button (with a count of active filters) and the favourites toggle. */
