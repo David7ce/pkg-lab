@@ -1,3 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Voz del Revés</string>
+    <string name="app_name">Reverse Voice</string>
+    <string name="status_idle">Tap the button and speak</string>
+    <string name="status_recording">Recording… (max %1$d s)</string>
+    <string name="status_playing">Playing</string>
+    <string name="status_paused">Paused</string>
+    <string name="recording_length">Recording: %1$s s</string>
+    <string name="record">Record</string>
+    <string name="stop">Stop</string>
+    <string name="play">Play</string>
+    <string name="pause">Pause</string>
+    <string name="share">Share</string>
+    <string name="reverse">Reversed</string>
+    <string name="normal">Normal</string>
+    <string name="selection">Selection: %1$s – %2$s s</string>
+    <string name="history">History</string>
+    <string name="history_empty">No recordings yet</string>
+    <string name="delete">Delete</string>
+    <string name="settings">Settings</string>
+    <string name="language">Language</string>
+    <string name="system_default">System default</string>
+    <string name="theme">Theme</string>
+    <string name="theme_light">Light</string>
+    <string name="theme_dark">Dark</string>
+    <string name="countdown">Countdown before recording</string>
+    <string name="max_length">Maximum length</string>
+    <string name="off">Off</string>
+    <string name="clear_history">Delete all recordings</string>
+    <string name="back">Back</string>
+    <string name="share_title">Share audio</string>
+    <string name="version">Version %1$s</string>
+    <string name="seconds_short">%1$d s</string>
 </resources>

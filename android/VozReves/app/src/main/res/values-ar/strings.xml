@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">الصوت المعكوس</string>
+    <string name="status_idle">اضغط الزر وتحدث</string>
+    <string name="status_recording">جارٍ التسجيل… (الحد الأقصى %1$d ث)</string>
+    <string name="status_playing">جارٍ التشغيل</string>
+    <string name="status_paused">متوقف مؤقتًا</string>
+    <string name="recording_length">التسجيل: %1$s ث</string>
+    <string name="record">تسجيل</string>
+    <string name="stop">إيقاف</string>
+    <string name="play">تشغيل</string>
+    <string name="pause">إيقاف مؤقت</string>
+    <string name="share">مشاركة</string>
+    <string name="reverse">معكوس</string>
+    <string name="normal">عادي</string>
+    <string name="selection">التحديد: %1$s – %2$s ث</string>
+    <string name="history">السجل</string>
+    <string name="history_empty">لا توجد تسجيلات بعد</string>
+    <string name="delete">حذف</string>
+    <string name="settings">الإعدادات</string>
+    <string name="language">اللغة</string>
+    <string name="system_default">لغة النظام</string>
+    <string name="theme">المظهر</string>
+    <string name="theme_light">فاتح</string>
+    <string name="theme_dark">داكن</string>
+    <string name="countdown">عدّ تنازلي قبل التسجيل</string>
+    <string name="max_length">المدة القصوى</string>
+    <string name="off">بدون</string>
+    <string name="clear_history">حذف كل التسجيلات</string>
+    <string name="back">رجوع</string>
+    <string name="share_title">مشاركة الصوت</string>
+    <string name="version">الإصدار %1$s</string>
+    <string name="seconds_short">%1$d ث</string>
+</resources>

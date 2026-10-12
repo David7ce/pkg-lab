@@ -1,7 +1,8 @@
 # Compila las apps de android/<App>/ en GitHub (no hace falta PC).
 # - Push a main: compila solo las apps cuya carpeta ha cambiado.
 # - Manual (Actions -> Android -> Run workflow): una app concreta o todas.
-# Cada app se publica en su propia release "android-<App>-latest" con la APK lista para descargar.
+# Cada app se compila EN PARALELO para arm64-v8a, armeabi-v7a y universal,
+# y se publica en su release "android-<App>-latest" con las tres APKs.
 name: Android
 
 on:
@@ -26,7 +27,7 @@ jobs:
     outputs:
       apps: ${{ steps.list.outputs.apps }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           fetch-depth: 0
 
@@ -65,13 +66,15 @@ jobs:
       fail-fast: false
       matrix:
         app: ${{ fromJson(needs.detect.outputs.apps) }}
+        abi: [arm64-v8a, armeabi-v7a, universal]
+    name: build (${{ matrix.app }}, ${{ matrix.abi }})
     defaults:
       run:
         working-directory: android/${{ matrix.app }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
-      - uses: actions/setup-java@v4
+      - uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: 17
@@ -85,35 +88,56 @@ jobs:
           if [ -n "$KEYSTORE_BASE64" ]; then
             echo "$KEYSTORE_BASE64" | base64 -d > "$RUNNER_TEMP/release.jks"
             echo "SIGNING_KEYSTORE=$RUNNER_TEMP/release.jks" >> "$GITHUB_ENV"
-            echo "Firmando con el keystore del repo."
           else
-            echo "::warning::Sin ANDROID_KEYSTORE_BASE64: se firma con clave debug (no podrás actualizar encima, habrá que desinstalar)."
+            echo "::warning::Sin ANDROID_KEYSTORE_BASE64: se firma con clave debug (para actualizar habrá que desinstalar)."
           fi
 
-      - name: Compilar APK release
+      - name: Compilar APK (${{ matrix.abi }})
         env:
           SIGNING_STORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
           SIGNING_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
           SIGNING_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
         run: |
           chmod +x gradlew
-          ./gradlew assembleRelease --no-daemon
+          ./gradlew assembleRelease -Pabi=${{ matrix.abi }} --no-daemon
           apk=$(ls app/build/outputs/apk/release/*.apk | head -1)
-          cp "$apk" "${{ matrix.app }}.apk"
-          ls -lh "${{ matrix.app }}.apk"
+          cp "$apk" "${{ matrix.app }}-${{ matrix.abi }}.apk"
+          ls -lh "${{ matrix.app }}-${{ matrix.abi }}.apk"
 
       - uses: actions/upload-artifact@v4
         with:
-          name: ${{ matrix.app }}-apk
-          path: android/${{ matrix.app }}/${{ matrix.app }}.apk
+          name: ${{ matrix.app }}-${{ matrix.abi }}
+          path: android/${{ matrix.app }}/${{ matrix.app }}-${{ matrix.abi }}.apk
+
+  release:
+    needs: [detect, build]
+    if: ${{ !cancelled() && needs.detect.outputs.apps != '[]' }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        app: ${{ fromJson(needs.detect.outputs.apps) }}
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: ${{ matrix.app }}-*
+          merge-multiple: true
+          path: apks
 
       - name: Publicar en Releases
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+          APP: ${{ matrix.app }}
           TAG: android-${{ matrix.app }}-latest
         run: |
+          ls -lh apks
           gh release delete "$TAG" --yes --cleanup-tag || true
-          gh release create "$TAG" "${{ matrix.app }}.apk" \
+          gh release create "$TAG" apks/*.apk \
             --target "$GITHUB_SHA" \
-            --title "${{ matrix.app }} (Android) · build ${GITHUB_RUN_NUMBER}" \
-            --notes "Compilada automáticamente desde ${GITHUB_SHA::7}."
+            --title "$APP (Android) · build ${GITHUB_RUN_NUMBER}" \
+            --notes "Compilada automáticamente desde ${GITHUB_SHA::7}.
+
+          - **$APP-arm64-v8a.apk**: la mayoría de móviles (64 bits).
+          - **$APP-armeabi-v7a.apk**: móviles antiguos de 32 bits.
+          - **$APP-universal.apk**: funciona en cualquiera."

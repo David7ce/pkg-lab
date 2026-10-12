@@ -4,6 +4,9 @@ plugins {
     id("org.jetbrains.kotlin.plugin.compose")
 }
 
+val targetAbi: String? = (findProperty("abi") as String?)?.takeIf { it != "universal" }
+val abiCodes = mapOf("armeabi-v7a" to 1, "arm64-v8a" to 2)
+
 android {
     namespace = "com.deivon.vozreves"
     compileSdk = 35
@@ -13,8 +16,21 @@ android {
         minSdk = 26
         targetSdk = 35
         // En GitHub Actions el número de compilación sube solo, así cada APK actualiza a la anterior.
-        versionCode = System.getenv("GITHUB_RUN_NUMBER")?.toIntOrNull() ?: 1
-        versionName = "1.0.$versionCode"
+        // ×10 + código de ABI para que las APKs por arquitectura no choquen entre sí.
+        val build = System.getenv("GITHUB_RUN_NUMBER")?.toIntOrNull() ?: 1
+        versionCode = build * 10 + (abiCodes[targetAbi] ?: 0)
+        versionName = "1.0.$build"
+        // Solo los 5 idiomas de la app: quita las traducciones sobrantes de las librerías.
+        resourceConfigurations += listOf("en", "es", "zh", "hi", "ar")
+    }
+
+    // -Pabi=arm64-v8a | armeabi-v7a | universal (el workflow compila cada una en paralelo).
+    splits {
+        abi {
+            isEnable = targetAbi != null
+            if (targetAbi != null) { reset(); include(targetAbi) }
+            isUniversalApk = false
+        }
     }
 
     // Firma: si el workflow encuentra el keystore en los secrets del repo, lo usa;

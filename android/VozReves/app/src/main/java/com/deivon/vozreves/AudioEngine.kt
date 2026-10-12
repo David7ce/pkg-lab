@@ -14,13 +14,10 @@ import java.io.File
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 
-/** Graba PCM 16 bits mono, lo reproduce normal o al revés y lo exporta a WAV. Sin dependencias. */
-class AudioEngine {
+const val SAMPLE_RATE = 44_100
 
-    companion object {
-        const val SAMPLE_RATE = 44_100
-        const val MAX_SECONDS = 60
-    }
+/** Graba PCM 16 bits mono y lo reproduce (o un tramo) normal o al revés. Sin dependencias. */
+class AudioEngine {
 
     var samples = ShortArray(0)
         private set
@@ -29,10 +26,15 @@ class AudioEngine {
 
     @Volatile private var recording = false
     @Volatile private var playing = false
+    @Volatile private var track: AudioTrack? = null
+    @Volatile private var startPos = 0
+    @Volatile private var direction = 1
 
-    /** Graba hasta que se llame a [stopRecording] o se llegue a [MAX_SECONDS]. */
+    fun load(data: ShortArray) { samples = data }
+
+    /** Graba hasta que se llame a [stopRecording] o se llegue a [maxSeconds]. */
     @SuppressLint("MissingPermission") // El permiso se pide en la UI antes de llamar aquí.
-    suspend fun record() = withContext(Dispatchers.IO) {
+    suspend fun record(maxSeconds: Int) = withContext(Dispatchers.IO) {
         val minBuf = AudioRecord.getMinBufferSize(
             SAMPLE_RATE, AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_16BIT
         )
@@ -40,7 +42,7 @@ class AudioEngine {
             MediaRecorder.AudioSource.MIC, SAMPLE_RATE,
             AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_16BIT, minBuf * 2
         )
-        val out = ShortArray(SAMPLE_RATE * MAX_SECONDS)
+        val out = ShortArray(SAMPLE_RATE * maxSeconds)
         val chunk = ShortArray(minBuf)
         var total = 0
 
@@ -63,15 +65,24 @@ class AudioEngine {
 
     fun stopRecording() { recording = false }
 
-    /** Reproduce la grabación; invertir es simplemente dar la vuelta al array de muestras. */
-    suspend fun play(reverse: Boolean) = withContext(Dispatchers.IO) {
-        val data = if (reverse) samples.reversedArray() else samples
+    /** Tramo [from, to) de la grabación, invertido si hace falta. */
+    fun slice(from: Int, to: Int, reverse: Boolean): ShortArray =
+        samples.copyOfRange(from, to).also { if (reverse) it.reverse() }
+
+    /** Muestra que está sonando ahora (en la grabación original), o -1 si no suena nada. */
+    fun position(): Int {
+        val t = track ?: return -1
+        return runCatching { startPos + direction * t.playbackHeadPosition }.getOrDefault(-1)
+    }
+
+    suspend fun play(reverse: Boolean, from: Int, to: Int) = withContext(Dispatchers.IO) {
+        val data = slice(from, to, reverse)
         if (data.isEmpty()) return@withContext
 
         val minBuf = AudioTrack.getMinBufferSize(
             SAMPLE_RATE, AudioFormat.CHANNEL_OUT_MONO, AudioFormat.ENCODING_PCM_16BIT
         )
-        val track = AudioTrack.Builder()
+        val t = AudioTrack.Builder()
             .setAudioAttributes(
                 AudioAttributes.Builder()
                     .setUsage(AudioAttributes.USAGE_MEDIA)
@@ -89,38 +100,56 @@ class AudioEngine {
             .setTransferMode(AudioTrack.MODE_STREAM)
             .build()
 
+        startPos = if (reverse) to else from
+        direction = if (reverse) -1 else 1
         playing = true
-        track.play()
+        track = t
+        t.play()
         try {
             var offset = 0
             while (playing && isActive && offset < data.size) {
-                val n = track.write(data, offset, minOf(4096, data.size - offset))
+                val n = t.write(data, offset, minOf(4096, data.size - offset))
                 if (n <= 0) break
                 offset += n
             }
-            // Esperar a que suene lo que queda en el buffer antes de soltar el AudioTrack.
-            while (playing && isActive && track.playbackHeadPosition < data.size) delay(20)
+            // Esperar a que suene lo que queda en el buffer (también mientras está en pausa).
+            while (playing && isActive && t.playbackHeadPosition < data.size) delay(20)
         } finally {
-            track.pause()
-            track.flush()
-            track.release()
+            track = null
+            t.pause()
+            t.flush()
+            t.release()
             playing = false
         }
     }
 
-    fun stopPlayback() { playing = false }
+    fun pause() { runCatching { track?.pause() } }
+    fun resume() { runCatching { track?.play() } }
 
-    /** Escribe la grabación (normal o invertida) como WAV PCM 16 bits mono. */
-    suspend fun exportWav(file: File, reverse: Boolean): File = withContext(Dispatchers.IO) {
-        val data = if (reverse) samples.reversedArray() else samples
-        val dataBytes = data.size * 2
-        val buf = ByteBuffer.allocate(44 + dataBytes).order(ByteOrder.LITTLE_ENDIAN)
-        buf.put("RIFF".toByteArray()).putInt(36 + dataBytes).put("WAVE".toByteArray())
-        buf.put("fmt ".toByteArray()).putInt(16).putShort(1).putShort(1)
-            .putInt(SAMPLE_RATE).putInt(SAMPLE_RATE * 2).putShort(2).putShort(16)
-        buf.put("data".toByteArray()).putInt(dataBytes)
-        data.forEach { buf.putShort(it) }
-        file.writeBytes(buf.array())
-        file
+    fun stopPlayback() {
+        playing = false
+        // Pausar y vaciar el buffer desbloquea un write() que esté esperando.
+        runCatching { track?.run { pause(); flush() } }
     }
+}
+
+/** WAV PCM 16 bits mono. */
+fun writeWav(file: File, data: ShortArray) {
+    val dataBytes = data.size * 2
+    val buf = ByteBuffer.allocate(44 + dataBytes).order(ByteOrder.LITTLE_ENDIAN)
+    buf.put("RIFF".toByteArray()).putInt(36 + dataBytes).put("WAVE".toByteArray())
+    buf.put("fmt ".toByteArray()).putInt(16).putShort(1).putShort(1)
+        .putInt(SAMPLE_RATE).putInt(SAMPLE_RATE * 2).putShort(2).putShort(16)
+    buf.put("data".toByteArray()).putInt(dataBytes)
+    data.forEach { buf.putShort(it) }
+    file.writeBytes(buf.array())
+}
+
+/** Lee los WAV que escribe [writeWav] (cabecera de 44 bytes). */
+fun readWav(file: File): ShortArray {
+    val bytes = file.readBytes()
+    if (bytes.size <= 44) return ShortArray(0)
+    val out = ShortArray((bytes.size - 44) / 2)
+    ByteBuffer.wrap(bytes, 44, out.size * 2).order(ByteOrder.LITTLE_ENDIAN).asShortBuffer().get(out)
+    return out
 }

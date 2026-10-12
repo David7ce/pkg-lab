@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Voz del Revés</string>
+    <string name="status_idle">Pulsa el botón y habla</string>
+    <string name="status_recording">Grabando… (máx. %1$d s)</string>
+    <string name="status_playing">Reproduciendo</string>
+    <string name="status_paused">En pausa</string>
+    <string name="recording_length">Grabación: %1$s s</string>
+    <string name="record">Grabar</string>
+    <string name="stop">Parar</string>
+    <string name="play">Reproducir</string>
+    <string name="pause">Pausa</string>
+    <string name="share">Compartir</string>
+    <string name="reverse">Al revés</string>
+    <string name="normal">Normal</string>
+    <string name="selection">Selección: %1$s – %2$s s</string>
+    <string name="history">Historial</string>
+    <string name="history_empty">Aún no hay grabaciones</string>
+    <string name="delete">Borrar</string>
+    <string name="settings">Ajustes</string>
+    <string name="language">Idioma</string>
+    <string name="system_default">Del sistema</string>
+    <string name="theme">Tema</string>
+    <string name="theme_light">Claro</string>
+    <string name="theme_dark">Oscuro</string>
+    <string name="countdown">Cuenta atrás antes de grabar</string>
+    <string name="max_length">Duración máxima</string>
+    <string name="off">No</string>
+    <string name="clear_history">Borrar todas las grabaciones</string>
+    <string name="back">Atrás</string>
+    <string name="share_title">Compartir audio</string>
+    <string name="version">Versión %1$s</string>
+    <string name="seconds_short">%1$d s</string>
+</resources>

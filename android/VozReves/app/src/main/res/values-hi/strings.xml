@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">उल्टी आवाज़</string>
+    <string name="status_idle">बटन दबाएँ और बोलें</string>
+    <string name="status_recording">रिकॉर्ड हो रहा है… (अधिकतम %1$d से.)</string>
+    <string name="status_playing">चल रहा है</string>
+    <string name="status_paused">रुका हुआ</string>
+    <string name="recording_length">रिकॉर्डिंग: %1$s से.</string>
+    <string name="record">रिकॉर्ड</string>
+    <string name="stop">रोकें</string>
+    <string name="play">चलाएँ</string>
+    <string name="pause">विराम</string>
+    <string name="share">साझा करें</string>
+    <string name="reverse">उल्टा</string>
+    <string name="normal">सामान्य</string>
+    <string name="selection">चयन: %1$s – %2$s से.</string>
+    <string name="history">इतिहास</string>
+    <string name="history_empty">अभी कोई रिकॉर्डिंग नहीं</string>
+    <string name="delete">हटाएँ</string>
+    <string name="settings">सेटिंग्स</string>
+    <string name="language">भाषा</string>
+    <string name="system_default">सिस्टम डिफ़ॉल्ट</string>
+    <string name="theme">थीम</string>
+    <string name="theme_light">हल्की</string>
+    <string name="theme_dark">गहरी</string>
+    <string name="countdown">रिकॉर्डिंग से पहले उलटी गिनती</string>
+    <string name="max_length">अधिकतम अवधि</string>
+    <string name="off">बंद</string>
+    <string name="clear_history">सभी रिकॉर्डिंग हटाएँ</string>
+    <string name="back">वापस</string>
+    <string name="share_title">ऑडियो साझा करें</string>
+    <string name="version">संस्करण %1$s</string>
+    <string name="seconds_short">%1$d से.</string>
+</resources>
