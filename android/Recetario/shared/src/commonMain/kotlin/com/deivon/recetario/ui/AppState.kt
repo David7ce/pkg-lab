@@ -225,7 +225,7 @@ class AppState(
         launch { withContext(io) { repo.setSetting(THEME, mode.name) } }
     }
 
-    fun setLanguage(value: AppLanguage) {
+    fun chooseLanguage(value: AppLanguage) {
         language = value
         launch { withContext(io) { repo.setSetting(LANGUAGE, value.name) } }
     }

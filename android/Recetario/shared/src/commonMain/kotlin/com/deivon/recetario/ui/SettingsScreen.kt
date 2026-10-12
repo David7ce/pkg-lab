@@ -55,7 +55,7 @@ fun SettingsScreen(app: AppState) {
                 Column(Modifier.selectableGroup()) {
                     AppLanguage.entries.forEach { language ->
                         val label = if (language == AppLanguage.System) s.languageSystem else language.nativeName
-                        OptionRow(label, null, app.language == language) { app.setLanguage(language) }
+                        OptionRow(label, null, app.language == language) { app.chooseLanguage(language) }
                     }
                 }
 

@@ -1,18 +1,24 @@
 # Recetario
 
 Minimal, offline personal recipe book. Kotlin Multiplatform + Compose Multiplatform; Android today,
-Windows/Linux prepared. English and Spanish (follows the system language).
+Windows/Linux prepared. Spanish, English, French, German, Portuguese and Italian (device language by default,
+or chosen in Settings).
 
-- Library grid with search (title, tags, ingredients; accents ignored), tag filters and sort by name or last edit.
+- Library grid with a search bar (title, tags, ingredients; accents ignored), a "show only favourites" button
+  and a filter panel (sort by last edit, name or rating; minimum stars; tags). The add button offers
+  *Add manually* or *Import from URL (web scraper)*. A gear button opens Settings.
 - Create, view, edit, duplicate and delete recipes (deletion asks first). Optional photo per recipe.
+- Favourites and 1–5 star ratings, set from the recipe page (tapping the current star clears it).
 - Structured ingredients (quantity, unit, name, note) and ordered steps; add, edit, reorder, remove.
-- Scaling: changing servings scales numeric quantities; text-only ingredients ("salt to taste") never change.
+- Adjust quantity / yield: by servings (when the recipe states them), preset multipliers (×½ to ×3) or any
+  other one (1.5, 1,5, 1/2, ½); text-only ingredients ("salt to taste") never change.
+- Settings: theme, language, and every library-wide action (import file or URL, export JSON, backup, cookbook PDF).
 - Cooking mode: one step at a time, progress, previous/next, ingredients on demand, screen kept on.
 - Import: the app's own JSON and full backups, **RecipeSage** exports (JSON-LD), **My RecipeBox** (RecetteTek)
   `.rtk` archives, and web pages with schema.org/Recipe JSON-LD (shown as an editable preview; nothing is saved
   until you tap Save). The file type is recognised by content.
 - Free-text notes per recipe (also where imported descriptions, comments and extra fields go).
-- Export: one recipe or the whole library as JSON; full backup ZIP with photos; recipe or cookbook PDF.
+- Export: one recipe as PDF; the whole library as JSON, as a full backup ZIP with photos, or as a cookbook PDF.
 - Light, dark or system theme. No accounts, no network except the explicit "Import from web page".
 
 ## Structure
@@ -34,7 +40,7 @@ Recetario/
         │   ├── kotlin/…/data/        RecipeRepository (SQLDelight + image files, write ordering)
         │   ├── kotlin/…/platform/    Services: ImageStore, ImageCodec, ZipCodec, WebClient, PdfExporter interfaces
         │   ├── kotlin/…/ui/          AppState (navigation + actions), Transfer (import/export), screens,
-        │   │                         Strings (en/es), Theme, AppIcons
+        │   │                         Strings (base + es), Translations (fr, de, pt, it, language list), Theme, AppIcons
         │   └── sqldelight/…/Recipe.sq schema and queries
         ├── androidMain/…/platform/   Android implementations, RecetarioApplication, MainActivity, pickers
         ├── commonTest/               logic tests (run on the JVM through the Android unit-test task)
@@ -67,9 +73,11 @@ no DI framework.
 
 ## Data
 
-SQLite database `recetario.db` (schema version 2, `Recipe.sq`): `recipe`, `ingredient`, `step`, `tag`
+SQLite database `recetario.db` (schema version 3, `Recipe.sq`): `recipe`, `ingredient`, `step`, `tag`
 (children ordered by `position`) and `setting` (theme). Migrations live next to it (`1.sqm`: 1 → 2 adds
-`recipe.notes`, appended last because `SELECT *` reads by position); `MigrationTest` upgrades a real v1 schema. Photos are JPEG files in the app's private
+`recipe.notes`; `2.sqm`: 2 → 3 adds `rating` and `favorite`). New columns go last, in migration order, because
+`SELECT *` reads by position; `MigrationTest` upgrades a real v1 schema through both steps. Settings rows: theme and
+language. Photos are JPEG files in the app's private
 `files/images/`, referenced by opaque name (`<random>.jpg`), never stored as Base64.
 
 Write ordering (`RecipeRepository`): new image files first → rows in one transaction → old image files
@@ -82,13 +90,15 @@ Picked photos are rotated upright (EXIF), scaled to 1600 px and re-encoded (JPEG
 **JSON** (`recetario-YYYY-MM-DD.json` or `<recipe>.json`):
 
 ```json
-{ "format": "recetario", "version": 2, "exportedAt": 1760227200000, "app": "Recetario",
+{ "format": "recetario", "version": 3, "exportedAt": 1760227200000, "app": "Recetario",
   "recipes": [ { "id": "…", "title": "…", "ingredients": [ {"name": "harina", "quantity": 200.0, "unit": "g"} ],
                  "steps": ["…"], "servings": 4, "prepMinutes": 10, "cookMinutes": 20, "tags": ["…"],
-                 "sourceUrl": "https://…", "notes": "…", "createdAt": 0, "updatedAt": 0 } ] }
+                 "sourceUrl": "https://…", "notes": "…", "rating": 4, "favorite": true,
+                 "createdAt": 0, "updatedAt": 0 } ] }
 ```
 
-Plain JSON carries no photos (no `image` field). Version 2 added `notes`; version 1 files still import.
+Plain JSON carries no photos (no `image` field). Version 2 added `notes`, version 3 `rating` and `favorite`;
+older files still import.
 Newer `version`s are rejected (an older app would otherwise drop fields silently); unknown fields are ignored.
 
 **Backup ZIP** (`recetario-backup-YYYY-MM-DD.zip`): `manifest.json` (format `recetario-backup`, version, counts,
@@ -115,10 +125,10 @@ transaction as backups; the source id is kept, so importing the same export twic
 | Notes | `description` + `comment[].text` | `description`, `notes`, nutrition, cookware, video |
 | Photo | first `image` URL, downloaded | file named in `pictures`, else `originalPicture` URL |
 | Dates | `dateModified` / `datePublished` | `lastModifiedDate` |
+| Rating / favourite | `aggregateRating.ratingValue` (rounded) | `rating` (rounded), `favorite` |
 
 Times with no field of their own (a total that is not prep + cook, resting time) or not understood are added
-to the notes with a label in the user's language. Not imported: ratings, favourites, RecipeBox meal plans and
-shopping lists. Entries without a title are skipped and counted; repeated ids get a new id. Photos are fetched
+to the notes with a label in the user's language. Not imported: RecipeBox meal plans and shopping lists. Entries without a title are skipped and counted; repeated ids get a new id. Photos are fetched
 (4 at a time, with progress and cancel) and resized only for the recipes that will be written, after the user
 confirms; a photo that fails leaves that recipe without one and is reported.
 
