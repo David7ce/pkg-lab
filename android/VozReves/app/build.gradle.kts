@@ -62,6 +62,16 @@ android {
     }
     kotlinOptions { jvmTarget = "17" }
     buildFeatures { compose = true }
+
+    // APK más ligera: fuera metadatos que la app no usa en ejecución.
+    packaging {
+        resources.excludes += setOf("META-INF/*.version", "DebugProbesKt.bin", "kotlin-tooling-metadata.json")
+    }
+    // Sin el bloque de dependencias cifrado de Google (no aporta nada fuera de Play; F-Droid lo pide).
+    dependenciesInfo {
+        includeInApk = false
+        includeInBundle = false
+    }
 }
 
 dependencies {

@@ -30,7 +30,7 @@ fun peaks(samples: ShortArray, bars: Int = 120): FloatArray {
 fun Waveform(
     peaks: FloatArray,
     selection: ClosedFloatingPointRange<Float>,
-    progress: Float,
+    progress: () -> Float, // Se lee al dibujar: solo se repinta el Canvas, no toda la pantalla.
     modifier: Modifier = Modifier
 ) {
     val active = MaterialTheme.colorScheme.primary
@@ -47,8 +47,9 @@ fun Waveform(
             val color = if ((i + 0.5f) / n in selection) active else inactive
             drawLine(color, Offset(x, mid - h), Offset(x, mid + h), barW * 0.6f, StrokeCap.Round)
         }
-        if (progress >= 0f) {
-            val x = progress * size.width
+        val p = progress()
+        if (p >= 0f) {
+            val x = p * size.width
             drawLine(cursor, Offset(x, 0f), Offset(x, size.height), 2.dp.toPx())
         }
     }

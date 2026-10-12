@@ -32,9 +32,16 @@ class AudioEngine {
 
     fun load(data: ShortArray) { samples = data }
 
-    /** Graba hasta que se llame a [stopRecording] o se llegue a [maxSeconds]. */
+    /** Muestras grabadas hasta ahora (para el contador mientras se graba). */
+    @Volatile var recordedSamples = 0
+        private set
+
+    /**
+     * Graba hasta que se llame a [stopRecording] o se llegue a [maxSeconds].
+     * Devuelve false si el micrófono no está disponible (p. ej. lo usa otra app).
+     */
     @SuppressLint("MissingPermission") // El permiso se pide en la UI antes de llamar aquí.
-    suspend fun record(maxSeconds: Int) = withContext(Dispatchers.IO) {
+    suspend fun record(maxSeconds: Int): Boolean = withContext(Dispatchers.IO) {
         val minBuf = AudioRecord.getMinBufferSize(
             SAMPLE_RATE, AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_16BIT
         )
@@ -42,18 +49,27 @@ class AudioEngine {
             MediaRecorder.AudioSource.MIC, SAMPLE_RATE,
             AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_16BIT, minBuf * 2
         )
-        val out = ShortArray(SAMPLE_RATE * maxSeconds)
+        if (recorder.state != AudioRecord.STATE_INITIALIZED) {
+            recorder.release()
+            return@withContext false
+        }
+        val max = SAMPLE_RATE * maxSeconds
+        // Empieza con 10 s y crece al doble según haga falta: no reserva 10 MB por si acaso.
+        var out = ShortArray(minOf(max, SAMPLE_RATE * 10))
         val chunk = ShortArray(minBuf)
         var total = 0
 
+        recordedSamples = 0
         recording = true
         recorder.startRecording()
         try {
-            while (recording && isActive && total < out.size) {
-                val n = recorder.read(chunk, 0, minOf(chunk.size, out.size - total))
+            while (recording && isActive && total < max) {
+                val n = recorder.read(chunk, 0, minOf(chunk.size, max - total))
                 if (n < 0) break
+                if (total + n > out.size) out = out.copyOf(minOf(max, out.size * 2))
                 chunk.copyInto(out, total, 0, n)
                 total += n
+                recordedSamples = total
             }
         } finally {
             recorder.stop()
@@ -61,6 +77,7 @@ class AudioEngine {
             recording = false
         }
         samples = out.copyOf(total)
+        true
     }
 
     fun stopRecording() { recording = false }
@@ -141,7 +158,7 @@ fun writeWav(file: File, data: ShortArray) {
     buf.put("fmt ".toByteArray()).putInt(16).putShort(1).putShort(1)
         .putInt(SAMPLE_RATE).putInt(SAMPLE_RATE * 2).putShort(2).putShort(16)
     buf.put("data".toByteArray()).putInt(dataBytes)
-    data.forEach { buf.putShort(it) }
+    buf.asShortBuffer().put(data) // Copia en bloque: mucho más rápido que muestra a muestra.
     file.writeBytes(buf.array())
 }
 

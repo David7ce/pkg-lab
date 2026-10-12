@@ -79,7 +79,7 @@ jobs:
           distribution: temurin
           java-version: 17
 
-      - uses: gradle/actions/setup-gradle@v4
+      - uses: gradle/actions/setup-gradle@v5
 
       # El keystore va cifrado (AES-256) en .github/signing/; solo la contraseña es secret.
       # La misma clave firma todas las apps, así cada versión nueva se instala encima.
@@ -109,7 +109,7 @@ jobs:
           cp "$apk" "${{ matrix.app }}-${{ matrix.abi }}.apk"
           ls -lh "${{ matrix.app }}-${{ matrix.abi }}.apk"
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v5
         with:
           name: ${{ matrix.app }}-${{ matrix.abi }}
           path: android/${{ matrix.app }}/${{ matrix.app }}-${{ matrix.abi }}.apk
@@ -123,7 +123,7 @@ jobs:
       matrix:
         app: ${{ fromJson(needs.detect.outputs.apps) }}
     steps:
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v5
         with:
           pattern: ${{ matrix.app }}-*
           merge-multiple: true

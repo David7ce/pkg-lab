@@ -2,7 +2,6 @@
 <resources>
     <string name="app_name">声音倒放</string>
     <string name="status_idle">点击按钮开始说话</string>
-    <string name="status_recording">录音中…（最长 %1$d 秒）</string>
     <string name="status_playing">播放中</string>
     <string name="status_paused">已暂停</string>
     <string name="recording_length">录音：%1$s 秒</string>
@@ -13,7 +12,6 @@
     <string name="share">分享</string>
     <string name="reverse">倒放</string>
     <string name="normal">正常</string>
-    <string name="selection">选区：%1$s – %2$s 秒</string>
     <string name="history">历史记录</string>
     <string name="history_empty">暂无录音</string>
     <string name="delete">删除</string>
@@ -23,12 +21,14 @@
     <string name="theme">主题</string>
     <string name="theme_light">浅色</string>
     <string name="theme_dark">深色</string>
-    <string name="countdown">录音前倒计时</string>
     <string name="max_length">最长时长</string>
-    <string name="off">关闭</string>
     <string name="clear_history">删除所有录音</string>
     <string name="back">返回</string>
     <string name="share_title">分享音频</string>
     <string name="version">版本 %1$s</string>
     <string name="seconds_short">%1$d 秒</string>
+    <string name="status_recording">录音中… %1$s / %2$s</string>
+    <string name="theme_system">系统</string>
+    <string name="mic_permission">录音需要麦克风权限</string>
+    <string name="open_settings">打开设置</string>
 </resources>

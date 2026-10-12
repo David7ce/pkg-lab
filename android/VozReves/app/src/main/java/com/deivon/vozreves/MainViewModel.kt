@@ -3,11 +3,11 @@ package com.deivon.vozreves
 import android.app.Application
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.coroutineScope
@@ -16,7 +16,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
 
-enum class Mode { Idle, Countdown, Recording, Playing, Paused }
+enum class Mode { Idle, Recording, Playing, Paused }
 
 /** Estado de la app; sobrevive a rotaciones y al cambio de idioma. */
 class MainViewModel(app: Application) : AndroidViewModel(app) {
@@ -28,16 +28,20 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
 
     var mode by mutableStateOf(Mode.Idle)
         private set
-    var countdown by mutableIntStateOf(0)
+    /** Segundos grabados mientras se graba. */
+    var recorded by mutableFloatStateOf(0f)
         private set
     var duration by mutableFloatStateOf(0f)
         private set
     var peaks by mutableStateOf(FloatArray(0))
         private set
-    /** Posición de reproducción 0..1, o -1 si no suena nada. */
+    /** Posición de reproducción 0..1 en la grabación completa, o -1 si no suena nada. */
     var progress by mutableFloatStateOf(-1f)
         private set
     var recordings by mutableStateOf(emptyList<History.Item>())
+        private set
+    /** El micrófono estaba ocupado o no se pudo abrir. */
+    var micError by mutableStateOf(false)
         private set
 
     var reverse by mutableStateOf(true)
@@ -45,26 +49,24 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
     var selection by mutableStateOf(0f..1f)
 
     val hasRecording: Boolean get() = duration > 0f
+    val isPlaying: Boolean get() = mode == Mode.Playing || mode == Mode.Paused
 
-    init { refreshHistory() }
+    init { viewModelScope.launch { refreshHistory() } }
 
-    /** Botón grande: empieza (con cuenta atrás), para la grabación o cancela la cuenta atrás. */
+    /** Botón grande: empieza o para la grabación (al parar se guarda en el historial). */
     fun onRecordButton() {
-        when (mode) {
-            Mode.Recording -> engine.stopRecording()
-            Mode.Countdown -> job?.cancel()
-            else -> launchExclusive {
-                for (i in settings.countdown downTo 1) {
-                    mode = Mode.Countdown
-                    countdown = i
-                    delay(1000)
-                }
-                mode = Mode.Recording
+        if (mode == Mode.Recording) { engine.stopRecording(); return }
+        launchExclusive {
+            micError = false
+            recorded = 0f
+            mode = Mode.Recording
+            val ok = withTicker(100, { recorded = engine.recordedSamples / SAMPLE_RATE.toFloat() }) {
                 engine.record(settings.maxSeconds)
-                onNewAudio()
-                withContext(Dispatchers.IO) { history.save(engine.samples) }
-                refreshHistory()
             }
+            if (!ok) { micError = true; return@launchExclusive }
+            onNewAudio()
+            withContext(Dispatchers.IO) { history.save(engine.samples) }
+            refreshHistory()
         }
     }
 
@@ -72,32 +74,31 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
         when (mode) {
             Mode.Playing -> { engine.pause(); mode = Mode.Paused }
             Mode.Paused -> { engine.resume(); mode = Mode.Playing }
-            else -> launchExclusive {
+            Mode.Recording -> Unit
+            Mode.Idle -> launchExclusive {
                 val (from, to) = range() ?: return@launchExclusive
                 val total = engine.samples.size.toFloat()
                 mode = Mode.Playing
-                coroutineScope {
-                    val ticker = launch {
-                        while (true) {
-                            engine.position().takeIf { it >= 0 }?.let { progress = it / total }
-                            delay(33)
-                        }
-                    }
-                    try { engine.play(reverse, from, to) } finally { ticker.cancel() }
+                withTicker(33, { engine.position().takeIf { it >= 0 }?.let { progress = it / total } }) {
+                    engine.play(reverse, from, to)
                 }
             }
         }
     }
 
-    fun stop() {
-        engine.stopPlayback()
-        if (mode == Mode.Countdown) job?.cancel()
+    fun stop() = engine.stopPlayback()
+
+    /** Al salir de la app: Android no deja grabar en segundo plano, así que se para y se guarda. */
+    fun onBackground() {
+        engine.stopRecording()
+        if (mode == Mode.Playing) { engine.pause(); mode = Mode.Paused }
     }
 
     /** WAV del tramo seleccionado en el sentido elegido, listo para compartir. */
     suspend fun exportSelection(): File? = withContext(Dispatchers.IO) {
         val (from, to) = range() ?: return@withContext null
-        File(getApplication<Application>().cacheDir, "voz.wav").also { writeWav(it, engine.slice(from, to, reverse)) }
+        val name = if (reverse) "reversed.wav" else "voice.wav"
+        File(getApplication<Application>().cacheDir, name).also { writeWav(it, engine.slice(from, to, reverse)) }
     }
 
     fun loadRecording(item: History.Item) = launchExclusive {
@@ -105,15 +106,24 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
         onNewAudio()
     }
 
-    fun deleteRecording(item: History.Item) { history.delete(item); refreshHistory() }
-    fun clearHistory() { history.clear(); refreshHistory() }
+    fun deleteRecording(item: History.Item) = viewModelScope.launch {
+        withContext(Dispatchers.IO) { history.delete(item) }
+        refreshHistory()
+    }
 
-    private fun refreshHistory() { recordings = history.list() }
+    fun clearHistory() = viewModelScope.launch {
+        withContext(Dispatchers.IO) { history.clear() }
+        refreshHistory()
+    }
 
-    private fun onNewAudio() {
+    private suspend fun refreshHistory() {
+        recordings = withContext(Dispatchers.IO) { history.list() }
+    }
+
+    private suspend fun onNewAudio() {
         duration = engine.durationSeconds
         selection = 0f..1f
-        peaks = peaks(engine.samples)
+        peaks = withContext(Dispatchers.Default) { peaks(engine.samples) } // Fuera del hilo de la UI.
     }
 
     private fun range(): Pair<Int, Int>? {
@@ -123,6 +133,13 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
         val to = (selection.endInclusive * n).toInt().coerceIn(from + 1, n)
         return from to to
     }
+
+    /** Ejecuta [block] actualizando el estado cada [periodMs] mientras dura. */
+    private suspend fun <T> withTicker(periodMs: Long, tick: () -> Unit, block: suspend CoroutineScope.() -> T): T =
+        coroutineScope {
+            val ticker = launch { while (true) { tick(); delay(periodMs) } }
+            try { block() } finally { ticker.cancel() }
+        }
 
     /** Para lo que esté sonando y lanza la nueva acción cuando la anterior haya terminado. */
     private fun launchExclusive(block: suspend () -> Unit) {

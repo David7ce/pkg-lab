@@ -2,7 +2,6 @@
 <resources>
     <string name="app_name">الصوت المعكوس</string>
     <string name="status_idle">اضغط الزر وتحدث</string>
-    <string name="status_recording">جارٍ التسجيل… (الحد الأقصى %1$d ث)</string>
     <string name="status_playing">جارٍ التشغيل</string>
     <string name="status_paused">متوقف مؤقتًا</string>
     <string name="recording_length">التسجيل: %1$s ث</string>
@@ -13,7 +12,6 @@
     <string name="share">مشاركة</string>
     <string name="reverse">معكوس</string>
     <string name="normal">عادي</string>
-    <string name="selection">التحديد: %1$s – %2$s ث</string>
     <string name="history">السجل</string>
     <string name="history_empty">لا توجد تسجيلات بعد</string>
     <string name="delete">حذف</string>
@@ -23,12 +21,14 @@
     <string name="theme">المظهر</string>
     <string name="theme_light">فاتح</string>
     <string name="theme_dark">داكن</string>
-    <string name="countdown">عدّ تنازلي قبل التسجيل</string>
     <string name="max_length">المدة القصوى</string>
-    <string name="off">بدون</string>
     <string name="clear_history">حذف كل التسجيلات</string>
     <string name="back">رجوع</string>
     <string name="share_title">مشاركة الصوت</string>
     <string name="version">الإصدار %1$s</string>
     <string name="seconds_short">%1$d ث</string>
+    <string name="status_recording">جارٍ التسجيل… %1$s / %2$s</string>
+    <string name="theme_system">النظام</string>
+    <string name="mic_permission">يلزم إذن الميكروفون للتسجيل</string>
+    <string name="open_settings">فتح الإعدادات</string>
 </resources>

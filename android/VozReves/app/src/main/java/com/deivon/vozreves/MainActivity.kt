@@ -7,15 +7,19 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Color
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.text.format.DateFormat
+import android.provider.Settings as AndroidSettings
 import androidx.activity.ComponentActivity
+import androidx.activity.SystemBarStyle
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.viewModels
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
@@ -66,6 +70,7 @@ import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -77,30 +82,38 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
-import androidx.lifecycle.viewmodel.compose.viewModel
 import kotlinx.coroutines.launch
+import java.text.DateFormat
 import java.util.Date
 
 class MainActivity : ComponentActivity() {
+    private val vm: MainViewModel by viewModels()
+
     override fun attachBaseContext(base: Context) = super.attachBaseContext(Settings.wrap(base))
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
-        setContent { App() }
+        setContent { App(vm) }
+    }
+
+    override fun onStop() {
+        super.onStop()
+        if (!isChangingConfigurations) vm.onBackground()
     }
 }
 
 private enum class Screen { Main, History, Settings }
 
 @Composable
-fun App(vm: MainViewModel = viewModel()) {
+fun App(vm: MainViewModel) {
     var screen by rememberSaveable { mutableStateOf(Screen.Main) }
     val back = { screen = Screen.Main }
     AppTheme(vm.settings.theme) {
@@ -117,6 +130,12 @@ fun App(vm: MainViewModel = viewModel()) {
 fun AppTheme(theme: Int, content: @Composable () -> Unit) {
     val dark = when (theme) { 1 -> false; 2 -> true; else -> isSystemInDarkTheme() }
     val ctx = LocalContext.current
+    // Iconos de la barra de estado/navegación acordes al tema de la app, no solo al del sistema.
+    DisposableEffect(dark) {
+        val style = SystemBarStyle.auto(Color.TRANSPARENT, Color.TRANSPARENT) { dark }
+        (ctx as? ComponentActivity)?.enableEdgeToEdge(style, style)
+        onDispose {}
+    }
     val colors = when {
         Build.VERSION.SDK_INT >= Build.VERSION_CODES.S ->
             if (dark) dynamicDarkColorScheme(ctx) else dynamicLightColorScheme(ctx)
@@ -126,15 +145,14 @@ fun AppTheme(theme: Int, content: @Composable () -> Unit) {
     MaterialTheme(colorScheme = colors, content = content)
 }
 
-private fun secs(v: Float) = "%.1f".format(v)
-
 @Composable
 private fun MainScreen(vm: MainViewModel, onHistory: () -> Unit, onSettings: () -> Unit) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
+    var permissionDenied by rememberSaveable { mutableStateOf(false) }
     val micPermission = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestPermission()
-    ) { granted -> if (granted) vm.onRecordButton() }
+    ) { granted -> permissionDenied = !granted; if (granted) vm.onRecordButton() }
 
     fun onRecordClick() {
         val granted = ContextCompat.checkSelfPermission(context, Manifest.permission.RECORD_AUDIO) ==
@@ -151,17 +169,17 @@ private fun MainScreen(vm: MainViewModel, onHistory: () -> Unit, onSettings: () 
         context.startActivity(Intent.createChooser(send, shareTitle))
     }
 
-    val capturing = vm.mode == Mode.Recording || vm.mode == Mode.Countdown
-    val playing = vm.mode == Mode.Playing || vm.mode == Mode.Paused
+    val recording = vm.mode == Mode.Recording
+    val playing = vm.isPlaying
 
     Scaffold(topBar = {
         TopAppBar(
             title = { Text(stringResource(R.string.app_name), fontWeight = FontWeight.Bold) },
             actions = {
-                IconButton(onClick = onHistory, enabled = !capturing) {
+                IconButton(onClick = onHistory, enabled = !recording) {
                     Icon(AppIcons.History, stringResource(R.string.history))
                 }
-                IconButton(onClick = onSettings, enabled = !capturing) {
+                IconButton(onClick = onSettings, enabled = !recording) {
                     Icon(Icons.Filled.Settings, stringResource(R.string.settings))
                 }
             }
@@ -173,56 +191,51 @@ private fun MainScreen(vm: MainViewModel, onHistory: () -> Unit, onSettings: () 
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            Text(
-                text = when (vm.mode) {
-                    Mode.Countdown, Mode.Recording -> stringResource(R.string.status_recording, vm.settings.maxSeconds)
-                    Mode.Playing -> stringResource(R.string.status_playing)
-                    Mode.Paused -> stringResource(R.string.status_paused)
-                    Mode.Idle -> if (vm.hasRecording) stringResource(R.string.recording_length, secs(vm.duration))
-                                 else stringResource(R.string.status_idle)
-                },
-                style = MaterialTheme.typography.bodyLarge,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
+            Status(vm)
+            if (permissionDenied || vm.micError) {
+                Spacer(Modifier.height(8.dp))
+                Text(
+                    stringResource(R.string.mic_permission),
+                    color = MaterialTheme.colorScheme.error,
+                    textAlign = TextAlign.Center
+                )
+                if (permissionDenied) TextButton(onClick = {
+                    context.startActivity(
+                        Intent(AndroidSettings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.fromParts("package", context.packageName, null))
+                    )
+                }) { Text(stringResource(R.string.open_settings)) }
+            }
             Spacer(Modifier.height(28.dp))
 
             Button(
                 onClick = { onRecordClick() },
                 shape = CircleShape,
                 modifier = Modifier.size(150.dp),
-                colors = if (capturing) ButtonDefaults.buttonColors(
+                colors = if (recording) ButtonDefaults.buttonColors(
                     containerColor = MaterialTheme.colorScheme.error,
                     contentColor = MaterialTheme.colorScheme.onError
                 ) else ButtonDefaults.buttonColors()
             ) {
-                if (vm.mode == Mode.Countdown) {
-                    Text("${vm.countdown}", fontSize = 56.sp, fontWeight = FontWeight.Bold)
-                } else Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Icon(if (capturing) AppIcons.Stop else AppIcons.Mic, null, Modifier.size(40.dp))
-                    Text(stringResource(if (capturing) R.string.stop else R.string.record), fontSize = 18.sp)
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Icon(if (recording) AppIcons.Stop else AppIcons.Mic, null, Modifier.size(40.dp))
+                    Text(stringResource(if (recording) R.string.stop else R.string.record), fontSize = 18.sp)
                 }
             }
 
-            if (vm.hasRecording && !capturing) {
+            if (vm.hasRecording && !recording) {
                 Spacer(Modifier.height(28.dp))
                 // El tiempo del audio siempre va de izquierda a derecha, también en árabe.
                 CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
                     Column {
-                        Waveform(vm.peaks, vm.selection, vm.progress, Modifier.fillMaxWidth().height(72.dp))
+                        Waveform(vm.peaks, vm.selection, { vm.progress }, Modifier.fillMaxWidth().height(72.dp))
                         RangeSlider(
                             value = vm.selection,
                             onValueChange = { vm.selection = it },
                             enabled = !playing
                         )
+                        PlaybackTimes(vm)
                     }
                 }
-                Text(
-                    stringResource(
-                        R.string.selection,
-                        secs(vm.selection.start * vm.duration), secs(vm.selection.endInclusive * vm.duration)
-                    ),
-                    style = MaterialTheme.typography.bodySmall
-                )
                 Spacer(Modifier.height(16.dp))
                 Choice(
                     listOf(true to stringResource(R.string.reverse), false to stringResource(R.string.normal)),
@@ -250,6 +263,47 @@ private fun MainScreen(vm: MainViewModel, onHistory: () -> Unit, onSettings: () 
     }
 }
 
+/** Texto de estado; aislado para que el contador de grabación no recomponga toda la pantalla. */
+@Composable
+private fun Status(vm: MainViewModel) {
+    val time = rememberTimeFormat()
+    Text(
+        text = when (vm.mode) {
+            Mode.Recording -> stringResource(
+                R.string.status_recording, time.clock(vm.recorded), time.clock(vm.settings.maxSeconds.toFloat())
+            )
+            Mode.Playing -> stringResource(R.string.status_playing)
+            Mode.Paused -> stringResource(R.string.status_paused)
+            Mode.Idle -> if (vm.hasRecording) stringResource(R.string.recording_length, time.seconds(vm.duration))
+                         else stringResource(R.string.status_idle)
+        },
+        style = MaterialTheme.typography.bodyLarge,
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
+        textAlign = TextAlign.Center
+    )
+}
+
+/**
+ * Tiempos estilo reproductor: transcurrido en el lado donde empieza a sonar y duración del tramo
+ * en el otro. Al revés el audio empieza por la derecha, así que el contador va a la derecha.
+ */
+@Composable
+private fun PlaybackTimes(vm: MainViewModel) {
+    val time = rememberTimeFormat()
+    val sel = vm.selection
+    val length = (sel.endInclusive - sel.start) * vm.duration
+    val p = vm.progress
+    val elapsed = if (p < 0f) 0f else (if (vm.reverse) sel.endInclusive - p else p - sel.start) * vm.duration
+    val counter = time.clock(elapsed.coerceIn(0f, length))
+    val total = time.clock(length)
+    val style = MaterialTheme.typography.labelMedium.copy(fontFamily = FontFamily.Monospace)
+    Row(Modifier.fillMaxWidth().padding(horizontal = 12.dp)) {
+        Text(if (vm.reverse) total else counter, style = style)
+        Spacer(Modifier.weight(1f))
+        Text(if (vm.reverse) counter else total, style = style)
+    }
+}
+
 /** Selector de una opción (botones segmentados). */
 @Composable
 private fun <T> Choice(options: List<Pair<T, String>>, selected: T, enabled: Boolean = true, onSelect: (T) -> Unit) {
@@ -260,7 +314,7 @@ private fun <T> Choice(options: List<Pair<T, String>>, selected: T, enabled: Boo
                 onClick = { onSelect(value) },
                 shape = SegmentedButtonDefaults.itemShape(i, options.size),
                 enabled = enabled
-            ) { Text(label, maxLines = 1) }
+            ) { Text(label, maxLines = 1, textAlign = TextAlign.Center) }
         }
     }
 }
@@ -279,18 +333,17 @@ private fun SubScreen(title: String, onBack: () -> Unit, content: @Composable (P
 
 @Composable
 private fun HistoryScreen(vm: MainViewModel, onBack: () -> Unit) {
-    val context = LocalContext.current
-    val format = remember { DateFormat.getMediumDateFormat(context) to DateFormat.getTimeFormat(context) }
+    val time = rememberTimeFormat()
+    val dates = remember(time.locale) { DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.SHORT, time.locale) }
     SubScreen(stringResource(R.string.history), onBack) { padding ->
         if (vm.recordings.isEmpty()) {
             Text(stringResource(R.string.history_empty), Modifier.padding(padding).padding(24.dp))
         }
         LazyColumn(contentPadding = padding) {
             items(vm.recordings, key = { it.file.name }) { item ->
-                val date = Date(item.file.lastModified())
                 ListItem(
-                    headlineContent = { Text("${format.first.format(date)}  ${format.second.format(date)}") },
-                    supportingContent = { Text("${secs(item.seconds)} s") },
+                    headlineContent = { Text(dates.format(Date(item.file.lastModified()))) },
+                    supportingContent = { Text(time.clock(item.seconds)) },
                     trailingContent = {
                         IconButton(onClick = { vm.deleteRecording(item) }) {
                             Icon(Icons.Filled.Delete, stringResource(R.string.delete))
@@ -328,14 +381,10 @@ private fun SettingsScreen(vm: MainViewModel, onBack: () -> Unit) {
 
             Section(stringResource(R.string.theme))
             Choice(
-                listOf(0 to stringResource(R.string.system_default), 1 to stringResource(R.string.theme_light),
+                listOf(0 to stringResource(R.string.theme_system), 1 to stringResource(R.string.theme_light),
                     2 to stringResource(R.string.theme_dark)),
                 s.theme, onSelect = s::updateTheme
             )
-
-            Section(stringResource(R.string.countdown))
-            Choice(listOf(0 to stringResource(R.string.off), 3 to seconds(3), 5 to seconds(5)), s.countdown,
-                onSelect = s::updateCountdown)
 
             Section(stringResource(R.string.max_length))
             Choice(listOf(30 to seconds(30), 60 to seconds(60), 120 to seconds(120)), s.maxSeconds,
@@ -376,4 +425,3 @@ private fun Section(title: String) {
         modifier = Modifier.padding(top = 20.dp, bottom = 8.dp)
     )
 }
-
