@@ -8,10 +8,12 @@ Data is local only; the optional map loads OpenStreetMap tiles. 8 languages (en,
 ```
 app/src/main/java/com/deivon/fuellog/
 ├── data/    Models.kt (Vehicle, Refuel) · FuelDatabase.kt (SQLiteOpenHelper)
-├── logic/   Decimals · FuelStats (+ Extremes) · Period · RefuelForm (validation) · Backup (JSON/CSV) · GeoPoint (+ Mercator)
+├── logic/   Decimals · FuelStats (+ Extremes) · Period · RefuelForm (validation, warnings, pay-by-amount)
+│            Units (metric / UK / US) · Backup (JSON/CSV) · GeoPoint (+ Mercator)
 │            ModelCatalog (brand/model list from assets/models_es.csv)
 └── ui/      MainActivity (3 tabs) · Overview · History · RefuelEditor · VehicleEditor · SettingsScreen
-             AppViewModel · AppSettings (language, theme, currency) · AppIcons · Theme · Formats
+             AppViewModel (+ UiEvent: saved / deleted with undo) · AppSettings (language, theme, units, currency)
+             AppIcons · Theme · Formats (locale + units) · Widgets (DropdownField, ConsumptionChart)
     ui/map/  TileMap (OSM tiles on a Canvas) · MapPicker · DeviceLocation (one-shot, platform LocationManager)
 app/src/test/…/logic/   Unit tests for everything in logic/
 ```
@@ -75,6 +77,16 @@ already exists, as on a v1 database rebuilt in the same upgrade). Schema changes
 - **Highlights**: highest/lowest price per litre and best/worst consumption, only when there are at least
   two different values to compare.
 - With no valid interval the UI shows "—" with the reason, never 0.
+- **Pay by amount**: volume = amount ÷ price, rounded to the mL; the stored total is then volume × price, which
+  equals the amount typed for normal prices (tested).
+- **Warnings** (record is valid but asked to confirm): > 2 500 km since the previous refuel, an interval outside
+  2–30 L/100 km, or a price more than 40 % away from the vehicle's average.
+
+## Units
+
+Storage is always metric. `Units` converts input and display: UK = miles, litres, imperial mpg; US = miles,
+US gallons, US mpg. A price typed per US gallon is stored per litre to the thousandth, so a US total can differ
+from the receipt by about a cent.
 
 ## Backup
 
