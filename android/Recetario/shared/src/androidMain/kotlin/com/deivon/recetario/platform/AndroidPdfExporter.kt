@@ -71,6 +71,11 @@ private class PageWriter(private val doc: PdfDocument) {
         write(s.steps, heading, before = 14f, after = 6f)
         r.steps.forEachIndexed { i, step -> write("${i + 1}.  $step", body, after = 6f) }
 
+        r.notes?.let {
+            write(s.notes, heading, before = 14f, after = 6f)
+            it.split("\n").forEach { line -> write(line.ifBlank { " " }, body, after = 2f) }
+        }
+
         r.sourceUrl?.let { write("${s.source}: $it", muted, before = 12f, after = 0f) }
     }
 

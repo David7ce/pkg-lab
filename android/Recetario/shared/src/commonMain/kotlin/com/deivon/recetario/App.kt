@@ -33,6 +33,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.deivon.recetario.logic.ConflictPolicy
+import com.deivon.recetario.logic.ForeignImport
 import com.deivon.recetario.ui.AppState
 import com.deivon.recetario.ui.CookingScreen
 import com.deivon.recetario.ui.DetailScreen
@@ -72,6 +73,7 @@ fun RecetarioApp(app: AppState, platform: PlatformUi) {
             }
             app.transfer.urlImport?.let { UrlImportDialog(app.transfer, it) }
             app.transfer.review?.let { ReviewDialog(app.transfer, it) }
+            app.transfer.photoProgress?.let { (done, total) -> PhotoProgressDialog(app.transfer, done, total) }
         }
     }
 }
@@ -116,16 +118,37 @@ private fun UrlImportDialog(transfer: Transfer, dialog: Transfer.UrlImport) {
     )
 }
 
+/** Name shown to the user; product names are not translated. */
+private val ForeignImport.Source.label: String
+    get() = when (this) {
+        ForeignImport.Source.RecipeSage -> "RecipeSage"
+        ForeignImport.Source.RecipeBox -> "My RecipeBox"
+    }
+
+@Composable
+private fun PhotoProgressDialog(transfer: Transfer, done: Int, total: Int) {
+    val s = LocalStrings.current
+    AlertDialog(
+        onDismissRequest = { },
+        title = { Text(s.downloadingPhotos(done, total)) },
+        text = { LinearProgressIndicator(progress = { if (total == 0) 1f else done.toFloat() / total }, modifier = Modifier.fillMaxWidth()) },
+        confirmButton = { },
+        dismissButton = { TextButton(onClick = transfer::cancelPhotoDownload) { Text(s.cancel) } },
+    )
+}
+
 @Composable
 private fun ReviewDialog(transfer: Transfer, review: Transfer.Review) {
     val s = LocalStrings.current
     val plan = review.plan
     AlertDialog(
         onDismissRequest = transfer::cancelImport,
-        title = { Text(s.importTitle) },
+        title = { Text(review.source?.let { s.importFrom(it.label) } ?: s.importTitle) },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 Text(s.importSummary(plan.added.size, plan.identical.size, plan.conflicts.size))
+                if (review.skipped > 0) Text(s.skipped(review.skipped), style = MaterialTheme.typography.bodySmall)
+                if (review.photosToDownload > 0) Text(s.photosToDownload(review.photosToDownload), style = MaterialTheme.typography.bodySmall)
                 if (plan.conflicts.isNotEmpty()) {
                     Text(s.conflictQuestion, style = MaterialTheme.typography.titleSmall)
                     TextButton(onClick = { transfer.confirmImport(ConflictPolicy.KeepMine) }) { Text(s.keepMine) }

@@ -1,0 +1,2 @@
+-- Version 1 → 2: free-text notes per recipe.
+ALTER TABLE recipe ADD COLUMN notes TEXT;

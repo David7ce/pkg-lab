@@ -1,6 +1,7 @@
 package com.deivon.recetario.data
 
 import com.deivon.recetario.db.RecipeDatabase
+import com.deivon.recetario.db.Recipe as DbRecipe
 import com.deivon.recetario.logic.ImageChange
 import com.deivon.recetario.logic.ImportPlan
 import com.deivon.recetario.model.Ingredient
@@ -33,40 +34,34 @@ class RecipeRepository(
         val steps = q.selectAllSteps().executeAsList().groupBy({ it.recipe_id }) { it.body }
         val tags = q.selectAllTags().executeAsList().groupBy({ it.recipe_id }) { it.name }
         return q.selectAllRecipes().executeAsList().map { row ->
-            Recipe(
-                id = row.id,
-                title = row.title,
-                imageFile = row.image_file,
-                ingredients = ingredients[row.id].orEmpty(),
-                steps = steps[row.id].orEmpty(),
-                servings = row.servings?.toInt(),
-                prepMinutes = row.prep_minutes?.toInt(),
-                cookMinutes = row.cook_minutes?.toInt(),
-                tags = tags[row.id].orEmpty(),
-                sourceUrl = row.source_url,
-                createdAt = row.created_at,
-                updatedAt = row.updated_at,
-            )
+            row.toRecipe(ingredients[row.id].orEmpty(), steps[row.id].orEmpty(), tags[row.id].orEmpty())
         }
     }
 
     fun get(id: String): Recipe? {
         val row = q.selectRecipe(id).executeAsOneOrNull() ?: return null
-        return Recipe(
-            id = row.id,
-            title = row.title,
-            imageFile = row.image_file,
+        return row.toRecipe(
             ingredients = q.selectIngredients(id).executeAsList().map { Ingredient(it.name, it.quantity, it.unit, it.note) },
             steps = q.selectSteps(id).executeAsList().map { it.body },
-            servings = row.servings?.toInt(),
-            prepMinutes = row.prep_minutes?.toInt(),
-            cookMinutes = row.cook_minutes?.toInt(),
             tags = q.selectTags(id).executeAsList().map { it.name },
-            sourceUrl = row.source_url,
-            createdAt = row.created_at,
-            updatedAt = row.updated_at,
         )
     }
+
+    private fun DbRecipe.toRecipe(ingredients: List<Ingredient>, steps: List<String>, tags: List<String>) = Recipe(
+        id = id,
+        title = title,
+        imageFile = image_file,
+        ingredients = ingredients,
+        steps = steps,
+        servings = servings?.toInt(),
+        prepMinutes = prep_minutes?.toInt(),
+        cookMinutes = cook_minutes?.toInt(),
+        tags = tags,
+        sourceUrl = source_url,
+        notes = notes,
+        createdAt = created_at,
+        updatedAt = updated_at,
+    )
 
     /** Saves [recipe] (insert or update) with the image change from the editor. Returns what was stored. */
     fun save(recipe: Recipe, image: ImageChange): Recipe {
@@ -143,7 +138,7 @@ class RecipeRepository(
     private fun writeRows(r: Recipe) {
         q.upsertRecipe(
             r.id, r.title, r.imageFile, r.servings?.toLong(), r.prepMinutes?.toLong(), r.cookMinutes?.toLong(),
-            r.sourceUrl, r.createdAt, r.updatedAt,
+            r.sourceUrl, r.notes, r.createdAt, r.updatedAt,
         )
         q.deleteIngredients(r.id)
         q.deleteSteps(r.id)

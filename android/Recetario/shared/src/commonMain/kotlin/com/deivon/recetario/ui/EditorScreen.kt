@@ -156,6 +156,15 @@ fun EditorScreen(app: AppState, state: EditorState) {
                 }
 
                 OutlinedTextField(
+                    value = draft.notes,
+                    onValueChange = { v -> state.update { it.copy(notes = v) } },
+                    label = { Text(s.notes) },
+                    minLines = 3,
+                    keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Sentences),
+                    modifier = Modifier.fillMaxWidth().padding(top = 12.dp),
+                )
+
+                OutlinedTextField(
                     value = draft.sourceUrl,
                     onValueChange = { v -> state.update { it.copy(sourceUrl = v) } },
                     label = { Text(s.sourceUrl) },

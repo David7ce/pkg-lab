@@ -29,6 +29,8 @@ data class Recipe(
     val cookMinutes: Int? = null,
     val tags: List<String> = emptyList(),
     val sourceUrl: String? = null,
+    /** Free text: description, tips, anything that has no field of its own. */
+    val notes: String? = null,
     val createdAt: Long,
     val updatedAt: Long,
 ) {

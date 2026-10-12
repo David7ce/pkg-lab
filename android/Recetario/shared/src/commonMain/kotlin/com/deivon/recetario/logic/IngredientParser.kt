@@ -15,13 +15,14 @@ object IngredientParser {
         // imperial / US
         "tsp", "teaspoon", "teaspoons", "tbsp", "tbs", "tablespoon", "tablespoons", "cup", "cups", "oz", "ounce",
         "ounces", "lb", "lbs", "pound", "pounds", "pint", "pints", "quart", "quarts", "pinch", "pinches",
-        "can", "cans", "clove", "cloves", "slice", "slices", "stick", "sticks",
+        "can", "cans", "clove", "cloves", "slice", "slices", "stick", "sticks", "count", "counts",
         // Spanish
         "cucharada", "cucharadas", "cda", "cdas", "cucharadita", "cucharaditas", "cdta", "cdtas", "cdita", "cditas",
         "taza", "tazas", "pizca", "pizcas", "diente", "dientes", "lata", "latas", "vaso", "vasos",
         "rebanada", "rebanadas", "sobre", "sobres", "loncha", "lonchas", "ramita", "ramitas",
     ).sortedByDescending { it.length }
 
+    private val noUnit = setOf("count", "counts")
     private val leading = Regex("^(${Quantities.pattern})(?=\\s|[A-Za-zÀ-ÿ]|$)")
     private val range = Regex("^\\s*(-|–|to\\b|a\\b|or\\b|o\\b)\\s*\\d", RegexOption.IGNORE_CASE)
     private val connector = Regex("^(of|de|del)\\s+", RegexOption.IGNORE_CASE)
@@ -48,6 +49,8 @@ object IngredientParser {
                 }
             }
         }
+        // My RecipeBox writes "1count Plátano" for "1 plátano": a counting word, not a unit.
+        if (unit != null && unit.lowercase() in noUnit) unit = null
         remainder = remainder.replace(connector, "")
         val comma = remainder.indexOf(',')
         val name = (if (comma >= 0) remainder.substring(0, comma) else remainder).trim()

@@ -30,6 +30,7 @@ object RecipeRules {
     const val MAX_TAGS = 30
     const val MAX_ITEMS = 500       // ingredients or steps per recipe
     const val MAX_TEXT = 5_000      // one step, one ingredient field, the source URL
+    const val MAX_NOTES = 20_000
 
     private val idPattern = Regex("[A-Za-z0-9_-]{1,64}")
     private val imagePattern = Regex("[A-Za-z0-9_-]{1,64}\\.(jpg|png|webp)")
@@ -55,6 +56,7 @@ object RecipeRules {
         if (r.steps.any { it.length > MAX_TEXT }) add(Problem.TooLarge)
         addAll(tagProblems(r.tags))
         r.sourceUrl?.let { if (!isValidUrl(it)) add(Problem.SourceUrlInvalid) }
+        if ((r.notes?.length ?: 0) > MAX_NOTES) add(Problem.TooLarge)
     }
 
     private fun problems(ing: Ingredient, index: Int): List<Problem> = buildList {

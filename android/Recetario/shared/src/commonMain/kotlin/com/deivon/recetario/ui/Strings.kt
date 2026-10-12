@@ -2,6 +2,7 @@ package com.deivon.recetario.ui
 
 import androidx.compose.runtime.staticCompositionLocalOf
 import com.deivon.recetario.logic.ImportFailure
+import com.deivon.recetario.logic.NoteLabels
 import com.deivon.recetario.logic.Problem
 import com.deivon.recetario.logic.RecipePage
 import com.deivon.recetario.platform.WebException
@@ -26,7 +27,7 @@ open class Strings {
     open val noMatches = "No recipes match"
     open val clearFilters = "Clear filters"
     open val importFromUrl = "Import from web page"
-    open val importFile = "Import file (JSON or backup)"
+    open val importFile = "Import file (Recetario, RecipeSage, My RecipeBox)"
     open val exportLibrary = "Export all (JSON)"
     open val backup = "Back up with photos"
     open val cookbookPdf = "Cookbook (PDF)"
@@ -84,6 +85,7 @@ open class Strings {
     open val tags = "Tags"
     open val tagsHint = "Separated by commas"
     open val sourceUrl = "Source URL"
+    open val notes = "Notes"
     open val quantity = "Qty"
     open val unit = "Unit"
     open val ingredient = "Ingredient"
@@ -145,6 +147,16 @@ open class Strings {
         append('.')
     }
     open val conflictQuestion = "What should happen with the recipes that differ?"
+    open fun importFrom(source: String) = "Import from $source"
+    open fun skipped(n: Int) = "$n entr${if (n == 1) "y" else "ies"} could not be read as a recipe and will be left out."
+    open fun photosToDownload(n: Int) = "$n photo(s) will be downloaded (needs a connection)."
+    open fun downloadingPhotos(done: Int, total: Int) = "Downloading photos… $done of $total"
+    open fun photosFailed(n: Int) = "$n photo(s) could not be downloaded or read; those recipes have no photo."
+    open val inactiveTime = "Resting time"
+    open val nutrition = "Nutrition"
+    open val cookware = "Cookware"
+    open val video = "Video"
+    fun noteLabels() = NoteLabels(prep, cook, total, inactiveTime, nutrition, cookware, video, ::duration)
     open val keepMine = "Keep mine"
     open val importAsCopies = "Import as copies"
     open val replaceMine = "Replace mine"
@@ -204,7 +216,7 @@ object EsStrings : Strings() {
     override val noMatches = "Ninguna receta coincide"
     override val clearFilters = "Quitar filtros"
     override val importFromUrl = "Importar desde página web"
-    override val importFile = "Importar archivo (JSON o copia)"
+    override val importFile = "Importar archivo (Recetario, RecipeSage, My RecipeBox)"
     override val exportLibrary = "Exportar todo (JSON)"
     override val backup = "Copia de seguridad con fotos"
     override val cookbookPdf = "Recetario (PDF)"
@@ -251,6 +263,7 @@ object EsStrings : Strings() {
     override val tags = "Etiquetas"
     override val tagsHint = "Separadas por comas"
     override val sourceUrl = "URL de origen"
+    override val notes = "Notas"
     override val quantity = "Cant."
     override val unit = "Unidad"
     override val ingredient = "Ingrediente"
@@ -310,6 +323,15 @@ object EsStrings : Strings() {
         append('.')
     }
     override val conflictQuestion = "¿Qué hacemos con las recetas que difieren?"
+    override fun importFrom(source: String) = "Importar desde $source"
+    override fun skipped(n: Int) = "$n elemento(s) no se pudieron leer como receta y se omitirán."
+    override fun photosToDownload(n: Int) = "Se descargarán $n foto(s) (hace falta conexión)."
+    override fun downloadingPhotos(done: Int, total: Int) = "Descargando fotos… $done de $total"
+    override fun photosFailed(n: Int) = "$n foto(s) no se pudieron descargar o leer; esas recetas quedan sin foto."
+    override val inactiveTime = "Reposo"
+    override val nutrition = "Nutrición"
+    override val cookware = "Utensilios"
+    override val video = "Vídeo"
     override val keepMine = "Conservar las mías"
     override val importAsCopies = "Importar como copias"
     override val replaceMine = "Reemplazar las mías"

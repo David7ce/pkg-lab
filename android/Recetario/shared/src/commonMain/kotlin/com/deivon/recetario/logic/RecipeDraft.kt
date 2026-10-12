@@ -38,6 +38,7 @@ data class RecipeDraft(
     val cookMinutes: String = "",
     val tags: String = "",
     val sourceUrl: String = "",
+    val notes: String = "",
     val ingredients: List<IngredientDraft> = emptyList(),
     val steps: List<StepDraft> = emptyList(),
     val createdAt: Long? = null,
@@ -91,6 +92,7 @@ data class RecipeDraft(
             cookMinutes = cook,
             tags = RecipeRules.parseTags(tags),
             sourceUrl = url,
+            notes = notes.trim().ifEmpty { null },
             createdAt = createdAt ?: now,
             updatedAt = now,
         )
@@ -120,6 +122,7 @@ data class RecipeDraft(
                 cookMinutes = r.cookMinutes?.toString().orEmpty(),
                 tags = r.tags.joinToString(", "),
                 sourceUrl = r.sourceUrl.orEmpty(),
+                notes = r.notes.orEmpty(),
                 ingredients = r.ingredients.map {
                     IngredientDraft(
                         key = key++,

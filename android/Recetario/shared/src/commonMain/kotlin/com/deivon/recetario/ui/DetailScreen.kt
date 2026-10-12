@@ -101,6 +101,11 @@ fun DetailScreen(app: AppState, screen: Screen.Detail) {
                 if (recipe.steps.isEmpty()) Text(s.noSteps, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 recipe.steps.forEachIndexed { i, step -> StepRow(i + 1, step) }
 
+                recipe.notes?.let { notes ->
+                    SectionTitle(s.notes)
+                    Text(notes, style = MaterialTheme.typography.bodyLarge)
+                }
+
                 recipe.sourceUrl?.let { url ->
                     SectionTitle(s.source)
                     val platform = LocalPlatform.current

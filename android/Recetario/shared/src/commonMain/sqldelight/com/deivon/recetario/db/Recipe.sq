@@ -1,4 +1,4 @@
--- Schema version 1. Children are always replaced as a whole when a recipe is saved,
+-- Schema version 2 (1.sqm adds recipe.notes). Children are always replaced as a whole when a recipe is saved,
 -- inside one transaction (see RecipeRepository), so positions stay dense (0..n-1).
 
 CREATE TABLE recipe (
@@ -10,7 +10,8 @@ CREATE TABLE recipe (
     cook_minutes INTEGER,
     source_url TEXT,
     created_at INTEGER NOT NULL,     -- epoch millis
-    updated_at INTEGER NOT NULL
+    updated_at INTEGER NOT NULL,
+    notes TEXT                       -- v2, last: ALTER TABLE in 1.sqm appends it, and SELECT * reads by position
 );
 
 CREATE TABLE ingredient (
@@ -70,8 +71,8 @@ selectImageFiles:
 SELECT image_file FROM recipe WHERE image_file IS NOT NULL;
 
 upsertRecipe:
-INSERT OR REPLACE INTO recipe(id, title, image_file, servings, prep_minutes, cook_minutes, source_url, created_at, updated_at)
-VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);
+INSERT OR REPLACE INTO recipe(id, title, image_file, servings, prep_minutes, cook_minutes, source_url, notes, created_at, updated_at)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
 
 insertIngredient:
 INSERT INTO ingredient(recipe_id, position, name, quantity, unit, note) VALUES (?, ?, ?, ?, ?, ?);

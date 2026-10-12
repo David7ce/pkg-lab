@@ -70,9 +70,24 @@ class RecipePageTest {
         assertEquals(45, Durations.minutes("P0DT45M"))
         assertEquals(45, Durations.minutes("PT2700S"))
         assertEquals(20, Durations.minutes("pt20m"))
+        assertEquals(60, Durations.minutes("PT1HM"), "empty designators, as RecipeSage writes them")
+        assertNull(Durations.minutes("PTM"))
         assertNull(Durations.minutes("PT0M"))
         assertNull(Durations.minutes("P1Y"))
         assertNull(Durations.minutes("20 minutes"))
         assertNull(Durations.minutes(null))
+    }
+
+    @Test
+    fun looseTimes() {
+        assertEquals(30, Durations.loose("30"))
+        assertEquals(160, Durations.loose("2 h 40"))
+        assertEquals(60, Durations.loose("1h"))
+        assertEquals(45, Durations.loose("45 min"))
+        assertEquals(90, Durations.loose("1:30"))
+        assertEquals(90, Durations.loose("PT1H30M"))
+        assertNull(Durations.loose(""))
+        assertNull(Durations.loose("0"))
+        assertNull(Durations.loose("un rato"))
     }
 }

@@ -16,6 +16,8 @@ class IngredientParserTest {
         assertEquals(Ingredient("butter", 100.0, "g"), p("100g butter"))
         assertEquals(Ingredient("olive oil", 4.0, "tbsp"), p("4 tbsp. olive oil"))
         assertEquals(Ingredient("eggs", 2.0), p("2 eggs"))
+        assertEquals(Ingredient("Plátano", 1.0), p("1count Plátano"))
+        assertEquals(Ingredient("Arroz bomba", 100.0, "g"), p("100g Arroz bomba"))
     }
 
     @Test

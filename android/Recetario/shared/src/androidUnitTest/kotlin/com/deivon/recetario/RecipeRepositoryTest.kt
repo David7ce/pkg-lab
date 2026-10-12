@@ -27,6 +27,7 @@ class RecipeRepositoryTest {
             ingredients = listOf(Ingredient("b", 2.5, "kg", "pelado"), Ingredient("a"), Ingredient("c", 1.0)),
             steps = listOf("uno", "dos", "tres"),
             sourceUrl = "https://example.com/r",
+            notes = "Mejor recién hecha.\n\nAguanta dos días.",
         )
         repo.save(r, ImageChange.Keep)
         assertEquals(listOf(r), repo.loadAll())
