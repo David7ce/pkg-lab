@@ -362,8 +362,8 @@ private fun <T> Choice(
                 selected = value == selected,
                 onClick = { onSelect(value) },
                 shape = SegmentedButtonDefaults.itemShape(i, options.size),
-                enabled = enabled
-                icon = {}, // Sin el check de "seleccionado": el color del botón ya lo indica.
+                enabled = enabled,
+                icon = {} // Sin el check de "seleccionado": el color del botón ya lo indica.
             ) {
                 icons[value]?.let { Icon(it, null, Modifier.size(18.dp)); Spacer(Modifier.size(6.dp)) }
                 Text(label, maxLines = 1, textAlign = TextAlign.Center)
