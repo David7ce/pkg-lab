@@ -41,6 +41,7 @@ import com.deivon.fuellog.data.Refuel
 import com.deivon.fuellog.logic.FuelStats
 import com.deivon.fuellog.logic.Period
 import com.deivon.shared.ui.ConfirmDialog
+import com.deivon.shared.ui.LocalSharedStrings
 import com.deivon.shared.ui.SelectionActions
 import com.deivon.shared.ui.rememberSelection
 
@@ -148,7 +149,7 @@ private fun SelectionBar(count: Int, allSelected: Boolean, onClose: () -> Unit, 
         verticalAlignment = Alignment.CenterVertically
     ) {
         IconButton(onClick = onClose) {
-            Icon(Icons.Filled.Close, stringResource(com.deivon.shared.R.string.shared_close))
+            Icon(Icons.Filled.Close, LocalSharedStrings.current.close)
         }
         Text(
             stringResource(R.string.selected_count, count),
