@@ -19,7 +19,10 @@ pkg-lab/
 - **Añadir una app:** crea `android/<NombreApp>/` con un proyecto Gradle (con `gradlew`). No hay que tocar el workflow.
 - **Compilar:** cada push a `main` compila solo las apps que han cambiado. También a mano desde
   *Actions → Android → Run workflow* (escribe el nombre de la carpeta o déjalo vacío para todas).
-- **Descargar:** *Releases → `android-<NombreApp>-latest`* → el `.apk`.
+- **Descargar:** *Releases → `android-<NombreApp>-latest`*. Cada app se compila en paralelo para
+  `arm64-v8a` (casi todos los móviles), `armeabi-v7a` (32 bits antiguos) y `universal`.
+  Para que una app genere APKs por arquitectura, su `app/build.gradle.kts` debe leer `-Pabi`
+  (ver VozReves); si no, las tres salen iguales.
 
 ### Firma (recomendado)
 
