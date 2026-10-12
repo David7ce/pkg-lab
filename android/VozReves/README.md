@@ -21,7 +21,7 @@ app/src/main/java/com/deivon/vozreves/
 ├── Names.kt          – nombres de archivo (reverse_voice_AAAA_MM_DD_HH-mm-ss.wav)
 ├── Settings.kt       – preferencias (idioma, tema, duración máxima de grabación)
 ├── Waveform.kt       – dibujo de la forma de onda
-├── TimeFormat.kt     – formato de tiempos (mm:ss)
+├── TimeFormat.kt     – formato de segundos con el separador decimal del idioma (3.4 / 3,4)
 ├── MainViewModel.kt  – estado de la app (sobrevive a rotaciones)
 ├── MainActivity.kt   – pantallas en Compose: Principal, Frases, Historial, Ajustes
 └── AppIcons.kt       – iconos propios de la app
