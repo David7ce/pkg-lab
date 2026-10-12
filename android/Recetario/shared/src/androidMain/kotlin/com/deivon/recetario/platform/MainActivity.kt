@@ -1,4 +1,4 @@
-package com.deivon.recetario.platform
+package com.david7ce.recetario.platform
 
 import android.graphics.Color
 import android.os.Bundle
@@ -9,9 +9,9 @@ import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.DisposableEffect
-import com.deivon.recetario.RecetarioApp
-import com.deivon.recetario.ui.Screen
-import com.deivon.recetario.ui.isDark
+import com.david7ce.recetario.RecetarioApp
+import com.david7ce.recetario.ui.Screen
+import com.david7ce.recetario.ui.isDark
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {

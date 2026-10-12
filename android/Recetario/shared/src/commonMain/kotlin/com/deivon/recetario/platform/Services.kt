@@ -1,8 +1,8 @@
-package com.deivon.recetario.platform
+package com.david7ce.recetario.platform
 
 import androidx.compose.ui.graphics.ImageBitmap
-import com.deivon.recetario.model.Recipe
-import com.deivon.recetario.ui.Strings
+import com.david7ce.recetario.model.Recipe
+import com.david7ce.recetario.ui.Strings
 import kotlin.random.Random
 
 /**
@@ -39,7 +39,7 @@ interface ImageCodec {
 
 interface ZipCodec {
     fun zip(entries: Map<String, ByteArray>): ByteArray
-    /** Throws [com.deivon.recetario.logic.ImportException] when not a ZIP or when it unpacks to more than [maxTotalBytes]. */
+    /** Throws [com.david7ce.recetario.logic.ImportException] when not a ZIP or when it unpacks to more than [maxTotalBytes]. */
     fun unzip(bytes: ByteArray, maxTotalBytes: Long): Map<String, ByteArray>
 }
 

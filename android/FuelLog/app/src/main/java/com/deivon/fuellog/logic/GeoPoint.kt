@@ -1,4 +1,4 @@
-package com.deivon.fuellog.logic
+package com.david7ce.fuellog.logic
 
 import java.util.Locale
 import kotlin.math.PI

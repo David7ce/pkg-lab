@@ -1,6 +1,6 @@
 @file:OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 
-package com.deivon.vozreves
+package com.david7ce.vozreves
 
 import android.Manifest
 import android.app.Activity
@@ -89,16 +89,16 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
-import com.deivon.shared.reverseText
-import com.deivon.shared.ui.LocalSharedStrings
-import com.deivon.shared.ui.SharedStrings
-import com.deivon.shared.ui.ChoiceDropdown
-import com.deivon.shared.ui.ConfirmDialog
-import com.deivon.shared.ui.SectionTitle
-import com.deivon.shared.ui.SegmentedChoice
-import com.deivon.shared.ui.SelectionActions
-import com.deivon.shared.ui.SubScreen
-import com.deivon.shared.ui.rememberSelection
+import com.david7ce.shared.reverseText
+import com.david7ce.shared.ui.LocalSharedStrings
+import com.david7ce.shared.ui.SharedStrings
+import com.david7ce.shared.ui.ChoiceDropdown
+import com.david7ce.shared.ui.ConfirmDialog
+import com.david7ce.shared.ui.SectionTitle
+import com.david7ce.shared.ui.SegmentedChoice
+import com.david7ce.shared.ui.SelectionActions
+import com.david7ce.shared.ui.SubScreen
+import com.david7ce.shared.ui.rememberSelection
 import kotlinx.coroutines.launch
 import java.text.DateFormat
 import java.util.Date
@@ -106,7 +106,7 @@ import java.util.Date
 class MainActivity : ComponentActivity() {
     private val vm: MainViewModel by viewModels()
 
-    override fun attachBaseContext(base: Context) = super.attachBaseContext(com.deivon.vozreves.Settings.wrap(base))
+    override fun attachBaseContext(base: Context) = super.attachBaseContext(com.david7ce.vozreves.Settings.wrap(base))
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -540,7 +540,7 @@ private fun SettingsScreen(vm: MainViewModel, onBack: () -> Unit) {
 
             SectionTitle(stringResource(R.string.language))
             ChoiceDropdown(
-                options = listOf("" to stringResource(R.string.system_default)) + com.deivon.vozreves.Settings.LANGUAGES,
+                options = listOf("" to stringResource(R.string.system_default)) + com.david7ce.vozreves.Settings.LANGUAGES,
                 selected = s.language
             ) { code ->
                 if (s.language != code) { s.updateLanguage(code); activity.recreate() }

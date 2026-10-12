@@ -1,4 +1,4 @@
-package com.deivon.recetario.ui
+package com.david7ce.recetario.ui
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -20,7 +20,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
-import com.deivon.shared.ui.ConfirmDialog
+import com.david7ce.shared.ui.ConfirmDialog
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
@@ -46,8 +46,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import com.deivon.recetario.logic.Quantities
-import com.deivon.recetario.model.Recipe
+import com.david7ce.recetario.logic.Quantities
+import com.david7ce.recetario.model.Recipe
 import kotlin.math.abs
 import kotlin.math.roundToInt
 

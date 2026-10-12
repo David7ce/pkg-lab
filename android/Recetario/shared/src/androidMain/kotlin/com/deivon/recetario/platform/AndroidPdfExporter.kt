@@ -1,4 +1,4 @@
-package com.deivon.recetario.platform
+package com.david7ce.recetario.platform
 
 import android.graphics.BitmapFactory
 import android.graphics.Color
@@ -8,9 +8,9 @@ import android.graphics.Typeface
 import android.graphics.pdf.PdfDocument
 import android.text.StaticLayout
 import android.text.TextPaint
-import com.deivon.recetario.logic.Quantities
-import com.deivon.recetario.model.Recipe
-import com.deivon.recetario.ui.Strings
+import com.david7ce.recetario.logic.Quantities
+import com.david7ce.recetario.model.Recipe
+import com.david7ce.recetario.ui.Strings
 import java.io.ByteArrayOutputStream
 import kotlin.math.max
 import kotlin.math.min

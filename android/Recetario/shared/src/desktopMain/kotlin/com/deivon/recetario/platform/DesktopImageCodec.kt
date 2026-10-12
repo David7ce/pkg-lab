@@ -1,4 +1,4 @@
-package com.deivon.recetario.platform
+package com.david7ce.recetario.platform
 
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.toComposeImageBitmap

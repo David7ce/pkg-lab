@@ -1,6 +1,6 @@
-package com.deivon.recetario.logic
+package com.david7ce.recetario.logic
 
-import com.deivon.recetario.model.Recipe
+import com.david7ce.recetario.model.Recipe
 
 enum class SortOrder { Modified, Name, Rating }
 

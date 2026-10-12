@@ -1,12 +1,12 @@
-package com.deivon.recetario.data
+package com.david7ce.recetario.data
 
-import com.deivon.recetario.db.RecipeDatabase
-import com.deivon.recetario.db.Recipe as DbRecipe
-import com.deivon.recetario.logic.ImageChange
-import com.deivon.recetario.logic.ImportPlan
-import com.deivon.recetario.model.Ingredient
-import com.deivon.recetario.model.Recipe
-import com.deivon.recetario.platform.ImageStore
+import com.david7ce.recetario.db.RecipeDatabase
+import com.david7ce.recetario.db.Recipe as DbRecipe
+import com.david7ce.recetario.logic.ImageChange
+import com.david7ce.recetario.logic.ImportPlan
+import com.david7ce.recetario.model.Ingredient
+import com.david7ce.recetario.model.Recipe
+import com.david7ce.recetario.platform.ImageStore
 
 /**
  * All reads and writes of recipes and their image files.

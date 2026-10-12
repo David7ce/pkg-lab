@@ -1,4 +1,4 @@
-package com.deivon.recetario.ui
+package com.david7ce.recetario.ui
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -27,7 +27,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import com.deivon.recetario.logic.Quantities
+import com.david7ce.recetario.logic.Quantities
 
 /** One step at a time, large text, previous/next, ingredients on demand. */
 @OptIn(ExperimentalMaterial3Api::class)

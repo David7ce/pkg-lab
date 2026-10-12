@@ -1,10 +1,10 @@
-package com.deivon.fuellog.ui.map
+package com.david7ce.fuellog.ui.map
 
 import android.annotation.SuppressLint
 import android.content.Context
 import android.location.LocationManager
 import android.os.Build
-import com.deivon.fuellog.logic.GeoPoint
+import com.david7ce.fuellog.logic.GeoPoint
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withTimeoutOrNull
 import kotlin.coroutines.resume

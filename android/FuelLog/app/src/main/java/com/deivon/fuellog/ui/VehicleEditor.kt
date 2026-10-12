@@ -1,6 +1,6 @@
 @file:OptIn(ExperimentalMaterial3Api::class)
 
-package com.deivon.fuellog.ui
+package com.david7ce.fuellog.ui
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.clickable
@@ -53,16 +53,16 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import com.deivon.fuellog.R
-import com.deivon.shared.ui.ConfirmDialog
-import com.deivon.fuellog.data.Vehicle
-import com.deivon.fuellog.data.VehicleType
-import com.deivon.fuellog.logic.CatalogFuel
-import com.deivon.fuellog.logic.CatalogModel
-import com.deivon.fuellog.logic.Decimals
-import com.deivon.fuellog.logic.ModelCatalog
-import com.deivon.fuellog.logic.UnitSystem
-import com.deivon.fuellog.logic.Units
+import com.david7ce.fuellog.R
+import com.david7ce.shared.ui.ConfirmDialog
+import com.david7ce.fuellog.data.Vehicle
+import com.david7ce.fuellog.data.VehicleType
+import com.david7ce.fuellog.logic.CatalogFuel
+import com.david7ce.fuellog.logic.CatalogModel
+import com.david7ce.fuellog.logic.Decimals
+import com.david7ce.fuellog.logic.ModelCatalog
+import com.david7ce.fuellog.logic.UnitSystem
+import com.david7ce.fuellog.logic.Units
 
 private val typeLabels = mapOf(
     VehicleType.Car to R.string.type_car, VehicleType.Motorcycle to R.string.type_motorcycle,

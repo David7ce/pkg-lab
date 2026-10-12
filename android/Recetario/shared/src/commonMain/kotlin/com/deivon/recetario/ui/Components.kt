@@ -1,4 +1,4 @@
-package com.deivon.recetario.ui
+package com.david7ce.recetario.ui
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -35,8 +35,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.deivon.recetario.logic.Quantities
-import com.deivon.recetario.model.Ingredient
+import com.david7ce.recetario.logic.Quantities
+import com.david7ce.recetario.model.Ingredient
 
 /** A recipe photo from the image folder, or from not-yet-saved bytes; a neutral placeholder otherwise. */
 @Composable

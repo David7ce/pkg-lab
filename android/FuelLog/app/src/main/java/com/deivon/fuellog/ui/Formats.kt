@@ -1,11 +1,11 @@
-package com.deivon.fuellog.ui
+package com.david7ce.fuellog.ui
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalConfiguration
-import com.deivon.fuellog.logic.Decimals
-import com.deivon.fuellog.logic.UnitSystem
-import com.deivon.fuellog.logic.Units
+import com.david7ce.fuellog.logic.Decimals
+import com.david7ce.fuellog.logic.UnitSystem
+import com.david7ce.fuellog.logic.Units
 import java.math.BigDecimal
 import java.text.DateFormat
 import java.text.NumberFormat

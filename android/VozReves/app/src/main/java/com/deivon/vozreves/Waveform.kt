@@ -1,4 +1,4 @@
-package com.deivon.vozreves
+package com.david7ce.vozreves
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.material3.MaterialTheme

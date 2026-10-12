@@ -1,7 +1,7 @@
-package com.deivon.recetario.platform
+package com.david7ce.recetario.platform
 
-import com.deivon.recetario.logic.ImportException
-import com.deivon.recetario.logic.ImportFailure
+import com.david7ce.recetario.logic.ImportException
+import com.david7ce.recetario.logic.ImportFailure
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.io.IOException

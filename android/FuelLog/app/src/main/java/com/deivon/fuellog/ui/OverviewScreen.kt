@@ -1,4 +1,4 @@
-package com.deivon.fuellog.ui
+package com.david7ce.fuellog.ui
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -36,11 +36,11 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import com.deivon.fuellog.R
-import com.deivon.fuellog.data.Refuel
-import com.deivon.fuellog.data.Vehicle
-import com.deivon.fuellog.logic.FuelStats
-import com.deivon.fuellog.logic.Period
+import com.david7ce.fuellog.R
+import com.david7ce.fuellog.data.Refuel
+import com.david7ce.fuellog.data.Vehicle
+import com.david7ce.fuellog.logic.FuelStats
+import com.david7ce.fuellog.logic.Period
 
 @Composable
 fun OverviewScreen(vm: AppViewModel, formats: Formats, modifier: Modifier, onOpen: (Refuel) -> Unit) {

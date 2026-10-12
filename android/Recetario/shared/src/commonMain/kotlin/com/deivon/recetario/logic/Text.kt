@@ -1,4 +1,4 @@
-package com.deivon.recetario.logic
+package com.david7ce.recetario.logic
 
 /** Small text helpers shared by search, import and file naming. */
 object Text {

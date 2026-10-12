@@ -1,4 +1,4 @@
-package com.deivon.fuellog.ui
+package com.david7ce.fuellog.ui
 
 import android.content.Context
 import android.content.res.Configuration
@@ -8,7 +8,7 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import com.deivon.fuellog.logic.UnitSystem
+import com.david7ce.fuellog.logic.UnitSystem
 import java.util.Currency
 import java.util.Locale
 

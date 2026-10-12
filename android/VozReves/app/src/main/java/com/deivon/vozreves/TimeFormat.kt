@@ -1,4 +1,4 @@
-package com.deivon.vozreves
+package com.david7ce.vozreves
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember

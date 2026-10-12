@@ -1,11 +1,11 @@
-package com.deivon.recetario
+package com.david7ce.recetario
 
-import com.deivon.recetario.logic.ForeignImport
-import com.deivon.recetario.logic.PhotoSource
-import com.deivon.recetario.logic.RecipeBoxFormat
-import com.deivon.recetario.logic.RecipeRules
-import com.deivon.recetario.logic.RecipeSageFormat
-import com.deivon.recetario.ui.EsStrings
+import com.david7ce.recetario.logic.ForeignImport
+import com.david7ce.recetario.logic.PhotoSource
+import com.david7ce.recetario.logic.RecipeBoxFormat
+import com.david7ce.recetario.logic.RecipeRules
+import com.david7ce.recetario.logic.RecipeSageFormat
+import com.david7ce.recetario.ui.EsStrings
 import kotlinx.serialization.json.Json
 import kotlin.test.Test
 import kotlin.test.assertEquals

@@ -1,4 +1,4 @@
-package com.deivon.fuellog.ui
+package com.david7ce.fuellog.ui
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
@@ -29,11 +29,11 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import com.deivon.fuellog.R
-import com.deivon.fuellog.data.Refuel
-import com.deivon.fuellog.data.VehicleType
-import com.deivon.fuellog.logic.ConsumptionInterval
-import com.deivon.fuellog.logic.Extremes
+import com.david7ce.fuellog.R
+import com.david7ce.fuellog.data.Refuel
+import com.david7ce.fuellog.data.VehicleType
+import com.david7ce.fuellog.logic.ConsumptionInterval
+import com.david7ce.fuellog.logic.Extremes
 
 val CardShape = RoundedCornerShape(16.dp)
 

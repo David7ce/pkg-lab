@@ -1,4 +1,4 @@
-package com.deivon.recetario.platform
+package com.david7ce.recetario.platform
 
 import android.content.ActivityNotFoundException
 import android.content.Context
@@ -12,7 +12,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalContext
-import com.deivon.recetario.ui.PlatformUi
+import com.david7ce.recetario.ui.PlatformUi
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

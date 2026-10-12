@@ -1,12 +1,12 @@
-package com.deivon.recetario
+package com.david7ce.recetario
 
 import app.cash.sqldelight.driver.jdbc.sqlite.JdbcSqliteDriver
-import com.deivon.recetario.data.RecipeRepository
-import com.deivon.recetario.db.RecipeDatabase
-import com.deivon.recetario.logic.ConflictPolicy
-import com.deivon.recetario.logic.ImageChange
-import com.deivon.recetario.logic.ImportPlan
-import com.deivon.recetario.model.Ingredient
+import com.david7ce.recetario.data.RecipeRepository
+import com.david7ce.recetario.db.RecipeDatabase
+import com.david7ce.recetario.logic.ConflictPolicy
+import com.david7ce.recetario.logic.ImageChange
+import com.david7ce.recetario.logic.ImportPlan
+import com.david7ce.recetario.model.Ingredient
 import kotlin.test.Test
 import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals

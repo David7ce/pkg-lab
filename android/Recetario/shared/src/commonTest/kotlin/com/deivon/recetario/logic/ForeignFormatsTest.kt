@@ -1,8 +1,8 @@
-package com.deivon.recetario.logic
+package com.david7ce.recetario.logic
 
-import com.deivon.recetario.fakeJpeg
-import com.deivon.recetario.model.Ingredient
-import com.deivon.recetario.ui.Strings
+import com.david7ce.recetario.fakeJpeg
+import com.david7ce.recetario.model.Ingredient
+import com.david7ce.recetario.ui.Strings
 import kotlinx.serialization.json.Json
 import kotlin.test.Test
 import kotlin.test.assertContentEquals

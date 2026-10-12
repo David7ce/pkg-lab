@@ -1,4 +1,4 @@
-package com.deivon.recetario.ui
+package com.david7ce.recetario.ui
 
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme

@@ -1,6 +1,6 @@
-package com.deivon.recetario.logic
+package com.david7ce.recetario.logic
 
-import com.deivon.recetario.model.Ingredient
+import com.david7ce.recetario.model.Ingredient
 
 /**
  * Best-effort split of a free-text ingredient line ("1 ½ cups flour, sifted") into quantity,

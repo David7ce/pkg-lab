@@ -1,8 +1,8 @@
-package com.deivon.recetario
+package com.david7ce.recetario
 
-import com.deivon.recetario.model.Ingredient
-import com.deivon.recetario.model.Recipe
-import com.deivon.recetario.platform.ImageStore
+import com.david7ce.recetario.model.Ingredient
+import com.david7ce.recetario.model.Recipe
+import com.david7ce.recetario.platform.ImageStore
 
 /** In-memory image folder for tests. */
 class MemoryImageStore : ImageStore {
@@ -20,7 +20,7 @@ class MemoryImageStore : ImageStore {
     override fun list(): List<String> = files.keys.toList()
 }
 
-/** JPEG signature followed by a marker byte: enough for [com.deivon.recetario.logic.Backup.looksLikeImage]. */
+/** JPEG signature followed by a marker byte: enough for [com.david7ce.recetario.logic.Backup.looksLikeImage]. */
 fun fakeJpeg(marker: Int): ByteArray = byteArrayOf(0xFF.toByte(), 0xD8.toByte(), 0xFF.toByte(), marker.toByte())
 
 fun recipe(

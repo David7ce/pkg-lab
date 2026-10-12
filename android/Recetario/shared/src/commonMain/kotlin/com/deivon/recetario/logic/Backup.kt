@@ -1,6 +1,6 @@
-package com.deivon.recetario.logic
+package com.david7ce.recetario.logic
 
-import com.deivon.recetario.model.Recipe
+import com.david7ce.recetario.model.Recipe
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.SerializationException
 
@@ -11,7 +11,7 @@ import kotlinx.serialization.SerializationException
  * - `images/<file>`: each referenced image, byte for byte.
  *
  * This object works on the archive as a name → bytes map, so it is platform-independent and
- * testable; zipping itself is done by [com.deivon.recetario.platform.ZipCodec].
+ * testable; zipping itself is done by [com.david7ce.recetario.platform.ZipCodec].
  */
 object Backup {
     const val FORMAT = "recetario-backup"

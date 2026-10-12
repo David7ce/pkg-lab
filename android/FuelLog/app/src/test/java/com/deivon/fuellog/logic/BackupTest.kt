@@ -1,8 +1,8 @@
-package com.deivon.fuellog.logic
+package com.david7ce.fuellog.logic
 
-import com.deivon.fuellog.data.Refuel
-import com.deivon.fuellog.data.Vehicle
-import com.deivon.fuellog.data.VehicleType
+import com.david7ce.fuellog.data.Refuel
+import com.david7ce.fuellog.data.Vehicle
+import com.david7ce.fuellog.data.VehicleType
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertThrows

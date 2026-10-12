@@ -1,11 +1,11 @@
-package com.deivon.fuellog.ui
+package com.david7ce.fuellog.ui
 
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.addPathNodes
 import androidx.compose.ui.unit.dp
-import com.deivon.fuellog.data.VehicleType
+import com.david7ce.fuellog.data.VehicleType
 
 /**
  * Material icons that are not in material-icons-core. Copying ~20 paths avoids the

@@ -1,4 +1,4 @@
-package com.deivon.fuellog.data
+package com.david7ce.fuellog.data
 
 /** Stored as its lowercase [key]; unknown keys from newer backups fall back to [Other]. */
 enum class VehicleType(val key: String) {

@@ -1,6 +1,6 @@
 @file:OptIn(ExperimentalMaterial3Api::class)
 
-package com.deivon.fuellog.ui
+package com.david7ce.fuellog.ui
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Column
@@ -34,8 +34,8 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import com.deivon.fuellog.logic.ConsumptionInterval
-import com.deivon.shared.ui.ChoiceDropdown
+import com.david7ce.fuellog.logic.ConsumptionInterval
+import com.david7ce.shared.ui.ChoiceDropdown
 
 /** Read-only dropdown (language, currency, units). The implementation lives in android/shared. */
 @Composable

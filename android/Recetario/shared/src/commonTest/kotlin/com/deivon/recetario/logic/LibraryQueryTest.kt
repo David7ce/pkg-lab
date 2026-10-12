@@ -1,7 +1,7 @@
-package com.deivon.recetario.logic
+package com.david7ce.recetario.logic
 
-import com.deivon.recetario.model.Ingredient
-import com.deivon.recetario.recipe
+import com.david7ce.recetario.model.Ingredient
+import com.david7ce.recetario.recipe
 import kotlin.test.Test
 import kotlin.test.assertEquals
 

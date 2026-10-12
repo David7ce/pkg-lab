@@ -1,4 +1,4 @@
-package com.deivon.recetario.model
+package com.david7ce.recetario.model
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -14,7 +14,7 @@ data class Ingredient(
 
 /**
  * A recipe as stored and exported. This class is also the JSON shape of the export format
- * (see [com.deivon.recetario.logic.RecipeJson]); renaming a property is a format change.
+ * (see [com.david7ce.recetario.logic.RecipeJson]); renaming a property is a format change.
  */
 @Serializable
 data class Recipe(

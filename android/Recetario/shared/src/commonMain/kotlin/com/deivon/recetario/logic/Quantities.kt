@@ -1,6 +1,6 @@
-package com.deivon.recetario.logic
+package com.david7ce.recetario.logic
 
-import com.deivon.recetario.model.Ingredient
+import com.david7ce.recetario.model.Ingredient
 import kotlin.math.abs
 import kotlin.math.floor
 import kotlin.math.roundToLong

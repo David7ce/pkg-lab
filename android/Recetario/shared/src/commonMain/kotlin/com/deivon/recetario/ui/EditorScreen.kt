@@ -1,4 +1,4 @@
-package com.deivon.recetario.ui
+package com.david7ce.recetario.ui
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -39,10 +39,10 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import com.deivon.recetario.logic.ImageChange
-import com.deivon.recetario.logic.IngredientDraft
-import com.deivon.recetario.logic.Problem
-import com.deivon.recetario.logic.moved
+import com.david7ce.recetario.logic.ImageChange
+import com.david7ce.recetario.logic.IngredientDraft
+import com.david7ce.recetario.logic.Problem
+import com.david7ce.recetario.logic.moved
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

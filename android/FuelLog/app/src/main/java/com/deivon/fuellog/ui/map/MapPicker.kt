@@ -1,6 +1,6 @@
 @file:OptIn(ExperimentalMaterial3Api::class)
 
-package com.deivon.fuellog.ui.map
+package com.david7ce.fuellog.ui.map
 
 import android.Manifest
 import android.content.pm.PackageManager
@@ -49,9 +49,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
-import com.deivon.fuellog.R
-import com.deivon.fuellog.logic.GeoPoint
-import com.deivon.fuellog.ui.AppIcons
+import com.david7ce.fuellog.R
+import com.david7ce.fuellog.logic.GeoPoint
+import com.david7ce.fuellog.ui.AppIcons
 import kotlinx.coroutines.launch
 
 /**

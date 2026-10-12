@@ -1,6 +1,6 @@
 @file:OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 
-package com.deivon.fuellog.ui
+package com.david7ce.fuellog.ui
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -36,14 +36,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import com.deivon.fuellog.R
-import com.deivon.fuellog.data.Refuel
-import com.deivon.fuellog.logic.FuelStats
-import com.deivon.fuellog.logic.Period
-import com.deivon.shared.ui.ConfirmDialog
-import com.deivon.shared.ui.LocalSharedStrings
-import com.deivon.shared.ui.SelectionActions
-import com.deivon.shared.ui.rememberSelection
+import com.david7ce.fuellog.R
+import com.david7ce.fuellog.data.Refuel
+import com.david7ce.fuellog.logic.FuelStats
+import com.david7ce.fuellog.logic.Period
+import com.david7ce.shared.ui.ConfirmDialog
+import com.david7ce.shared.ui.LocalSharedStrings
+import com.david7ce.shared.ui.SelectionActions
+import com.david7ce.shared.ui.rememberSelection
 
 private val periodLabels = mapOf(
     Period.All to R.string.period_all, Period.ThisMonth to R.string.period_month,

@@ -1,12 +1,12 @@
-package com.deivon.recetario
+package com.david7ce.recetario
 
-import com.deivon.recetario.logic.Backup
-import com.deivon.recetario.logic.ConflictPolicy
-import com.deivon.recetario.logic.ImageChange
-import com.deivon.recetario.logic.ImportException
-import com.deivon.recetario.logic.ImportFailure
-import com.deivon.recetario.logic.ImportPlan
-import com.deivon.recetario.platform.JvmZipCodec
+import com.david7ce.recetario.logic.Backup
+import com.david7ce.recetario.logic.ConflictPolicy
+import com.david7ce.recetario.logic.ImageChange
+import com.david7ce.recetario.logic.ImportException
+import com.david7ce.recetario.logic.ImportFailure
+import com.david7ce.recetario.logic.ImportPlan
+import com.david7ce.recetario.platform.JvmZipCodec
 import kotlin.test.Test
 import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals

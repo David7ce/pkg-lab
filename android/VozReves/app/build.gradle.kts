@@ -10,11 +10,11 @@ val targetAbi: String? = (findProperty("abi") as String?)?.takeIf { it != "unive
 val abiCodes = mapOf("armeabi-v7a" to 1, "arm64-v8a" to 2)
 
 android {
-    namespace = "com.deivon.vozreves"
+    namespace = "com.david7ce.vozreves"
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "com.deivon.vozreves"
+        applicationId = "com.david7ce.vozreves"
         minSdk = 26
         targetSdk = 35
         // En GitHub Actions el número de compilación sube solo, así cada APK actualiza a la anterior.

@@ -1,6 +1,6 @@
-package com.deivon.recetario.platform
+package com.david7ce.recetario.platform
 
-import com.deivon.recetario.logic.RecipeRules
+import com.david7ce.recetario.logic.RecipeRules
 import java.io.File
 import java.io.IOException
 

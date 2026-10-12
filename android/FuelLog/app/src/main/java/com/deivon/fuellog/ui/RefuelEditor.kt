@@ -1,6 +1,6 @@
 @file:OptIn(ExperimentalMaterial3Api::class)
 
-package com.deivon.fuellog.ui
+package com.david7ce.fuellog.ui
 
 import android.content.Intent
 import android.net.Uri
@@ -67,14 +67,14 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import com.deivon.fuellog.R
-import com.deivon.shared.ui.ConfirmDialog
-import com.deivon.shared.ui.SegmentedChoice
-import com.deivon.fuellog.logic.FormError
-import com.deivon.fuellog.logic.FormWarning
-import com.deivon.fuellog.logic.GeoPoint
-import com.deivon.fuellog.logic.RefuelForm
-import com.deivon.fuellog.ui.map.MapPicker
+import com.david7ce.fuellog.R
+import com.david7ce.shared.ui.ConfirmDialog
+import com.david7ce.shared.ui.SegmentedChoice
+import com.david7ce.fuellog.logic.FormError
+import com.david7ce.fuellog.logic.FormWarning
+import com.david7ce.fuellog.logic.GeoPoint
+import com.david7ce.fuellog.logic.RefuelForm
+import com.david7ce.fuellog.ui.map.MapPicker
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneId

@@ -9,11 +9,11 @@ val targetAbi: String? = (findProperty("abi") as String?)?.takeIf { it != "unive
 val abiCodes = mapOf("armeabi-v7a" to 1, "arm64-v8a" to 2)
 
 android {
-    namespace = "com.deivon.recetario"
+    namespace = "com.david7ce.recetario"
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "com.deivon.recetario"
+        applicationId = "com.david7ce.recetario"
         minSdk = 26
         targetSdk = 36
         // CI run number ×10 + ABI code: every build installs over the previous one.

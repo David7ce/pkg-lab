@@ -1,4 +1,4 @@
-package com.deivon.vozreves
+package com.david7ce.vozreves
 
 import org.junit.Assert.assertArrayEquals
 import org.junit.Assert.assertTrue
@@ -131,13 +131,13 @@ class DecodeWavTest {
 
 class SharedTest {
     @Test fun reverseTextReversesByCodePoints() {
-        assertEquals("olleH", com.deivon.shared.reverseText("Hello"))
-        assertEquals("a😀", com.deivon.shared.reverseText("😀a"))
-        assertEquals("", com.deivon.shared.reverseText(""))
+        assertEquals("olleH", com.david7ce.shared.reverseText("Hello"))
+        assertEquals("a😀", com.david7ce.shared.reverseText("😀a"))
+        assertEquals("", com.david7ce.shared.reverseText(""))
     }
 
     @Test fun selectionToggleSelectAllClearAndRetain() {
-        val sel = com.deivon.shared.ui.Selection<String>()
+        val sel = com.david7ce.shared.ui.Selection<String>()
         assertEquals(false, sel.active)
         sel.toggle("a"); sel.toggle("b")
         assertEquals(true, "a" in sel)

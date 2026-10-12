@@ -1,6 +1,6 @@
 @file:OptIn(ExperimentalMaterial3Api::class)
 
-package com.deivon.fuellog.ui
+package com.david7ce.fuellog.ui
 
 import android.app.Activity
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -48,15 +48,15 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import com.deivon.fuellog.R
-import com.deivon.shared.ui.ConfirmDialog
-import com.deivon.shared.ui.SegmentedChoice
-import com.deivon.fuellog.logic.Backup
+import com.david7ce.fuellog.R
+import com.david7ce.shared.ui.ConfirmDialog
+import com.david7ce.shared.ui.SegmentedChoice
+import com.david7ce.fuellog.logic.Backup
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.util.Currency
 import java.util.Locale
-import com.deivon.fuellog.logic.UnitSystem
+import com.david7ce.fuellog.logic.UnitSystem
 
 /** Third tab: vehicles first (most used), then app settings and data. */
 @Composable

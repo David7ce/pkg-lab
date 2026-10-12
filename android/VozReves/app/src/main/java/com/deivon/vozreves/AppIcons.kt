@@ -1,4 +1,4 @@
-package com.deivon.vozreves
+package com.david7ce.vozreves
 
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor

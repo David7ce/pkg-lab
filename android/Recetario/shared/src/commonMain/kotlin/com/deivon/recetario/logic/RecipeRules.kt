@@ -1,7 +1,7 @@
-package com.deivon.recetario.logic
+package com.david7ce.recetario.logic
 
-import com.deivon.recetario.model.Ingredient
-import com.deivon.recetario.model.Recipe
+import com.david7ce.recetario.model.Ingredient
+import com.david7ce.recetario.model.Recipe
 
 /** Things that can be wrong with a recipe, whether typed in the editor or read from a file. */
 sealed interface Problem {

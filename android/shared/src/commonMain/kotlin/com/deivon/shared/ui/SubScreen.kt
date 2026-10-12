@@ -1,4 +1,4 @@
-package com.deivon.shared.ui
+package com.david7ce.shared.ui
 
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.RowScope

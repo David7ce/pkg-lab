@@ -1,4 +1,4 @@
-package com.deivon.recetario.logic
+package com.david7ce.recetario.logic
 
 import kotlin.test.Test
 import kotlin.test.assertEquals

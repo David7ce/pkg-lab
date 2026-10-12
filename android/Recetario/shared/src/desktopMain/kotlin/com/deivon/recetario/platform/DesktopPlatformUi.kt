@@ -1,8 +1,8 @@
-package com.deivon.recetario.platform
+package com.david7ce.recetario.platform
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
-import com.deivon.recetario.ui.PlatformUi
+import com.david7ce.recetario.ui.PlatformUi
 import java.awt.Desktop
 import java.awt.FileDialog
 import java.awt.Frame

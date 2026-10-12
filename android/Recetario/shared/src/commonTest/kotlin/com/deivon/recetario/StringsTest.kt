@@ -1,8 +1,8 @@
-package com.deivon.recetario
+package com.david7ce.recetario
 
-import com.deivon.recetario.ui.AppLanguage
-import com.deivon.recetario.ui.EnStrings
-import com.deivon.recetario.ui.stringsFor
+import com.david7ce.recetario.ui.AppLanguage
+import com.david7ce.recetario.ui.EnStrings
+import com.david7ce.recetario.ui.stringsFor
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotEquals

@@ -1,6 +1,6 @@
 @file:OptIn(ExperimentalMaterial3Api::class)
 
-package com.deivon.fuellog.ui
+package com.david7ce.fuellog.ui
 
 import android.content.Context
 import android.os.Bundle
@@ -10,8 +10,8 @@ import androidx.activity.compose.setContent
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.res.stringResource
-import com.deivon.shared.ui.LocalSharedStrings
-import com.deivon.shared.ui.SharedStrings
+import com.david7ce.shared.ui.LocalSharedStrings
+import com.david7ce.shared.ui.SharedStrings
 import androidx.activity.viewModels
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -51,7 +51,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.graphics.vector.ImageVector
-import com.deivon.fuellog.R
+import com.david7ce.fuellog.R
 import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {

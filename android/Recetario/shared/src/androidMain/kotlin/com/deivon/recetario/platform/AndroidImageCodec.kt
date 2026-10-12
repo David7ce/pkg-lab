@@ -1,4 +1,4 @@
-package com.deivon.recetario.platform
+package com.david7ce.recetario.platform
 
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory

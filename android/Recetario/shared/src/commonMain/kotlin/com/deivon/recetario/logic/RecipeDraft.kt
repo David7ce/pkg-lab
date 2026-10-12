@@ -1,7 +1,7 @@
-package com.deivon.recetario.logic
+package com.david7ce.recetario.logic
 
-import com.deivon.recetario.model.Ingredient
-import com.deivon.recetario.model.Recipe
+import com.david7ce.recetario.model.Ingredient
+import com.david7ce.recetario.model.Recipe
 
 /** Editor rows carry a [key] so lists keep their identity while rows are moved or removed. */
 data class IngredientDraft(

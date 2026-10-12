@@ -1,4 +1,4 @@
-package com.deivon.fuellog.data
+package com.david7ce.fuellog.data
 
 import android.content.ContentValues
 import android.content.Context

@@ -1,6 +1,6 @@
-package com.deivon.fuellog.logic
+package com.david7ce.fuellog.logic
 
-import com.deivon.fuellog.data.Refuel
+import com.david7ce.fuellog.data.Refuel
 import java.time.LocalDate
 import java.time.ZoneId
 

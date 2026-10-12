@@ -1,4 +1,4 @@
-package com.deivon.fuellog.ui.map
+package com.david7ce.fuellog.ui.map
 
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
@@ -26,8 +26,8 @@ import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
-import com.deivon.fuellog.logic.GeoPoint
-import com.deivon.fuellog.logic.Mercator
+import com.david7ce.fuellog.logic.GeoPoint
+import com.david7ce.fuellog.logic.Mercator
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

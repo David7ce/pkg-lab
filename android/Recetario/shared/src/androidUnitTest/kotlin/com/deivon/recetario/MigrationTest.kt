@@ -1,9 +1,9 @@
-package com.deivon.recetario
+package com.david7ce.recetario
 
 import app.cash.sqldelight.driver.jdbc.sqlite.JdbcSqliteDriver
-import com.deivon.recetario.data.RecipeRepository
-import com.deivon.recetario.db.RecipeDatabase
-import com.deivon.recetario.logic.ImageChange
+import com.david7ce.recetario.data.RecipeRepository
+import com.david7ce.recetario.db.RecipeDatabase
+import com.david7ce.recetario.logic.ImageChange
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNull

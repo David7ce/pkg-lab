@@ -1,6 +1,6 @@
-package com.deivon.recetario.logic
+package com.david7ce.recetario.logic
 
-import com.deivon.recetario.model.Recipe
+import com.david7ce.recetario.model.Recipe
 
 /** What the user chooses when an imported recipe has the same id as a different local one. */
 enum class ConflictPolicy { KeepMine, ImportAsCopies, ReplaceMine }

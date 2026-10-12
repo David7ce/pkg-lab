@@ -1,4 +1,4 @@
-package com.deivon.fuellog.ui
+package com.david7ce.fuellog.ui
 
 import android.graphics.Color as AndroidColor
 import androidx.activity.ComponentActivity
