@@ -131,4 +131,7 @@
     <string name="worst_consumption">最高油耗</string>
     <string name="zoom_in">放大</string>
     <string name="zoom_out">缩小</string>
+    <string name="selected_count">已选择 %1$d 项</string>
+    <string name="delete_refuel_confirm">删除这条加油记录？</string>
+    <string name="delete_refuels_confirm">删除 %1$d 条加油记录？</string>
 </resources>

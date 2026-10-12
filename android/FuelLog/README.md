@@ -5,6 +5,9 @@ Data is local only; the optional map loads OpenStreetMap tiles. 8 languages (en,
 
 ## Structure
 
+Shared UI (selectors, confirmations, multi-select, dropdowns) comes from `android/shared/` (see its README).
+
+
 ```
 app/src/main/java/com/deivon/fuellog/
 ├── data/    Models.kt (Vehicle, Refuel) · FuelDatabase.kt (SQLiteOpenHelper)

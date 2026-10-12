@@ -88,7 +88,6 @@ fun FuelApp(vm: AppViewModel) {
     val msgSaved = stringResource(R.string.saved)
     val msgSavedWith = stringResource(R.string.saved_consumption)
     val msgDeleted = stringResource(R.string.deleted)
-    val undo = stringResource(R.string.undo)
     LaunchedEffect(vm.event) {
         when (val e = vm.event) {
             is UiEvent.Saved -> {
@@ -97,9 +96,7 @@ fun FuelApp(vm: AppViewModel) {
             }
             UiEvent.Deleted -> {
                 vm.consumeEvent()
-                if (snackbar.showSnackbar(msgDeleted, undo, duration = SnackbarDuration.Long) == SnackbarResult.ActionPerformed) {
-                    vm.undoDelete()
-                }
+                snackbar.showSnackbar(msgDeleted)
             }
             null -> Unit
         }

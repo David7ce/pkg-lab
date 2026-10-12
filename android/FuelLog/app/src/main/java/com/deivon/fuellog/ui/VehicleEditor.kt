@@ -54,6 +54,7 @@ import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.deivon.fuellog.R
+import com.deivon.shared.ui.ConfirmDialog
 import com.deivon.fuellog.data.Vehicle
 import com.deivon.fuellog.data.VehicleType
 import com.deivon.fuellog.logic.CatalogFuel
@@ -168,12 +169,13 @@ fun VehicleEditor(vm: AppViewModel, original: Vehicle) {
         }
     }
 
-    if (confirmDelete) AlertDialog(
-        onDismissRequest = { confirmDelete = false },
-        title = { Text(stringResource(R.string.delete_vehicle_title)) },
-        text = { Text(stringResource(R.string.delete_vehicle_message, vm.refuelCount(original.id))) },
-        confirmButton = { TextButton(onClick = { confirmDelete = false; vm.deleteVehicle(original.id) }) { Text(stringResource(R.string.delete)) } },
-        dismissButton = { TextButton(onClick = { confirmDelete = false }) { Text(stringResource(R.string.cancel)) } }
+    if (confirmDelete) ConfirmDialog(
+        title = stringResource(R.string.delete_vehicle_title),
+        text = stringResource(R.string.delete_vehicle_message, vm.refuelCount(original.id)),
+        confirmLabel = stringResource(R.string.delete),
+        destructive = true,
+        onConfirm = { confirmDelete = false; vm.deleteVehicle(original.id) },
+        onDismiss = { confirmDelete = false },
     )
 }
 

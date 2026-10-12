@@ -80,7 +80,6 @@ class AppViewModel(app: Application) : AndroidViewModel(app) {
         private set
     var event by mutableStateOf<UiEvent?>(null)
         private set
-    private var lastDeleted: Refuel? = null
 
     init {
         viewModelScope.launch(Dispatchers.IO) {
@@ -179,23 +178,15 @@ class AppViewModel(app: Application) : AndroidViewModel(app) {
 
     fun dismissWarnings() { pendingWarnings = emptyList() }
 
-    /** Deletes at once; the snackbar offers [undoDelete] instead of a confirmation dialog. */
-    fun delete(id: Long) = viewModelScope.launch {
-        lastDeleted = all.firstOrNull { it.id == id }
-        withContext(Dispatchers.IO) { db.delete(id) }
+    /** Deletes the given refuellings. The UI asks for confirmation first (see HistoryScreen, RefuelEditor). */
+    fun deleteRefuels(ids: Collection<Long>) = viewModelScope.launch {
+        withContext(Dispatchers.IO) { ids.forEach(db::delete) }
         closeForm()
         load()
         event = UiEvent.Deleted
     }
 
-    fun undoDelete() {
-        val r = lastDeleted ?: return
-        lastDeleted = null
-        viewModelScope.launch {
-            withContext(Dispatchers.IO) { runCatching { db.restore(r) } }
-            load()
-        }
-    }
+    fun delete(id: Long) = deleteRefuels(listOf(id))
 
     fun consumeEvent() { event = null }
 

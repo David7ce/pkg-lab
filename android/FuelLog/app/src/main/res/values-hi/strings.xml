@@ -131,4 +131,7 @@
     <string name="worst_consumption">सबसे खराब खपत</string>
     <string name="zoom_in">ज़ूम इन</string>
     <string name="zoom_out">ज़ूम आउट</string>
+    <string name="selected_count">%1$d चुने गए</string>
+    <string name="delete_refuel_confirm">यह ईंधन भराई हटाएँ?</string>
+    <string name="delete_refuels_confirm">%1$d ईंधन भराइयाँ हटाएँ?</string>
 </resources>

@@ -35,8 +35,9 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.deivon.fuellog.logic.ConsumptionInterval
+import com.deivon.shared.ui.ChoiceDropdown
 
-/** Read-only dropdown (language, currency, units): shows the current label, opens a menu to pick. */
+/** Read-only dropdown (language, currency, units). The implementation lives in android/shared. */
 @Composable
 fun <T> DropdownField(
     label: String,
@@ -45,30 +46,7 @@ fun <T> DropdownField(
     selected: T,
     onSelect: (T) -> Unit,
     modifier: Modifier = Modifier,
-) {
-    var open by remember { mutableStateOf(false) }
-    ExposedDropdownMenuBox(expanded = open, onExpandedChange = { open = it }, modifier = modifier) {
-        OutlinedTextField(
-            value = options.firstOrNull { it.first == selected }?.second.orEmpty(),
-            onValueChange = {},
-            readOnly = true,
-            label = { Text(label) },
-            leadingIcon = { Icon(icon, null) },
-            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = open) },
-            singleLine = true,
-            modifier = Modifier.fillMaxWidth().menuAnchor(MenuAnchorType.PrimaryNotEditable)
-        )
-        ExposedDropdownMenu(expanded = open, onDismissRequest = { open = false }) {
-            options.forEach { (value, text) ->
-                DropdownMenuItem(
-                    text = { Text(text, maxLines = 1, overflow = TextOverflow.Ellipsis) },
-                    onClick = { onSelect(value); open = false },
-                    trailingIcon = if (value == selected) { { Icon(Icons.Filled.Check, null) } } else null,
-                )
-            }
-        }
-    }
-}
+) = ChoiceDropdown(options, selected, modifier, label, icon, onSelect)
 
 /**
  * Consumption of the last intervals as a simple line, oldest left, with the reference as a dashed

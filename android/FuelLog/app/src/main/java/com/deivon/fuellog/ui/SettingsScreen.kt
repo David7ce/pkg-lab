@@ -49,6 +49,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.deivon.fuellog.R
+import com.deivon.shared.ui.ConfirmDialog
+import com.deivon.shared.ui.SegmentedChoice
 import com.deivon.fuellog.logic.Backup
 import kotlinx.coroutines.launch
 import java.time.LocalDate
@@ -121,14 +123,11 @@ private fun LanguagePicker(settings: AppSettings) {
 private fun AppearanceAndCurrency(settings: AppSettings) {
     SectionTitle(stringResource(R.string.appearance), AppIcons.Palette)
     val themes = listOf(R.string.theme_system, R.string.theme_light, R.string.theme_dark)
-    SingleChoiceSegmentedButtonRow(Modifier.fillMaxWidth()) {
-        themes.forEachIndexed { i, label ->
-            SegmentedButton(
-                selected = settings.theme == i, onClick = { settings.updateTheme(i) },
-                shape = SegmentedButtonDefaults.itemShape(i, themes.size)
-            ) { Text(stringResource(label), maxLines = 1) }
-        }
-    }
+    SegmentedChoice(
+        options = themes.mapIndexed { i, res -> i to stringResource(res) },
+        selected = settings.theme,
+        onSelect = settings::updateTheme,
+    )
     Spacer(Modifier.height(16.dp))
     DropdownField(
         label = stringResource(R.string.units),
@@ -201,16 +200,13 @@ private fun DataSection(vm: AppViewModel, showMessage: (String) -> Unit) {
     }
 
     pendingRestore?.let { parsed ->
-        AlertDialog(
-            onDismissRequest = { pendingRestore = null },
-            title = { Text(stringResource(R.string.restore_title)) },
-            text = { Text(stringResource(R.string.restore_message, parsed.vehicles.size, parsed.refuelCount, parsed.skipped)) },
-            confirmButton = {
-                TextButton(onClick = { pendingRestore = null; vm.restore(parsed); showMessage(msgRestored) }) {
-                    Text(stringResource(R.string.restore))
-                }
-            },
-            dismissButton = { TextButton(onClick = { pendingRestore = null }) { Text(stringResource(R.string.cancel)) } }
+        ConfirmDialog(
+            title = stringResource(R.string.restore_title),
+            text = stringResource(R.string.restore_message, parsed.vehicles.size, parsed.refuelCount, parsed.skipped),
+            confirmLabel = stringResource(R.string.restore),
+            destructive = true, // reemplaza todos los datos actuales
+            onConfirm = { pendingRestore = null; vm.restore(parsed); showMessage(msgRestored) },
+            onDismiss = { pendingRestore = null },
         )
     }
 }

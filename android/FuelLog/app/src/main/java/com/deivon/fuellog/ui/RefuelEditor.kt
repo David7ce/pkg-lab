@@ -68,6 +68,8 @@ import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.deivon.fuellog.R
+import com.deivon.shared.ui.ConfirmDialog
+import com.deivon.shared.ui.SegmentedChoice
 import com.deivon.fuellog.logic.FormError
 import com.deivon.fuellog.logic.FormWarning
 import com.deivon.fuellog.logic.GeoPoint
@@ -104,12 +106,21 @@ fun RefuelEditor(vm: AppViewModel, form: RefuelForm, formats: Formats, showMessa
     val odometerFocus = remember { FocusRequester() }
     LaunchedEffect(Unit) { if (isNew && form.odometer.isEmpty()) runCatching { odometerFocus.requestFocus() } }
 
+    var confirmDelete by remember { mutableStateOf(false) }
+    if (confirmDelete) ConfirmDialog(
+        text = stringResource(R.string.delete_refuel_confirm),
+        confirmLabel = stringResource(R.string.delete),
+        destructive = true,
+        onConfirm = { confirmDelete = false; vm.delete(form.id) },
+        onDismiss = { confirmDelete = false },
+    )
+
     Scaffold(topBar = {
         TopAppBar(
             title = { Text(stringResource(if (isNew) R.string.new_refuel else R.string.edit_refuel)) },
             navigationIcon = { IconButton(onClick = vm::closeForm) { Icon(Icons.Filled.Close, stringResource(R.string.cancel)) } },
             actions = {
-                if (!isNew) IconButton(onClick = { vm.delete(form.id) }) { Icon(Icons.Filled.Delete, stringResource(R.string.delete)) }
+                if (!isNew) IconButton(onClick = { confirmDelete = true }) { Icon(Icons.Filled.Delete, stringResource(R.string.delete)) }
                 TextButton(onClick = { vm.saveForm() }) { Text(stringResource(R.string.save)) }
             }
         )
@@ -134,14 +145,11 @@ fun RefuelEditor(vm: AppViewModel, form: RefuelForm, formats: Formats, showMessa
                 modifier = Modifier.fillMaxWidth().focusRequester(odometerFocus)
             )
 
-            SingleChoiceSegmentedButtonRow(Modifier.fillMaxWidth()) {
-                listOf(false to stringResource(R.string.by_volume), true to stringResource(R.string.by_amount)).forEachIndexed { i, (amount, label) ->
-                    SegmentedButton(
-                        selected = form.byAmount == amount, onClick = { update(form.copy(byAmount = amount)) },
-                        shape = SegmentedButtonDefaults.itemShape(i, 2)
-                    ) { Text(label, maxLines = 1) }
-                }
-            }
+            SegmentedChoice(
+                options = listOf(false to stringResource(R.string.by_volume), true to stringResource(R.string.by_amount)),
+                selected = form.byAmount,
+                onSelect = { update(form.copy(byAmount = it)) },
+            )
             Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                 if (form.byAmount) {
                     Field(

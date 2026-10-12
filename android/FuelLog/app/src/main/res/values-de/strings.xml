@@ -131,4 +131,7 @@
     <string name="worst_consumption">Schlechtester Verbrauch</string>
     <string name="zoom_in">Vergrößern</string>
     <string name="zoom_out">Verkleinern</string>
+    <string name="selected_count">%1$d ausgewählt</string>
+    <string name="delete_refuel_confirm">Diesen Tankvorgang löschen?</string>
+    <string name="delete_refuels_confirm">%1$d Tankvorgänge löschen?</string>
 </resources>

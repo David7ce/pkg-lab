@@ -1,6 +1,8 @@
 package com.deivon.fuellog.ui
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -13,6 +15,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Place
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -93,10 +96,27 @@ private fun Tag(icon: ImageVector, text: String, color: Color) {
     }
 }
 
-/** A refuelling in lists: date and total on top, fuel details below, highlights and consumption. */
+/**
+ * A refuelling in lists: date and total on top, fuel details below, highlights and consumption.
+ * Long press starts selection; while [selecting], a checkbox shows the state and a tap toggles it.
+ */
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun RefuelRow(r: Refuel, interval: ConsumptionInterval?, extremes: Extremes, formats: Formats, onClick: () -> Unit) {
-    Column(Modifier.fillMaxWidth().clickable(onClick = onClick).padding(horizontal = 16.dp, vertical = 12.dp)) {
+fun RefuelRow(
+    r: Refuel, interval: ConsumptionInterval?, extremes: Extremes, formats: Formats,
+    selecting: Boolean = false, checked: Boolean = false,
+    onLongClick: () -> Unit = {}, onClick: () -> Unit,
+) {
+    Row(
+        Modifier.fillMaxWidth().combinedClickable(onClick = onClick, onLongClick = onLongClick)
+            .padding(horizontal = 16.dp, vertical = 12.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        if (selecting) {
+            Checkbox(checked = checked, onCheckedChange = null)
+            Spacer(Modifier.width(4.dp))
+        }
+        Column(Modifier.weight(1f)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Row(Modifier.weight(1f), verticalAlignment = Alignment.CenterVertically) {
                 Text(
@@ -130,6 +150,7 @@ fun RefuelRow(r: Refuel, interval: ConsumptionInterval?, extremes: Extremes, for
             }
             val label = formats.consumption(interval.litresPer100Km) + " · " + formats.distance(interval.distanceKm)
             Tag(AppIcons.Speed, label, color)
+        }
         }
     }
 }

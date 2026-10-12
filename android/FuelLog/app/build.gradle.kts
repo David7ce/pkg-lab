@@ -79,6 +79,8 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.7")
     implementation("androidx.core:core-ktx:1.15.0")
 
+    implementation(project(":shared"))
+
     // Tests only (not shipped): JUnit, and the real org.json so backup parsing runs on the JVM.
     testImplementation("junit:junit:4.13.2")
     testImplementation("org.json:json:20240303")

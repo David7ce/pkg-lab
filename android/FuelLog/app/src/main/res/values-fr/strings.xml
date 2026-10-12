@@ -131,4 +131,7 @@
     <string name="worst_consumption">Pire consommation</string>
     <string name="zoom_in">Zoom avant</string>
     <string name="zoom_out">Zoom arrière</string>
+    <string name="selected_count">%1$d sélectionné(s)</string>
+    <string name="delete_refuel_confirm">Supprimer ce plein ?</string>
+    <string name="delete_refuels_confirm">Supprimer %1$d pleins ?</string>
 </resources>

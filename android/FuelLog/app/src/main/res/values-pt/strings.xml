@@ -131,4 +131,7 @@
     <string name="worst_consumption">Pior consumo</string>
     <string name="zoom_in">Aproximar</string>
     <string name="zoom_out">Afastar</string>
+    <string name="selected_count">%1$d selecionado(s)</string>
+    <string name="delete_refuel_confirm">Apagar este abastecimento?</string>
+    <string name="delete_refuels_confirm">Apagar %1$d abastecimentos?</string>
 </resources>
