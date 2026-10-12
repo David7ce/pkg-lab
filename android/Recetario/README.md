@@ -21,11 +21,15 @@ or chosen in Settings).
 - Export: one recipe as PDF; the whole library as JSON, as a full backup ZIP with photos, or as a cookbook PDF.
 - Light, dark or system theme. No accounts, no network except the explicit "Import from web page".
 
+Sample data: [`sample-recipes/`](sample-recipes/) has 112 ready-made recipes with photos to import
+on a first run.
+
 ## Structure
 
 ```
 Recetario/
 ├── gradle/libs.versions.toml     versions, checked 2026-10-12 (see "Dependencies")
+├── sample-recipes/               starter recipe collection, importable as-is (see its README)
 ├── app/                          Android packaging only: id, version, signing, ABI splits, icon, manifest
 └── shared/                       all code (Kotlin Multiplatform library)
     └── src/
