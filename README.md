@@ -8,7 +8,8 @@ pkg-lab/
 ├── .github/workflows/
 │   └── android.yml        ← compila todo lo que hay en android/
 ├── android/
-│   └── VozReves/          ← cada app es un proyecto Gradle independiente
+│   ├── VozReves/          ← cada app es un proyecto Gradle independiente
+│   └── FuelLog/           ← registro de repostajes y consumo
 ├── linux/                 ← (futuro) con su propio linux.yml
 ├── windows/               ← (futuro)
 └── web/                   ← (futuro)
@@ -17,6 +18,7 @@ pkg-lab/
 ## Android
 
 - **Añadir una app:** crea `android/<NombreApp>/` con un proyecto Gradle (con `gradlew`). No hay que tocar el workflow.
+- **Tests:** si la app tiene tests unitarios (`app/src/test`), se ejecutan en cada build.
 - **Compilar:** cada push a `main` compila solo las apps que han cambiado. También a mano desde
   *Actions → Android → Run workflow* (escribe el nombre de la carpeta o déjalo vacío para todas).
 - **Descargar:** *Releases → `android-<NombreApp>-latest`*. Cada app se compila en paralelo para
