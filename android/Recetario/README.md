@@ -8,8 +8,10 @@ Windows/Linux prepared. English and Spanish (follows the system language).
 - Structured ingredients (quantity, unit, name, note) and ordered steps; add, edit, reorder, remove.
 - Scaling: changing servings scales numeric quantities; text-only ingredients ("salt to taste") never change.
 - Cooking mode: one step at a time, progress, previous/next, ingredients on demand, screen kept on.
-- Import: the app's own JSON, full backups, and web pages with schema.org/Recipe JSON-LD (always shown as an
-  editable preview; nothing is saved until you tap Save).
+- Import: the app's own JSON and full backups, **RecipeSage** exports (JSON-LD), **My RecipeBox** (RecetteTek)
+  `.rtk` archives, and web pages with schema.org/Recipe JSON-LD (shown as an editable preview; nothing is saved
+  until you tap Save). The file type is recognised by content.
+- Free-text notes per recipe (also where imported descriptions, comments and extra fields go).
 - Export: one recipe or the whole library as JSON; full backup ZIP with photos; recipe or cookbook PDF.
 - Light, dark or system theme. No accounts, no network except the explicit "Import from web page".
 
@@ -27,7 +29,8 @@ Recetario/
         │   │     Quantities (parse/format/scale) · IngredientParser · RecipeDraft (editor form + validation)
         │   │     RecipeRules (limits shared by editor and import) · LibraryQuery (search/filter/sort)
         │   │     RecipeJson (file format) · Backup (archive layout + validation) · ImportPlan (conflicts)
-        │   │     RecipePage + Durations (schema.org JSON-LD) · Text (accents, entities, slugs, dates)
+        │   │     RecipePage + Durations (schema.org JSON-LD) · Text (accents, entities, Markdown, dates)
+        │   │     ForeignFormats (RecipeSage, My RecipeBox → recipes + photo sources)
         │   ├── kotlin/…/data/        RecipeRepository (SQLDelight + image files, write ordering)
         │   ├── kotlin/…/platform/    Services: ImageStore, ImageCodec, ZipCodec, WebClient, PdfExporter interfaces
         │   ├── kotlin/…/ui/          AppState (navigation + actions), Transfer (import/export), screens,
@@ -64,8 +67,9 @@ no DI framework.
 
 ## Data
 
-SQLite database `recetario.db` (schema version 1, `Recipe.sq`): `recipe`, `ingredient`, `step`, `tag`
-(children ordered by `position`) and `setting` (theme). Photos are JPEG files in the app's private
+SQLite database `recetario.db` (schema version 2, `Recipe.sq`): `recipe`, `ingredient`, `step`, `tag`
+(children ordered by `position`) and `setting` (theme). Migrations live next to it (`1.sqm`: 1 → 2 adds
+`recipe.notes`, appended last because `SELECT *` reads by position); `MigrationTest` upgrades a real v1 schema. Photos are JPEG files in the app's private
 `files/images/`, referenced by opaque name (`<random>.jpg`), never stored as Base64.
 
 Write ordering (`RecipeRepository`): new image files first → rows in one transaction → old image files
@@ -78,13 +82,14 @@ Picked photos are rotated upright (EXIF), scaled to 1600 px and re-encoded (JPEG
 **JSON** (`recetario-YYYY-MM-DD.json` or `<recipe>.json`):
 
 ```json
-{ "format": "recetario", "version": 1, "exportedAt": 1760227200000, "app": "Recetario",
+{ "format": "recetario", "version": 2, "exportedAt": 1760227200000, "app": "Recetario",
   "recipes": [ { "id": "…", "title": "…", "ingredients": [ {"name": "harina", "quantity": 200.0, "unit": "g"} ],
                  "steps": ["…"], "servings": 4, "prepMinutes": 10, "cookMinutes": 20, "tags": ["…"],
-                 "sourceUrl": "https://…", "createdAt": 0, "updatedAt": 0 } ] }
+                 "sourceUrl": "https://…", "notes": "…", "createdAt": 0, "updatedAt": 0 } ] }
 ```
 
-Plain JSON carries no photos (no `image` field). Newer `version`s are rejected; unknown fields are ignored.
+Plain JSON carries no photos (no `image` field). Version 2 added `notes`; version 1 files still import.
+Newer `version`s are rejected (an older app would otherwise drop fields silently); unknown fields are ignored.
 
 **Backup ZIP** (`recetario-backup-YYYY-MM-DD.zip`): `manifest.json` (format `recetario-backup`, version, counts,
 image list), `recipes.json` (the JSON above with `image` names) and `images/<name>`.
@@ -94,6 +99,28 @@ against `RecipeRules`, unique ids, entry names (no paths outside `images/`), eve
 and with a JPEG/PNG/WebP signature, size limits (300 MB unpacked, 20 MB per photo). Then, per recipe id:
 new → added; identical content → skipped; different content → the user chooses *keep mine*, *import as copies*
 (new ids) or *replace mine*. Nothing is overwritten silently. All writes happen in one transaction.
+
+**Other apps** (`logic/ForeignFormats.kt`). Both go through the same review, conflict choice and single
+transaction as backups; the source id is kept, so importing the same export twice finds nothing new.
+
+| | RecipeSage (`.json` / `.jsonld`) | My RecipeBox (`.rtk` ZIP) |
+|---|---|---|
+| Recipes | `recipes[]` of schema.org `Recipe` | `recipes_N.json` arrays |
+| Id | `identifier` | `uuid` |
+| Ingredients | `recipeIngredient[]` | `ingredients` (one per line; `1count X` → 1 X) |
+| Steps | `HowToStep` / `HowToSection` text | `instructions` paragraphs; `**bold**`/links unwrapped |
+| Servings | first number of `recipeYield` ("Para 4 Personas") | first number of `quantity` |
+| Times | ISO 8601, tolerant of `PT1HM` | "30", "2 h 40", "45 min", "1:30" |
+| Tags | `recipeCategory`, emoji prefixes kept | `categories` + `tags` titles |
+| Notes | `description` + `comment[].text` | `description`, `notes`, nutrition, cookware, video |
+| Photo | first `image` URL, downloaded | file named in `pictures`, else `originalPicture` URL |
+| Dates | `dateModified` / `datePublished` | `lastModifiedDate` |
+
+Times with no field of their own (a total that is not prep + cook, resting time) or not understood are added
+to the notes with a label in the user's language. Not imported: ratings, favourites, RecipeBox meal plans and
+shopping lists. Entries without a title are skipped and counted; repeated ids get a new id. Photos are fetched
+(4 at a time, with progress and cancel) and resized only for the recipes that will be written, after the user
+confirms; a photo that fails leaves that recipe without one and is reported.
 
 **Web pages**: the page's `<script type="application/ld+json">` blocks are searched for a schema.org `Recipe`
 (also inside `@graph` and arrays). Title, ingredients (split into quantity/unit/name/note only when the line
@@ -116,8 +143,10 @@ Locally the same commands need JDK 17+ and an Android SDK with platform 36. The 
 
 Tests (`shared/src/commonTest`, `shared/src/androidUnitTest`) cover quantity parsing/formatting/scaling,
 ingredient line parsing, editor validation, the JSON format (round trip, versions, duplicates, invalid data),
-JSON-LD extraction and durations, backup layout and validation, conflict planning, search/filter/sort, and
-the repository and full backup → ZIP → restore path against real SQLite.
+JSON-LD extraction and durations, RecipeSage and My RecipeBox mapping (including the owner's real 108-recipe
+RecipeSage export and a real `.rtk`, in `androidUnitTest/resources`), backup layout and validation, conflict
+planning, search/filter/sort, the v1 → v2 migration, and the repository and full backup → ZIP → restore path
+against real SQLite.
 
 ## Next steps: Windows and Linux
 
