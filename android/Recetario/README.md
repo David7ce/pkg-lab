@@ -167,10 +167,11 @@ igual en todos los sistemas (estilo Material 3, no widgets nativos del sistema).
 - `shared/src/desktopMain`: `DesktopMain.kt` (ventana y arranque), `DesktopImageCodec` (Skia), `DesktopPlatformUi`
   (diálogos nativos AWT y enlaces), SQLite por JDBC. Sin PDF por ahora (`Services.pdf = null`, la opción se oculta).
 - Datos: `%APPDATA%\Recetario` en Windows, `~/.recetario` en Linux.
-- Compilar en local: `./gradlew :shared:desktopRun` (ejecuta la app), `:shared:desktopTest` (tests),
-  `:shared:packageMsi` (Windows) o `:shared:packageDeb` (Linux).
-- CI: `.github/workflows/desktop.yml` compila e instala en `ubuntu-latest` (.deb) y `windows-latest` (.msi),
-  ejecuta los tests de escritorio y publica en el release `desktop-recetario-latest`.
+- Compilar en local: `./gradlew :shared:desktopRun` (ejecuta la app), `:shared:desktopTest` (tests).
+  Instaladores: `:shared:packageMsi` (Windows), `:shared:packageAppImage` (Linux), `:shared:packageDmg` (macOS).
+- CI: `.github/workflows/desktop.yml`: `.msi` en `windows-latest` (x64), `.AppImage` en `ubuntu-latest` (x64) y
+  `.dmg` en `macos-14` (Apple Silicon). Publica los tres en el release `desktop-recetario-latest`.
+  Fuera por ahora: Linux arm64 (poco común) e iOS (necesita cuenta de Apple Developer para instalar en un iPhone).
 
 Pendiente en escritorio:
 - Rotación EXIF de fotos de móvil (las fotos pueden salir de lado al importarlas).

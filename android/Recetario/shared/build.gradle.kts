@@ -79,12 +79,13 @@ sqldelight {
     }
 }
 
-// Desktop app: `./gradlew :shared:packageMsi` on Windows, `:shared:packageDeb` on Linux (see .github/workflows/desktop.yml).
+// Desktop app: packageMsi (Windows), packageAppImage (Linux), packageDmg (macOS). See .github/workflows/desktop.yml.
 compose.desktop {
     application {
         mainClass = "com.deivon.recetario.platform.DesktopMainKt"
         nativeDistributions {
-            targetFormats(TargetFormat.Msi, TargetFormat.Deb)
+            // Solo lo que se publica: .msi (Windows), AppImage (Linux), .dmg (macOS). Cada uno se genera en su sistema.
+            targetFormats(TargetFormat.Msi, TargetFormat.AppImage, TargetFormat.Dmg)
             packageName = "Recetario"
             // Installers need MAJOR.MINOR.PATCH with a number in MAJOR; CI run number keeps each build newer.
             packageVersion = "1.0." + (System.getenv("GITHUB_RUN_NUMBER") ?: "1")

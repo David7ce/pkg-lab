@@ -1,6 +1,8 @@
-# Recetario para escritorio: instalador de Windows (.msi) y Linux (.deb), cada uno en su propio sistema.
-# - Push a main que toque android/Recetario/ o android/shared/ (o manual).
-# - Tests de escritorio en ambos sistemas; después publica en el release "desktop-recetario-latest".
+# Recetario para escritorio. Solo lo mínimo, cada formato en el sistema que lo genera:
+#   Windows x64  → .msi
+#   Linux x64    → AppImage (un fichero, funciona en cualquier distro)
+#   macOS arm64  → .dmg (runner arm)
+# Pendientes a propósito: Linux arm64, iOS (requiere cuenta de Apple Developer para instalar en un iPhone).
 name: Desktop
 
 on:
@@ -15,19 +17,27 @@ on:
 permissions:
   contents: write
 
-defaults:
-  run:
-    shell: bash
-    working-directory: android/Recetario
-
 jobs:
   build:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, windows-latest]
+        include:
+          - os: windows-latest
+            task: packageMsi
+            glob: "*.msi"
+          - os: ubuntu-latest
+            task: packageAppImage
+            glob: "*.AppImage"
+          - os: macos-14
+            task: packageDmg
+            glob: "*.dmg"
     runs-on: ${{ matrix.os }}
     name: build (${{ matrix.os }})
+    defaults:
+      run:
+        shell: bash
+        working-directory: android/Recetario
     steps:
       - uses: actions/checkout@v5
 
@@ -43,21 +53,14 @@ jobs:
           chmod +x gradlew
           ./gradlew :shared:desktopTest --no-daemon
 
-      - name: Instalador Linux (.deb)
-        if: runner.os == 'Linux'
-        run: ./gradlew :shared:packageDeb --no-daemon
-
-      - name: Instalador Windows (.msi)
-        if: runner.os == 'Windows'
-        run: ./gradlew :shared:packageMsi --no-daemon
+      - name: Instalador (${{ matrix.task }})
+        run: ./gradlew :shared:${{ matrix.task }} --no-daemon
 
       - name: Guardar instalador
         uses: actions/upload-artifact@v5
         with:
-          name: desktop-${{ runner.os }}
-          path: |
-            android/Recetario/shared/build/compose/binaries/main/msi/*.msi
-            android/Recetario/shared/build/compose/binaries/main/deb/*.deb
+          name: desktop-${{ matrix.os }}
+          path: android/Recetario/shared/build/compose/binaries/main/*/${{ matrix.glob }}
           if-no-files-found: error
 
   release:
@@ -76,14 +79,15 @@ jobs:
           GH_REPO: ${{ github.repository }}
         run: |
           set -o pipefail
-          files=$(find dist -type f \( -name '*.msi' -o -name '*.deb' \))
+          files=$(find dist -type f \( -name '*.msi' -o -name '*.AppImage' -o -name '*.dmg' \))
           echo "::notice title=Instaladores::$(echo $files | tr '\n' ' ')"
           [ -n "$files" ] || { echo "::error::No hay instaladores que publicar"; exit 1; }
           cat > "$RUNNER_TEMP/notes.md" <<NOTES
           Compilado automáticamente desde ${GITHUB_SHA::7}.
 
-          - **.msi**: instalador de Windows.
-          - **.deb**: paquete de Linux (Debian, Ubuntu y derivados).
+          - **.msi**: Windows (64 bits).
+          - **.AppImage**: Linux (64 bits). Hazlo ejecutable y ábrelo, no necesita instalación.
+          - **.dmg**: macOS (Apple Silicon).
           NOTES
           gh release delete desktop-recetario-latest --yes --cleanup-tag >/dev/null 2>&1 || true
           if ! out=$(gh release create desktop-recetario-latest $files \
