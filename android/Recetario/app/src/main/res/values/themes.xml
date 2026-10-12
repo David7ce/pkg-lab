@@ -1,0 +1,4 @@
+<resources>
+    <!-- Window theme only; colours come from Compose (RecetarioTheme). -->
+    <style name="Theme.Recetario" parent="android:Theme.Material.Light.NoActionBar" />
+</resources>

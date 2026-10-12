@@ -1,0 +1,101 @@
+-- Schema version 1. Children are always replaced as a whole when a recipe is saved,
+-- inside one transaction (see RecipeRepository), so positions stay dense (0..n-1).
+
+CREATE TABLE recipe (
+    id TEXT NOT NULL PRIMARY KEY,
+    title TEXT NOT NULL,
+    image_file TEXT,                 -- file name inside the app's image folder, never a path
+    servings INTEGER,
+    prep_minutes INTEGER,
+    cook_minutes INTEGER,
+    source_url TEXT,
+    created_at INTEGER NOT NULL,     -- epoch millis
+    updated_at INTEGER NOT NULL
+);
+
+CREATE TABLE ingredient (
+    recipe_id TEXT NOT NULL,
+    position INTEGER NOT NULL,
+    name TEXT NOT NULL,
+    quantity REAL,                   -- NULL = no numeric quantity ("salt to taste")
+    unit TEXT,
+    note TEXT,
+    PRIMARY KEY (recipe_id, position)
+);
+
+CREATE TABLE step (
+    recipe_id TEXT NOT NULL,
+    position INTEGER NOT NULL,
+    body TEXT NOT NULL,
+    PRIMARY KEY (recipe_id, position)
+);
+
+CREATE TABLE tag (
+    recipe_id TEXT NOT NULL,
+    position INTEGER NOT NULL,
+    name TEXT NOT NULL,
+    PRIMARY KEY (recipe_id, position)
+);
+
+CREATE TABLE setting (
+    name TEXT NOT NULL PRIMARY KEY,
+    content TEXT NOT NULL
+);
+
+selectAllRecipes:
+SELECT * FROM recipe;
+
+selectRecipe:
+SELECT * FROM recipe WHERE id = ?;
+
+selectAllIngredients:
+SELECT * FROM ingredient ORDER BY recipe_id, position;
+
+selectIngredients:
+SELECT * FROM ingredient WHERE recipe_id = ? ORDER BY position;
+
+selectAllSteps:
+SELECT * FROM step ORDER BY recipe_id, position;
+
+selectSteps:
+SELECT * FROM step WHERE recipe_id = ? ORDER BY position;
+
+selectAllTags:
+SELECT * FROM tag ORDER BY recipe_id, position;
+
+selectTags:
+SELECT * FROM tag WHERE recipe_id = ? ORDER BY position;
+
+selectImageFiles:
+SELECT image_file FROM recipe WHERE image_file IS NOT NULL;
+
+upsertRecipe:
+INSERT OR REPLACE INTO recipe(id, title, image_file, servings, prep_minutes, cook_minutes, source_url, created_at, updated_at)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);
+
+insertIngredient:
+INSERT INTO ingredient(recipe_id, position, name, quantity, unit, note) VALUES (?, ?, ?, ?, ?, ?);
+
+insertStep:
+INSERT INTO step(recipe_id, position, body) VALUES (?, ?, ?);
+
+insertTag:
+INSERT INTO tag(recipe_id, position, name) VALUES (?, ?, ?);
+
+deleteRecipe:
+DELETE FROM recipe WHERE id = ?;
+
+deleteIngredients:
+DELETE FROM ingredient WHERE recipe_id = ?;
+
+deleteSteps:
+DELETE FROM step WHERE recipe_id = ?;
+
+deleteTags:
+DELETE FROM tag WHERE recipe_id = ?;
+
+selectSetting:
+SELECT content FROM setting WHERE name = ?;
+
+upsertSetting:
+INSERT OR REPLACE INTO setting(name, content) VALUES (?, ?);

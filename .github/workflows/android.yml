@@ -103,8 +103,9 @@ jobs:
           SIGNING_KEY_ALIAS: pkglab
           SIGNING_KEY_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
         run: |
+          set -o pipefail
           chmod +x gradlew
-          ./gradlew assembleRelease -Pabi=${{ matrix.abi }} --no-daemon
+          ./gradlew assembleRelease -Pabi=${{ matrix.abi }} --no-daemon 2>&1 | tee -a "$RUNNER_TEMP/gradle.log"
           apk=$(ls app/build/outputs/apk/release/*.apk | head -1)
           # Version read from the built APK itself, so any app's own versionName is used.
           aapt2="$(ls -d "$ANDROID_HOME"/build-tools/*/ | sort -V | tail -1)aapt2"
@@ -117,7 +118,30 @@ jobs:
       # Unit tests once per app (not per ABI). Apps without tests pass with nothing to run.
       - name: Tests unitarios
         if: matrix.abi == 'universal'
-        run: ./gradlew testReleaseUnitTest --no-daemon
+        run: |
+          set -o pipefail
+          ./gradlew testReleaseUnitTest --no-daemon 2>&1 | tee -a "$RUNNER_TEMP/gradle.log"
+
+      # On failure, compiler errors, Gradle's summary and failed tests become annotations,
+      # visible on the run page (and through the API) without opening the full log.
+      - name: Errores como anotaciones
+        if: failure()
+        run: |
+          log="$RUNNER_TEMP/gradle.log"
+          [ -f "$log" ] || exit 0
+          esc() { awk 'BEGIN{ORS=""} {gsub(/%/,"%25"); gsub(/\r/,"%0D"); if (NR>1) print "%0A"; print}'; }
+          grep -E '^e: ' "$log" | sort -u | head -8 | while IFS= read -r line; do
+            loc=$(echo "$line" | sed -nE "s#^e: file://$GITHUB_WORKSPACE/([^:]+):([0-9]+):([0-9]+) .*#file=\1,line=\2,col=\3#p")
+            msg=$(echo "$line" | sed -E 's#^e: file://[^ ]+ ##; s#^e: ##')
+            echo "::error ${loc}::$(printf '%s' "$msg" | esc)"
+          done
+          {
+            grep -A12 '^\* What went wrong:' "$log" | head -30
+            grep -E ' FAILED$' "$log" | head -10
+            find . -path '*/build/test-results/*' -name '*.xml' -exec grep -h -A2 '<failure' {} + 2>/dev/null | head -30
+          } > "$RUNNER_TEMP/summary.txt"
+          [ -s "$RUNNER_TEMP/summary.txt" ] && echo "::error title=Gradle::$(esc < "$RUNNER_TEMP/summary.txt")"
+          true
 
       - uses: actions/upload-artifact@v5
         with:
