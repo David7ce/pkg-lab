@@ -31,4 +31,10 @@
     <string name="theme_system">System</string>
     <string name="mic_permission">Microphone access is needed to record</string>
     <string name="open_settings">Open settings</string>
+    <string name="save_to_device">Save to Music</string>
+    <string name="saved_to_music">Saved to Music/VozReves</string>
+    <string name="save_error">Could not save the audio</string>
+    <string name="rename">Rename</string>
+    <string name="name">Name</string>
+    <string name="save">Save</string>
 </resources>

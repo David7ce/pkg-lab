@@ -14,7 +14,15 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import android.content.ContentValues
+import android.net.Uri
+import android.os.Build
+import android.os.Environment
+import android.provider.MediaStore
 import java.io.File
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 enum class Mode { Idle, Recording, Playing, Paused }
 
@@ -92,6 +100,47 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
     fun onBackground() {
         engine.stopRecording()
         if (mode == Mode.Playing) { engine.pause(); mode = Mode.Paused }
+    }
+
+    /**
+     * Guarda el tramo seleccionado en Música/VozReves (Android 10+), visible en apps de música y
+     * archivos sin pedir permisos. Devuelve false si falla.
+     */
+    suspend fun saveToMusic(): Boolean = withContext(Dispatchers.IO) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) return@withContext false
+        val (from, to) = range() ?: return@withContext false
+        val resolver = getApplication<Application>().contentResolver
+        val values = ContentValues().apply {
+            put(MediaStore.Audio.Media.DISPLAY_NAME, exportName())
+            put(MediaStore.Audio.Media.MIME_TYPE, "audio/wav")
+            put(MediaStore.Audio.Media.RELATIVE_PATH, Environment.DIRECTORY_MUSIC + "/VozReves")
+            put(MediaStore.Audio.Media.IS_PENDING, 1)
+        }
+        val uri = resolver.insert(MediaStore.Audio.Media.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY), values)
+            ?: return@withContext false
+        runCatching {
+            resolver.openOutputStream(uri)!!.use { it.write(wavBytes(engine.slice(from, to, reverse))) }
+            resolver.update(uri, ContentValues().apply { put(MediaStore.Audio.Media.IS_PENDING, 0) }, null, null)
+        }.onFailure { resolver.delete(uri, null, null) }.isSuccess
+    }
+
+    /** Android 8–9: el usuario elige dónde guardar con el selector del sistema. */
+    suspend fun writeSelection(uri: Uri): Boolean = withContext(Dispatchers.IO) {
+        val (from, to) = range() ?: return@withContext false
+        runCatching {
+            getApplication<Application>().contentResolver.openOutputStream(uri, "wt")!!
+                .use { it.write(wavBytes(engine.slice(from, to, reverse))) }
+        }.isSuccess
+    }
+
+    fun exportName(): String {
+        val stamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(Date())
+        return "VozReves_$stamp${if (reverse) "_reves" else ""}.wav"
+    }
+
+    fun renameRecording(item: History.Item, title: String) = viewModelScope.launch {
+        withContext(Dispatchers.IO) { history.rename(item, title) }
+        refreshHistory()
     }
 
     /** WAV del tramo seleccionado en el sentido elegido, listo para compartir. */

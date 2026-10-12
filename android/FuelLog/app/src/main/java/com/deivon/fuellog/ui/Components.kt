@@ -113,9 +113,9 @@ fun RefuelRow(r: Refuel, interval: ConsumptionInterval?, extremes: Extremes, for
             Text(formats.money(r.totalCents), style = MaterialTheme.typography.titleSmall)
         }
         val details = buildList {
-            add(formats.litres(r.volumeMl))
-            add(formats.pricePerLitre(r.pricePerLitreMilli))
-            add(formats.km(r.odometerKm))
+            add(formats.volume(r.volumeMl))
+            add(formats.pricePerVolume(r.pricePerLitreMilli))
+            add(formats.distance(r.odometerKm))
             if (!r.fullTank) add(stringResource(R.string.partial))
         }.joinToString(" · ")
         Text(details, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
@@ -128,7 +128,7 @@ fun RefuelRow(r: Refuel, interval: ConsumptionInterval?, extremes: Extremes, for
                 extremes.bestConsumption -> lowColor()
                 else -> MaterialTheme.colorScheme.onSurface
             }
-            val label = formats.consumption(interval.litresPer100Km) + " · " + formats.km(interval.distanceKm)
+            val label = formats.consumption(interval.litresPer100Km) + " · " + formats.distance(interval.distanceKm)
             Tag(AppIcons.Speed, label, color)
         }
     }

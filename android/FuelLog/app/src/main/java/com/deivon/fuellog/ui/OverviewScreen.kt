@@ -17,6 +17,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material3.Button
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
@@ -51,6 +52,7 @@ fun OverviewScreen(vm: AppViewModel, formats: Formats, modifier: Modifier, onOpe
 
     Column(modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(horizontal = 16.dp, vertical = 8.dp)) {
         VehicleSelector(vm)
+        if (vm.loaded && refuels.isEmpty() && vm.vehicle.name.isBlank()) SetupCard { vm.editVehicle(vm.vehicle) }
         Spacer(Modifier.height(12.dp))
         Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
             StatCard(AppIcons.Payments, stringResource(R.string.this_month), formats.money(monthSpent), "", Modifier.weight(1f))
@@ -74,9 +76,17 @@ fun OverviewScreen(vm: AppViewModel, formats: Formats, modifier: Modifier, onOpe
         Spacer(Modifier.height(12.dp))
         Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
             StatCard(AppIcons.Fuel, stringResource(R.string.average_price),
-                summary.averagePriceMilli?.let { formats.pricePerLitre(it) }, stringResource(R.string.no_data), Modifier.weight(1f))
+                summary.averagePriceMilli?.let { formats.pricePerVolume(it) }, stringResource(R.string.no_data), Modifier.weight(1f))
             StatCard(AppIcons.Drop, stringResource(R.string.cost_per_km),
-                latest?.let { formats.perKm(it.costPerKm) }, needsTwo, Modifier.weight(1f))
+                latest?.let { formats.perDistance(it.costPerKm) }, needsTwo, Modifier.weight(1f))
+        }
+
+        if (summary.intervals.size >= 2) {
+            Spacer(Modifier.height(12.dp))
+            ConsumptionChart(
+                summary.intervals, vm.vehicle.referenceDl100?.let { it / 10.0 }, formats,
+                stringResource(R.string.chart_title)
+            )
         }
 
         Highlights(vm, formats, onOpen)
@@ -130,6 +140,28 @@ private fun VehicleSelector(vm: AppViewModel) {
     }
 }
 
+/** First run: nudge towards choosing the vehicle, which also sets the reference consumption. */
+@Composable
+private fun SetupCard(onSetup: () -> Unit) {
+    Surface(
+        shape = CardShape, color = MaterialTheme.colorScheme.primaryContainer,
+        modifier = Modifier.fillMaxWidth().padding(top = 8.dp)
+    ) {
+        Column(Modifier.padding(16.dp)) {
+            Text(stringResource(R.string.setup_title), style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.onPrimaryContainer)
+            Text(stringResource(R.string.setup_text), style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onPrimaryContainer)
+            Spacer(Modifier.height(12.dp))
+            Button(onClick = onSetup) {
+                Icon(AppIcons.Car, null, Modifier.size(18.dp))
+                Spacer(Modifier.width(8.dp))
+                Text(stringResource(R.string.setup_button))
+            }
+        }
+    }
+}
+
 @Composable
 fun vehicleName(v: Vehicle): String = v.name.ifBlank { stringResource(R.string.unnamed_vehicle) }
 
@@ -139,8 +171,8 @@ private fun Highlights(vm: AppViewModel, formats: Formats, onOpen: (Refuel) -> U
     val e = vm.summary.extremes
     val byId = remember(vm.refuels) { vm.refuels.associateBy { it.id } }
     val rows = buildList {
-        e.highestPrice?.let { add(Highlight(AppIcons.TrendingUp, highColor(), R.string.highest_price, formats.pricePerLitre(it.pricePerLitreMilli), it)) }
-        e.lowestPrice?.let { add(Highlight(AppIcons.TrendingDown, lowColor(), R.string.lowest_price, formats.pricePerLitre(it.pricePerLitreMilli), it)) }
+        e.highestPrice?.let { add(Highlight(AppIcons.TrendingUp, highColor(), R.string.highest_price, formats.pricePerVolume(it.pricePerLitreMilli), it)) }
+        e.lowestPrice?.let { add(Highlight(AppIcons.TrendingDown, lowColor(), R.string.lowest_price, formats.pricePerVolume(it.pricePerLitreMilli), it)) }
         e.worstConsumption?.let { add(Highlight(AppIcons.TrendingUp, highColor(), R.string.worst_consumption, formats.consumption(it.litresPer100Km), byId[it.endId])) }
         e.bestConsumption?.let { add(Highlight(AppIcons.TrendingDown, lowColor(), R.string.best_consumption, formats.consumption(it.litresPer100Km), byId[it.endId])) }
     }

@@ -31,4 +31,10 @@
     <string name="theme_system">सिस्टम</string>
     <string name="mic_permission">रिकॉर्ड करने के लिए माइक्रोफ़ोन की अनुमति चाहिए</string>
     <string name="open_settings">सेटिंग्स खोलें</string>
+    <string name="save_to_device">संगीत में सहेजें</string>
+    <string name="saved_to_music">संगीत/VozReves में सहेजा गया</string>
+    <string name="save_error">ऑडियो सहेजा नहीं जा सका</string>
+    <string name="rename">नाम बदलें</string>
+    <string name="name">नाम</string>
+    <string name="save">सहेजें</string>
 </resources>

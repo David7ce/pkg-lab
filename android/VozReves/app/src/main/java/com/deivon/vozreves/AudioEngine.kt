@@ -10,9 +10,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.withContext
-import java.io.File
-import java.nio.ByteBuffer
-import java.nio.ByteOrder
 
 const val SAMPLE_RATE = 44_100
 
@@ -148,25 +145,4 @@ class AudioEngine {
         // Pausar y vaciar el buffer desbloquea un write() que esté esperando.
         runCatching { track?.run { pause(); flush() } }
     }
-}
-
-/** WAV PCM 16 bits mono. */
-fun writeWav(file: File, data: ShortArray) {
-    val dataBytes = data.size * 2
-    val buf = ByteBuffer.allocate(44 + dataBytes).order(ByteOrder.LITTLE_ENDIAN)
-    buf.put("RIFF".toByteArray()).putInt(36 + dataBytes).put("WAVE".toByteArray())
-    buf.put("fmt ".toByteArray()).putInt(16).putShort(1).putShort(1)
-        .putInt(SAMPLE_RATE).putInt(SAMPLE_RATE * 2).putShort(2).putShort(16)
-    buf.put("data".toByteArray()).putInt(dataBytes)
-    buf.asShortBuffer().put(data) // Copia en bloque: mucho más rápido que muestra a muestra.
-    file.writeBytes(buf.array())
-}
-
-/** Lee los WAV que escribe [writeWav] (cabecera de 44 bytes). */
-fun readWav(file: File): ShortArray {
-    val bytes = file.readBytes()
-    if (bytes.size <= 44) return ShortArray(0)
-    val out = ShortArray((bytes.size - 44) / 2)
-    ByteBuffer.wrap(bytes, 44, out.size * 2).order(ByteOrder.LITTLE_ENDIAN).asShortBuffer().get(out)
-    return out
 }

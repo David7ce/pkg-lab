@@ -31,4 +31,10 @@
     <string name="theme_system">系统</string>
     <string name="mic_permission">录音需要麦克风权限</string>
     <string name="open_settings">打开设置</string>
+    <string name="save_to_device">保存到音乐</string>
+    <string name="saved_to_music">已保存到 音乐/VozReves</string>
+    <string name="save_error">无法保存音频</string>
+    <string name="rename">重命名</string>
+    <string name="name">名称</string>
+    <string name="save">保存</string>
 </resources>

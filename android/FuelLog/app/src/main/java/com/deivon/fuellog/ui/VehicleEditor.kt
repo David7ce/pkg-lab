@@ -60,6 +60,8 @@ import com.deivon.fuellog.logic.CatalogFuel
 import com.deivon.fuellog.logic.CatalogModel
 import com.deivon.fuellog.logic.Decimals
 import com.deivon.fuellog.logic.ModelCatalog
+import com.deivon.fuellog.logic.UnitSystem
+import com.deivon.fuellog.logic.Units
 
 private val typeLabels = mapOf(
     VehicleType.Car to R.string.type_car, VehicleType.Motorcycle to R.string.type_motorcycle,
@@ -78,17 +80,20 @@ private val catalogFuelLabels = mapOf(
 @Composable
 fun VehicleEditor(vm: AppViewModel, original: Vehicle) {
     val locale = LocalConfiguration.current.locales[0]
+    val units = vm.settings.units
+    /** Stored tenths of L/100 km → text in the user's unit (L/100 km or mpg), one decimal. */
+    fun refText(dl100: Int) = Decimals.toInput(Math.round(Units.consumption(dl100 / 10.0, units) * 10), 1, locale)
     var name by rememberSaveable { mutableStateOf(original.name) }
     var type by rememberSaveable { mutableStateOf(original.type) }
     var registration by rememberSaveable { mutableStateOf(original.registration) }
     var fuelType by rememberSaveable { mutableStateOf(original.fuelType) }
     var notes by rememberSaveable { mutableStateOf(original.notes) }
-    var reference by rememberSaveable { mutableStateOf(original.referenceDl100?.let { Decimals.toInput(it.toLong(), 1, locale) } ?: "") }
+    var reference by rememberSaveable { mutableStateOf(original.referenceDl100?.let(::refText) ?: "") }
     var confirmDelete by rememberSaveable { mutableStateOf(false) }
     var pickingModel by rememberSaveable { mutableStateOf(false) }
     val isNew = original.id == 0L
     val canDelete = !isNew && vm.vehicles.size > 1
-    val referenceValue = Decimals.parse(reference, 1)?.toInt()?.takeIf { it in 1..999 }
+    val referenceValue = Decimals.parse(reference, 1)?.let { Units.consumptionToDl100(it / 10.0, units) }?.takeIf { it in 1..999 }
     val referenceInvalid = reference.isNotBlank() && referenceValue == null
 
     if (pickingModel) {
@@ -98,7 +103,7 @@ fun VehicleEditor(vm: AppViewModel, original: Vehicle) {
             name = m.name
             type = VehicleType.Car
             fuelType = fuelNames.getValue(m.fuel)
-            reference = Decimals.toInput(m.referenceDl100.toLong(), 1, locale)
+            reference = refText(m.referenceDl100)
             pickingModel = false
         }
         return
@@ -152,7 +157,7 @@ fun VehicleEditor(vm: AppViewModel, original: Vehicle) {
                 onValueChange = { reference = it },
                 label = { Text(stringResource(R.string.reference_consumption)) },
                 leadingIcon = { Icon(AppIcons.Speed, null) },
-                suffix = { Text("L/100 km") },
+                suffix = { Text(if (units == UnitSystem.Metric) "L/100 km" else "mpg") },
                 supportingText = { Text(stringResource(if (referenceInvalid) R.string.error_number else R.string.reference_hint)) },
                 isError = referenceInvalid,
                 singleLine = true,
@@ -178,7 +183,7 @@ private fun ModelPicker(vm: AppViewModel, onClose: () -> Unit, onPick: (CatalogM
     LaunchedEffect(Unit) { vm.loadCatalog() }
     var query by rememberSaveable { mutableStateOf("") }
     val results = remember(vm.catalog, query) { ModelCatalog.search(vm.catalog, query) }
-    val formats = rememberFormats(vm.settings.currency)
+    val formats = rememberFormats(vm.settings.currency, vm.settings.units)
 
     Scaffold(topBar = {
         TopAppBar(

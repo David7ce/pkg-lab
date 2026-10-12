@@ -8,6 +8,7 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import com.deivon.fuellog.logic.UnitSystem
 import java.util.Currency
 import java.util.Locale
 
@@ -25,10 +26,13 @@ class AppSettings(context: Context) {
         private set
     var vehicleId by mutableLongStateOf(prefs.getLong("vehicle", -1))
         private set
+    var units by mutableStateOf(UnitSystem.of(prefs.getString("units", null)))
+        private set
 
     fun updateLanguage(value: String) { language = value; prefs.edit().putString(KEY_LANG, value).apply() }
     fun updateTheme(value: Int) { theme = value; prefs.edit().putInt("theme", value).apply() }
     fun updateVehicle(id: Long) { vehicleId = id; prefs.edit().putLong("vehicle", id).apply() }
+    fun updateUnits(value: UnitSystem) { units = value; prefs.edit().putString("units", value.key).apply() }
 
     /** Returns false if [code] is not a valid ISO 4217 code (e.g. "EUR"). */
     fun updateCurrency(code: String): Boolean {

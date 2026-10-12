@@ -31,4 +31,10 @@
     <string name="theme_system">Sistema</string>
     <string name="mic_permission">Hace falta acceso al micrófono para grabar</string>
     <string name="open_settings">Abrir ajustes</string>
+    <string name="save_to_device">Guardar en Música</string>
+    <string name="saved_to_music">Guardado en Música/VozReves</string>
+    <string name="save_error">No se pudo guardar el audio</string>
+    <string name="rename">Renombrar</string>
+    <string name="name">Nombre</string>
+    <string name="save">Guardar</string>
 </resources>

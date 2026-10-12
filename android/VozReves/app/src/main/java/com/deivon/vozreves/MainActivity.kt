@@ -11,6 +11,9 @@ import android.graphics.Color
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material.icons.filled.Edit
+import android.widget.Toast
 import android.provider.Settings as AndroidSettings
 import androidx.activity.ComponentActivity
 import androidx.activity.SystemBarStyle
@@ -161,6 +164,17 @@ private fun MainScreen(vm: MainViewModel, onHistory: () -> Unit, onSettings: () 
     }
 
     val shareTitle = stringResource(R.string.share_title)
+    val msgSaved = stringResource(R.string.saved_to_music)
+    val msgSaveError = stringResource(R.string.save_error)
+    fun toast(text: String) = Toast.makeText(context, text, Toast.LENGTH_SHORT).show()
+    // Android 8–9 have no MediaStore folder API without storage permission: let the user pick a place.
+    val createDocument = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("audio/wav")) { uri ->
+        if (uri != null) scope.launch { toast(if (vm.writeSelection(uri)) msgSaved else msgSaveError) }
+    }
+    fun saveToDevice() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) scope.launch { toast(if (vm.saveToMusic()) msgSaved else msgSaveError) }
+        else createDocument.launch(vm.exportName())
+    }
     fun share() = scope.launch {
         val file = vm.exportSelection() ?: return@launch
         val uri = FileProvider.getUriForFile(context, "${context.packageName}.files", file)
@@ -257,6 +271,9 @@ private fun MainScreen(vm: MainViewModel, onHistory: () -> Unit, onSettings: () 
                     IconButton(onClick = { share() }, enabled = !playing) {
                         Icon(Icons.Filled.Share, stringResource(R.string.share))
                     }
+                    IconButton(onClick = { saveToDevice() }, enabled = !playing) {
+                        Icon(AppIcons.Download, stringResource(R.string.save_to_device))
+                    }
                 }
             }
         }
@@ -333,6 +350,8 @@ private fun SubScreen(title: String, onBack: () -> Unit, content: @Composable (P
 
 @Composable
 private fun HistoryScreen(vm: MainViewModel, onBack: () -> Unit) {
+    var renaming by remember { mutableStateOf<History.Item?>(null) }
+    renaming?.let { item -> RenameDialog(item.title.orEmpty(), onDismiss = { renaming = null }) { vm.renameRecording(item, it); renaming = null } }
     val time = rememberTimeFormat()
     val dates = remember(time.locale) { DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.SHORT, time.locale) }
     SubScreen(stringResource(R.string.history), onBack) { padding ->
@@ -341,12 +360,18 @@ private fun HistoryScreen(vm: MainViewModel, onBack: () -> Unit) {
         }
         LazyColumn(contentPadding = padding) {
             items(vm.recordings, key = { it.file.name }) { item ->
+                val date = dates.format(Date(item.file.lastModified()))
                 ListItem(
-                    headlineContent = { Text(dates.format(Date(item.file.lastModified()))) },
-                    supportingContent = { Text(time.clock(item.seconds)) },
+                    headlineContent = { Text(item.title ?: date) },
+                    supportingContent = { Text(if (item.title != null) "$date · ${time.clock(item.seconds)}" else time.clock(item.seconds)) },
                     trailingContent = {
-                        IconButton(onClick = { vm.deleteRecording(item) }) {
-                            Icon(Icons.Filled.Delete, stringResource(R.string.delete))
+                        Row {
+                            IconButton(onClick = { renaming = item }) {
+                                Icon(Icons.Filled.Edit, stringResource(R.string.rename))
+                            }
+                            IconButton(onClick = { vm.deleteRecording(item) }) {
+                                Icon(Icons.Filled.Delete, stringResource(R.string.delete))
+                            }
                         }
                     },
                     modifier = Modifier.clickable { vm.loadRecording(item); onBack() }
@@ -423,5 +448,22 @@ private fun Section(title: String) {
         style = MaterialTheme.typography.titleSmall,
         color = MaterialTheme.colorScheme.primary,
         modifier = Modifier.padding(top = 20.dp, bottom = 8.dp)
+    )
+}
+
+@Composable
+private fun RenameDialog(initial: String, onDismiss: () -> Unit, onConfirm: (String) -> Unit) {
+    var text by remember { mutableStateOf(initial) }
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(stringResource(R.string.rename)) },
+        text = {
+            OutlinedTextField(
+                value = text, onValueChange = { text = it.take(History.MAX_TITLE) },
+                label = { Text(stringResource(R.string.name)) }, singleLine = true
+            )
+        },
+        confirmButton = { TextButton(onClick = { onConfirm(text) }) { Text(stringResource(R.string.save)) } },
+        dismissButton = { TextButton(onClick = onDismiss) { Text(stringResource(R.string.back)) } }
     )
 }

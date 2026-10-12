@@ -17,15 +17,24 @@ import com.deivon.fuellog.logic.ModelCatalog
 import com.deivon.fuellog.logic.Decimals
 import com.deivon.fuellog.logic.FormError
 import com.deivon.fuellog.logic.FormResult
+import com.deivon.fuellog.logic.FormWarning
 import com.deivon.fuellog.logic.FuelSummary
 import com.deivon.fuellog.logic.GeoPoint
 import com.deivon.fuellog.logic.RefuelForm
 import com.deivon.fuellog.logic.RefuelValidator
+import com.deivon.fuellog.logic.Units
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
 import java.util.Locale
+
+/** One-off messages for the snackbar. */
+sealed interface UiEvent {
+    /** [l100] is the consumption of the interval this refuel closed, if any. */
+    data class Saved(val l100: Double?) : UiEvent
+    data object Deleted : UiEvent
+}
 
 /** Screen state and actions. Database work runs on IO; statistics on Default. */
 class AppViewModel(app: Application) : AndroidViewModel(app) {
@@ -66,6 +75,12 @@ class AppViewModel(app: Application) : AndroidViewModel(app) {
         private set
     var vehicleForm by mutableStateOf<Vehicle?>(null)
         private set
+    /** Plausibility warnings waiting for the user to confirm or go back and fix. */
+    var pendingWarnings by mutableStateOf(emptyList<FormWarning>())
+        private set
+    var event by mutableStateOf<UiEvent?>(null)
+        private set
+    private var lastDeleted: Refuel? = null
 
     init {
         viewModelScope.launch(Dispatchers.IO) {
@@ -77,7 +92,9 @@ class AppViewModel(app: Application) : AndroidViewModel(app) {
         reload()
     }
 
-    private fun reload() = viewModelScope.launch {
+    private fun reload() = viewModelScope.launch { load() }
+
+    private suspend fun load() {
         val (v, list) = withContext(Dispatchers.IO) {
             if (db.vehicles().isEmpty()) db.saveVehicle(Vehicle())
             db.vehicles() to db.refuels()
@@ -132,32 +149,55 @@ class AppViewModel(app: Application) : AndroidViewModel(app) {
         val last = refuels.firstOrNull()
         form = RefuelForm(
             timestamp = System.currentTimeMillis(),
-            price = last?.let { Decimals.toInput(it.pricePerLitreMilli, 3, locale) } ?: "",
+            price = last?.let { Decimals.toInput(Units.priceFromPerLitre(it.pricePerLitreMilli, settings.units), 3, locale) } ?: "",
         )
         formErrors = emptySet()
     }
 
-    fun edit(r: Refuel, locale: Locale) { form = RefuelForm.from(r, locale); formErrors = emptySet() }
+    fun edit(r: Refuel, locale: Locale) { form = RefuelForm.from(r, locale, settings.units); formErrors = emptySet() }
     fun updateForm(f: RefuelForm) { form = f; if (formErrors.isNotEmpty()) formErrors = emptySet() }
-    fun closeForm() { form = null; formErrors = emptySet() }
+    fun closeForm() { form = null; formErrors = emptySet(); pendingWarnings = emptyList() }
 
-    fun saveForm() {
+    /** Validates; if the record looks mistyped, asks first (see [pendingWarnings]) unless [confirmed]. */
+    fun saveForm(confirmed: Boolean = false) {
         val f = form ?: return
-        when (val result = RefuelValidator.validate(f, refuels, vehicle.id)) {
+        when (val result = RefuelValidator.validate(f, refuels, vehicle.id, settings.units)) {
             is FormResult.Invalid -> formErrors = result.errors
-            is FormResult.Valid -> viewModelScope.launch {
-                withContext(Dispatchers.IO) { db.save(result.refuel) }
-                closeForm()
-                reload()
+            is FormResult.Valid -> {
+                val warnings = if (confirmed) emptyList() else RefuelValidator.warnings(result.refuel, refuels)
+                if (warnings.isNotEmpty()) { pendingWarnings = warnings; return }
+                pendingWarnings = emptyList()
+                viewModelScope.launch {
+                    val id = withContext(Dispatchers.IO) { db.save(result.refuel) }
+                    closeForm()
+                    load()
+                    event = UiEvent.Saved(summary.byEndId[id]?.litresPer100Km)
+                }
             }
         }
     }
 
+    fun dismissWarnings() { pendingWarnings = emptyList() }
+
+    /** Deletes at once; the snackbar offers [undoDelete] instead of a confirmation dialog. */
     fun delete(id: Long) = viewModelScope.launch {
+        lastDeleted = all.firstOrNull { it.id == id }
         withContext(Dispatchers.IO) { db.delete(id) }
         closeForm()
-        reload()
+        load()
+        event = UiEvent.Deleted
     }
+
+    fun undoDelete() {
+        val r = lastDeleted ?: return
+        lastDeleted = null
+        viewModelScope.launch {
+            withContext(Dispatchers.IO) { runCatching { db.restore(r) } }
+            load()
+        }
+    }
+
+    fun consumeEvent() { event = null }
 
     // --- Vehicles ----------------------------------------------------------------------------
 

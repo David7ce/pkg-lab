@@ -122,6 +122,9 @@ class FuelDatabase(context: Context) : SQLiteOpenHelper(context, "fuellog.db", n
 
     fun delete(id: Long) { writableDatabase.delete("refuel", "id = ?", arrayOf(id.toString())) }
 
+    /** Puts a deleted record back with its original id (undo). */
+    fun restore(r: Refuel) { writableDatabase.insertWithOnConflict("refuel", null, r.toValues(), SQLiteDatabase.CONFLICT_REPLACE) }
+
     /** Restore: replaces everything in one transaction, so a failure leaves the old data intact. */
     fun replaceAll(data: List<Pair<Vehicle, List<Refuel>>>) {
         val db = writableDatabase

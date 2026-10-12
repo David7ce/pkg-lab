@@ -17,24 +17,17 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.ExposedDropdownMenuBox
-import androidx.compose.material3.ExposedDropdownMenuDefaults
-import androidx.compose.material3.MenuAnchorType
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.RadioButton
 import androidx.compose.material3.SegmentedButton
 import androidx.compose.material3.SegmentedButtonDefaults
 import androidx.compose.material3.SingleChoiceSegmentedButtonRow
@@ -60,6 +53,8 @@ import com.deivon.fuellog.logic.Backup
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.util.Currency
+import java.util.Locale
+import com.deivon.fuellog.logic.UnitSystem
 
 /** Third tab: vehicles first (most used), then app settings and data. */
 @Composable
@@ -113,18 +108,13 @@ private fun VehicleList(vm: AppViewModel) {
 private fun LanguagePicker(settings: AppSettings) {
     val activity = LocalContext.current as Activity
     SectionTitle(stringResource(R.string.language), AppIcons.Language)
-    (listOf("" to stringResource(R.string.system_default)) + AppSettings.LANGUAGES).forEach { (code, name) ->
-        Row(
-            Modifier.fillMaxWidth().selectable(selected = settings.language == code) {
-                if (settings.language != code) { settings.updateLanguage(code); activity.recreate() }
-            }.padding(vertical = 2.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            RadioButton(selected = settings.language == code, onClick = null)
-            Spacer(Modifier.width(12.dp))
-            Text(name)
-        }
-    }
+    DropdownField(
+        label = stringResource(R.string.language),
+        icon = AppIcons.Language,
+        options = listOf("" to stringResource(R.string.system_default)) + AppSettings.LANGUAGES,
+        selected = settings.language,
+        onSelect = { code -> if (settings.language != code) { settings.updateLanguage(code); activity.recreate() } },
+    )
 }
 
 @Composable
@@ -140,7 +130,27 @@ private fun AppearanceAndCurrency(settings: AppSettings) {
         }
     }
     Spacer(Modifier.height(16.dp))
-    CurrencyPicker(settings)
+    DropdownField(
+        label = stringResource(R.string.units),
+        icon = AppIcons.Speed,
+        options = listOf(
+            UnitSystem.Metric to stringResource(R.string.units_metric),
+            UnitSystem.Uk to stringResource(R.string.units_uk),
+            UnitSystem.Us to stringResource(R.string.units_us),
+        ),
+        selected = settings.units,
+        onSelect = settings::updateUnits,
+    )
+    Spacer(Modifier.height(16.dp))
+    val locale = LocalConfiguration.current.locales[0]
+    val codes = remember(settings.currency) { (listOf(settings.currency) + COMMON_CURRENCIES).distinct() }
+    DropdownField(
+        label = stringResource(R.string.currency),
+        icon = AppIcons.Payments,
+        options = remember(codes, locale) { codes.map { it to currencyLabel(it, locale) } },
+        selected = settings.currency,
+        onSelect = { settings.updateCurrency(it) },
+    )
 }
 
 /** Common currencies first; the current one is always listed even if it is not among them. */
@@ -149,38 +159,10 @@ private val COMMON_CURRENCIES = listOf(
     "JPY", "CNY", "INR", "SAR", "AED", "MAD", "PLN", "SEK", "NOK", "DKK", "CZK", "RON", "TRY",
 )
 
-@Composable
-private fun CurrencyPicker(settings: AppSettings) {
-    var open by remember { mutableStateOf(false) }
-    val locale = LocalConfiguration.current.locales[0]
-    val codes = remember(settings.currency) { (listOf(settings.currency) + COMMON_CURRENCIES).distinct() }
-    fun label(code: String) = runCatching {
-        val c = Currency.getInstance(code)
-        "$code · ${c.getSymbol(locale)} · ${c.getDisplayName(locale).replaceFirstChar { it.titlecase(locale) }}"
-    }.getOrDefault(code)
-
-    ExposedDropdownMenuBox(expanded = open, onExpandedChange = { open = it }) {
-        OutlinedTextField(
-            value = label(settings.currency),
-            onValueChange = {},
-            readOnly = true,
-            label = { Text(stringResource(R.string.currency)) },
-            leadingIcon = { Icon(AppIcons.Payments, null) },
-            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = open) },
-            singleLine = true,
-            modifier = Modifier.fillMaxWidth().menuAnchor(MenuAnchorType.PrimaryNotEditable)
-        )
-        ExposedDropdownMenu(expanded = open, onDismissRequest = { open = false }) {
-            codes.forEach { code ->
-                DropdownMenuItem(
-                    text = { Text(label(code), maxLines = 1, overflow = TextOverflow.Ellipsis) },
-                    onClick = { settings.updateCurrency(code); open = false },
-                    trailingIcon = if (code == settings.currency) { { Icon(Icons.Filled.Check, null) } } else null,
-                )
-            }
-        }
-    }
-}
+private fun currencyLabel(code: String, locale: Locale) = runCatching {
+    val c = Currency.getInstance(code)
+    "$code · ${c.getSymbol(locale)} · ${c.getDisplayName(locale).replaceFirstChar { it.titlecase(locale) }}"
+}.getOrDefault(code)
 
 @Composable
 private fun DataSection(vm: AppViewModel, showMessage: (String) -> Unit) {

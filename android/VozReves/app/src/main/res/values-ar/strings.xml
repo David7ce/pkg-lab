@@ -31,4 +31,10 @@
     <string name="theme_system">النظام</string>
     <string name="mic_permission">يلزم إذن الميكروفون للتسجيل</string>
     <string name="open_settings">فتح الإعدادات</string>
+    <string name="save_to_device">حفظ في الموسيقى</string>
+    <string name="saved_to_music">تم الحفظ في الموسيقى/VozReves</string>
+    <string name="save_error">تعذّر حفظ الصوت</string>
+    <string name="rename">إعادة تسمية</string>
+    <string name="name">الاسم</string>
+    <string name="save">حفظ</string>
 </resources>
