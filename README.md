@@ -25,6 +25,7 @@ pkg-lab/
   `arm64-v8a` (casi todos los móviles), `armeabi-v7a` (32 bits antiguos) y `universal`.
   Para que una app genere APKs por arquitectura, su `app/build.gradle.kts` debe leer `-Pabi`
   (ver VozReves); si no, las tres salen iguales.
+- **Nombre de las APK:** `<App>-android-<versión>-<arquitectura>.apk` (la versión se lee de la propia APK).
 
 ### Firma (recomendado)
 

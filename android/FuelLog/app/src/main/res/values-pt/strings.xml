@@ -86,8 +86,8 @@
     <string name="switch_vehicle">Mudar de veículo</string>
     <string name="system_default">Idioma do sistema</string>
     <string name="tab_history">Histórico</string>
-    <string name="tab_overview">Resumo</string>
-    <string name="tab_vehicle">Veículos</string>
+    <string name="tab_home">Início</string>
+    <string name="tab_settings">Definições</string>
     <string name="theme_dark">Escuro</string>
     <string name="theme_light">Claro</string>
     <string name="theme_system">Sistema</string>

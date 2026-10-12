@@ -106,8 +106,13 @@ jobs:
           chmod +x gradlew
           ./gradlew assembleRelease -Pabi=${{ matrix.abi }} --no-daemon
           apk=$(ls app/build/outputs/apk/release/*.apk | head -1)
-          cp "$apk" "${{ matrix.app }}-${{ matrix.abi }}.apk"
-          ls -lh "${{ matrix.app }}-${{ matrix.abi }}.apk"
+          # Version read from the built APK itself, so any app's own versionName is used.
+          aapt2="$(ls -d "$ANDROID_HOME"/build-tools/*/ | sort -V | tail -1)aapt2"
+          version=$("$aapt2" dump badging "$apk" | sed -n "s/.*versionName='\([^']*\)'.*/\1/p")
+          name="${{ matrix.app }}-android-${version:-unknown}-${{ matrix.abi }}.apk"
+          cp "$apk" "$name"
+          echo "APK_NAME=$name" >> "$GITHUB_ENV"
+          ls -lh "$name"
 
       # Unit tests once per app (not per ABI). Apps without tests pass with nothing to run.
       - name: Tests unitarios
@@ -117,7 +122,7 @@ jobs:
       - uses: actions/upload-artifact@v5
         with:
           name: ${{ matrix.app }}-${{ matrix.abi }}
-          path: android/${{ matrix.app }}/${{ matrix.app }}-${{ matrix.abi }}.apk
+          path: android/${{ matrix.app }}/${{ env.APK_NAME }}
 
   release:
     needs: [detect, build]
@@ -142,12 +147,14 @@ jobs:
           TAG: android-${{ matrix.app }}-latest
         run: |
           ls -lh apks
+          # <App>-android-<version>-<abi>.apk → <version>
+          version=$(ls apks/*.apk | head -1 | sed -E "s#.*/${APP}-android-(.*)-(arm64-v8a|armeabi-v7a|universal)\.apk#\1#")
           gh release delete "$TAG" --yes --cleanup-tag || true
           gh release create "$TAG" apks/*.apk \
             --target "$GITHUB_SHA" \
-            --title "$APP (Android) · build ${GITHUB_RUN_NUMBER}" \
+            --title "$APP ${version} (Android)" \
             --notes "Compilada automáticamente desde ${GITHUB_SHA::7}.
 
-          - **$APP-arm64-v8a.apk**: la mayoría de móviles (64 bits).
-          - **$APP-armeabi-v7a.apk**: móviles antiguos de 32 bits.
-          - **$APP-universal.apk**: funciona en cualquiera."
+          - **…-arm64-v8a.apk**: la mayoría de móviles (64 bits).
+          - **…-armeabi-v7a.apk**: móviles antiguos de 32 bits.
+          - **…-universal.apk**: funciona en cualquiera."

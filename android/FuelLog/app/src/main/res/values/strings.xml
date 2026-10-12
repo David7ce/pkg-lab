@@ -87,8 +87,8 @@
     <string name="switch_vehicle">Switch vehicle</string>
     <string name="system_default">System default</string>
     <string name="tab_history">History</string>
-    <string name="tab_overview">Overview</string>
-    <string name="tab_vehicle">Vehicles</string>
+    <string name="tab_home">Home</string>
+    <string name="tab_settings">Settings</string>
     <string name="theme_dark">Dark</string>
     <string name="theme_light">Light</string>
     <string name="theme_system">System</string>

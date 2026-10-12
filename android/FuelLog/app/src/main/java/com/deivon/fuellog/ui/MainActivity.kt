@@ -13,6 +13,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
@@ -47,19 +48,19 @@ class MainActivity : ComponentActivity() {
 }
 
 private enum class Tab(val label: Int) {
-    Overview(R.string.tab_overview), History(R.string.tab_history), Vehicles(R.string.tab_vehicle);
+    Home(R.string.tab_home), History(R.string.tab_history), Settings(R.string.tab_settings);
 
     val icon: ImageVector get() = when (this) {
-        Overview -> Icons.Filled.Home
+        Home -> Icons.Filled.Home
         History -> Icons.AutoMirrored.Filled.List
-        Vehicles -> AppIcons.Car
+        Settings -> Icons.Filled.Settings
     }
 }
 
 /** Three tabs plus full-screen forms on top. Plain Compose state: no navigation library needed. */
 @Composable
 fun FuelApp(vm: AppViewModel) {
-    var tab by rememberSaveable { mutableStateOf(Tab.Overview) }
+    var tab by rememberSaveable { mutableStateOf(Tab.Home) }
     val snackbar = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
     val showMessage: (String) -> Unit = { scope.launch { snackbar.showSnackbar(it) } }
@@ -78,7 +79,7 @@ fun FuelApp(vm: AppViewModel) {
     Scaffold(
         snackbarHost = { SnackbarHost(snackbar) },
         floatingActionButton = {
-            if (tab != Tab.Vehicles) ExtendedFloatingActionButton(
+            if (tab != Tab.Settings) ExtendedFloatingActionButton(
                 onClick = { vm.newRefuel(formats.locale) },
                 icon = { Icon(Icons.Filled.Add, null) },
                 text = { Text(stringResource(R.string.add_refuel)) }
@@ -97,9 +98,9 @@ fun FuelApp(vm: AppViewModel) {
     ) { padding ->
         val modifier = Modifier.padding(padding)
         when (tab) {
-            Tab.Overview -> OverviewScreen(vm, formats, modifier) { vm.edit(it, formats.locale) }
+            Tab.Home -> OverviewScreen(vm, formats, modifier) { vm.edit(it, formats.locale) }
             Tab.History -> HistoryScreen(vm, formats, modifier) { vm.edit(it, formats.locale) }
-            Tab.Vehicles -> SettingsScreen(vm, showMessage, modifier)
+            Tab.Settings -> SettingsScreen(vm, showMessage, modifier)
         }
     }
 }

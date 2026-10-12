@@ -86,8 +86,8 @@
     <string name="switch_vehicle">تبديل المركبة</string>
     <string name="system_default">لغة النظام</string>
     <string name="tab_history">السجل</string>
-    <string name="tab_overview">نظرة عامة</string>
-    <string name="tab_vehicle">المركبات</string>
+    <string name="tab_home">الرئيسية</string>
+    <string name="tab_settings">الإعدادات</string>
     <string name="theme_dark">داكن</string>
     <string name="theme_light">فاتح</string>
     <string name="theme_system">النظام</string>

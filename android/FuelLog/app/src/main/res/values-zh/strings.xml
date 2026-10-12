@@ -86,8 +86,8 @@
     <string name="switch_vehicle">切换车辆</string>
     <string name="system_default">跟随系统</string>
     <string name="tab_history">历史</string>
-    <string name="tab_overview">概览</string>
-    <string name="tab_vehicle">车辆</string>
+    <string name="tab_home">首页</string>
+    <string name="tab_settings">设置</string>
     <string name="theme_dark">深色</string>
     <string name="theme_light">浅色</string>
     <string name="theme_system">系统</string>

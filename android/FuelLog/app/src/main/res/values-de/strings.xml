@@ -86,8 +86,8 @@
     <string name="switch_vehicle">Fahrzeug wechseln</string>
     <string name="system_default">Systemsprache</string>
     <string name="tab_history">Verlauf</string>
-    <string name="tab_overview">Übersicht</string>
-    <string name="tab_vehicle">Fahrzeuge</string>
+    <string name="tab_home">Start</string>
+    <string name="tab_settings">Einstellungen</string>
     <string name="theme_dark">Dunkel</string>
     <string name="theme_light">Hell</string>
     <string name="theme_system">System</string>

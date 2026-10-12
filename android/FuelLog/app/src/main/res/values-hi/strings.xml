@@ -86,8 +86,8 @@
     <string name="switch_vehicle">वाहन बदलें</string>
     <string name="system_default">सिस्टम डिफ़ॉल्ट</string>
     <string name="tab_history">इतिहास</string>
-    <string name="tab_overview">सारांश</string>
-    <string name="tab_vehicle">वाहन</string>
+    <string name="tab_home">होम</string>
+    <string name="tab_settings">सेटिंग्स</string>
     <string name="theme_dark">गहरा</string>
     <string name="theme_light">हल्का</string>
     <string name="theme_system">सिस्टम</string>
