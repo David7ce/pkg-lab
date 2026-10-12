@@ -56,11 +56,20 @@ jobs:
       - name: Instalador (${{ matrix.task }})
         run: ./gradlew :shared:${{ matrix.task }} --no-daemon
 
+      # El plugin deja cada formato en su propia subcarpeta; se busca y se copia a una carpeta fija.
+      - name: Localizar instalador
+        run: |
+          mkdir -p "$RUNNER_TEMP/installers"
+          found=$(find shared/build/compose -type f -name '${{ matrix.glob }}' | head -1)
+          echo "::notice title=Instalador::${found:-no encontrado}"
+          [ -n "$found" ] || { echo "::error::No se generó ${{ matrix.glob }}"; find shared/build/compose -maxdepth 4 | head -50; exit 1; }
+          cp "$found" "$RUNNER_TEMP/installers/"
+
       - name: Guardar instalador
         uses: actions/upload-artifact@v5
         with:
           name: desktop-${{ matrix.os }}
-          path: android/Recetario/shared/build/compose/binaries/main/*/${{ matrix.glob }}
+          path: ${{ runner.temp }}/installers/${{ matrix.glob }}
           if-no-files-found: error
 
   release:
