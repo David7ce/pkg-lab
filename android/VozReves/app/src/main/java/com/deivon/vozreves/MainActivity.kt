@@ -54,7 +54,10 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -360,6 +363,7 @@ private fun <T> Choice(
                 onClick = { onSelect(value) },
                 shape = SegmentedButtonDefaults.itemShape(i, options.size),
                 enabled = enabled
+                icon = {}, // Sin el check de "seleccionado": el color del botón ya lo indica.
             ) {
                 icons[value]?.let { Icon(it, null, Modifier.size(18.dp)); Spacer(Modifier.size(6.dp)) }
                 Text(label, maxLines = 1, textAlign = TextAlign.Center)
@@ -419,10 +423,10 @@ private fun HistoryScreen(vm: MainViewModel, onBack: () -> Unit) {
                 else IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Filled.ArrowBack, stringResource(R.string.back)) }
             },
             actions = {
+                IconButton(onClick = { selected = names }, enabled = names.isNotEmpty() && sel.size < names.size) {
+                    Icon(AppIcons.SelectAll, stringResource(R.string.select_all))
+                }
                 if (selecting) {
-                    TextButton(onClick = { selected = names }, enabled = sel.size < names.size) {
-                        Text(stringResource(R.string.select_all))
-                    }
                     IconButton(onClick = { pendingDelete = vm.recordings.filter { it.file.name in sel } }) {
                         Icon(Icons.Filled.Delete, stringResource(R.string.delete))
                     }
@@ -486,7 +490,8 @@ private fun PhrasesScreen(vm: MainViewModel, onBack: () -> Unit) {
             LazyColumn {
                 items(vm.phrases, key = { it }) { phrase ->
                     ListItem(
-                        headlineContent = { Text(phrase) },
+                        // Al revés se ve la frase invertida ("olleH"); en normal, tal cual ("Hello").
+                        headlineContent = { Text(if (vm.reverse) StringBuilder(phrase).reverse().toString() else phrase) },
                         leadingContent = {
                             // El icono muestra en qué sentido sonará al tocar.
                             IconButton(onClick = { vm.playPhrase(phrase); onBack() }) {
@@ -515,19 +520,10 @@ private fun SettingsScreen(vm: MainViewModel, onBack: () -> Unit) {
 
     SubScreen(stringResource(R.string.settings), onBack) { padding ->
         Column(Modifier.padding(padding).verticalScroll(rememberScrollState()).padding(16.dp)) {
-            Section(stringResource(R.string.language))
-            (listOf("" to stringResource(R.string.system_default)) + Settings.LANGUAGES).forEach { (code, name) ->
-                Row(
-                    Modifier.fillMaxWidth().selectable(selected = s.language == code) {
-                        if (s.language != code) { s.updateLanguage(code); activity.recreate() }
-                    }.padding(vertical = 4.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    RadioButton(selected = s.language == code, onClick = null)
-                    Spacer(Modifier.size(12.dp))
-                    Text(name)
-                }
-            }
+            // De más a menos uso: duración (cada grabación), tema, idioma (se cambia una vez).
+            Section(stringResource(R.string.max_length))
+            Choice(listOf(30 to seconds(30), 60 to seconds(60), 120 to seconds(120)), s.maxSeconds,
+                onSelect = s::updateMaxSeconds)
 
             Section(stringResource(R.string.theme))
             Choice(
@@ -536,9 +532,25 @@ private fun SettingsScreen(vm: MainViewModel, onBack: () -> Unit) {
                 s.theme, onSelect = s::updateTheme
             )
 
-            Section(stringResource(R.string.max_length))
-            Choice(listOf(30 to seconds(30), 60 to seconds(60), 120 to seconds(120)), s.maxSeconds,
-                onSelect = s::updateMaxSeconds)
+            Section(stringResource(R.string.language))
+            val languages = listOf("" to stringResource(R.string.system_default)) + Settings.LANGUAGES
+            var open by remember { mutableStateOf(false) }
+            ExposedDropdownMenuBox(expanded = open, onExpandedChange = { open = it }) {
+                OutlinedTextField(
+                    value = languages.firstOrNull { it.first == s.language }?.second.orEmpty(),
+                    onValueChange = {}, readOnly = true, singleLine = true,
+                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(open) },
+                    modifier = Modifier.menuAnchor().fillMaxWidth()
+                )
+                ExposedDropdownMenu(expanded = open, onDismissRequest = { open = false }) {
+                    languages.forEach { (code, name) ->
+                        DropdownMenuItem(text = { Text(name) }, onClick = {
+                            open = false
+                            if (s.language != code) { s.updateLanguage(code); activity.recreate() }
+                        })
+                    }
+                }
+            }
 
             Spacer(Modifier.height(24.dp))
             HorizontalDivider()

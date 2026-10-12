@@ -128,11 +128,20 @@ class AudioEngine {
             var offset = 0
             while (playing && isActive && offset < data.size) {
                 val n = t.write(data, offset, minOf(4096, data.size - offset))
-                if (n <= 0) break
+                if (n < 0) break
+                // Algunos dispositivos devuelven 0 en vez de bloquear si la pista está en pausa: esperar y reintentar.
+                if (n == 0) { delay(20); continue }
                 offset += n
             }
             // Esperar a que suene lo que queda en el buffer (también mientras está en pausa).
-            while (playing && isActive && t.playbackHeadPosition < data.size) delay(20)
+            // Si la posición no avanza durante 1,5 s sin estar en pausa, se da por terminada (nunca queda colgada).
+            var last = -1
+            var stalled = 0
+            while (playing && isActive && t.playbackHeadPosition < data.size) {
+                delay(20)
+                val head = t.playbackHeadPosition
+                if (paused || head != last) { stalled = 0; last = head } else if (++stalled > 75) break
+            }
         } finally {
             synchronized(lock) {
                 track = null
