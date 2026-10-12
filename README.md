@@ -8,6 +8,7 @@ pkg-lab/
 ├── .github/workflows/
 │   └── android.yml        ← compila todo lo que hay en android/
 ├── android/
+│   ├── shared/            ← módulo común (Kotlin Multiplatform, Compose): componentes de UI compartidos
 │   ├── VozReves/          ← cada app es un proyecto Gradle independiente
 │   ├── FuelLog/           ← registro de repostajes y consumo
 │   └── Recetario/         ← recetario personal (Kotlin Multiplatform: preparado para Windows/Linux)
@@ -25,6 +26,12 @@ pkg-lab/
   página de la ejecución, sin tener que abrir el log completo.
 - **Apps multiplataforma:** una app Kotlin Multiplatform vive igual en `android/<App>/`, con su código común en un
   módulo `shared` y `app` solo para empaquetar (ver Recetario). El CI no cambia.
+- **Módulo compartido (`android/shared`, `:pkgshared`):** selectores, diálogos de confirmación, selección múltiple,
+  subpantallas y textos comunes. Todas las apps lo incluyen y comparten el mismo comportamiento de UX; solo cambian
+  colores, icono y funciones propias. Cambios en esa carpeta recompilan todas las apps. Detalles y cómo incluirlo en
+  `android/shared/README.md`.
+- **Versiones comunes:** Kotlin 2.4.21, Compose Multiplatform 1.11.1 (Material 3 1.9.0), AGP 8.13.2, Gradle 8.14.3,
+  compileSdk 36, minSdk 26. Las apps deben usar la misma versión para poder compartir el módulo.
 - **Compilar:** cada push a `main` compila solo las apps que han cambiado. También a mano desde
   *Actions → Android → Run workflow* (escribe el nombre de la carpeta o déjalo vacío para todas).
 - **Descargar:** *Releases → `android-<NombreApp>-latest`*. Cada app se compila en paralelo para
