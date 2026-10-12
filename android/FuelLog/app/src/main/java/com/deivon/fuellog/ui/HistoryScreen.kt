@@ -69,7 +69,7 @@ fun HistoryScreen(vm: AppViewModel, formats: Formats, modifier: Modifier, onOpen
         }
         LazyColumn(contentPadding = PaddingValues(bottom = 88.dp)) {
             items(records, key = { it.id }) { r ->
-                RefuelRow(r, summary.byEndId[r.id], formats) { onOpen(r) }
+                RefuelRow(r, summary.byEndId[r.id], summary.extremes, formats) { onOpen(r) }
                 HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
             }
         }

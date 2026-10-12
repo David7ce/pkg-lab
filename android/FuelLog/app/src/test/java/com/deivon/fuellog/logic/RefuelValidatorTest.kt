@@ -8,33 +8,37 @@ import org.junit.Test
 class RefuelValidatorTest {
 
     private val existing = listOf(
-        Refuel(id = 1, timestamp = 1_000, station = "A", odometerKm = 10_000, volumeMl = 40_000, pricePerLitreMilli = 1500, totalCents = 6000),
-        Refuel(id = 2, timestamp = 3_000, station = "B", odometerKm = 10_800, volumeMl = 40_000, pricePerLitreMilli = 1500, totalCents = 6000),
+        Refuel(id = 1, vehicleId = 7, timestamp = 1_000, station = "A", odometerKm = 10_000, volumeMl = 40_000, pricePerLitreMilli = 1500, totalCents = 6000),
+        Refuel(id = 2, vehicleId = 7, timestamp = 3_000, station = "B", odometerKm = 10_800, volumeMl = 40_000, pricePerLitreMilli = 1500, totalCents = 6000),
     )
 
     private fun form(ts: Long = 2_000, km: String = "10400", id: Long = 0) =
         RefuelForm(id = id, timestamp = ts, station = "C", odometer = km, litres = "45,2", price = "1.459")
 
-    private fun errors(f: RefuelForm) = (RefuelValidator.validate(f, existing) as FormResult.Invalid).errors
+    private fun errors(f: RefuelForm) = (RefuelValidator.validate(f, existing, 7) as FormResult.Invalid).errors
 
     @Test fun validFormCalculatesTotal() {
-        val r = (RefuelValidator.validate(form(), existing) as FormResult.Valid).refuel
+        val r = (RefuelValidator.validate(form(), existing, 7) as FormResult.Valid).refuel
         assertEquals(6595L, r.totalCents)
         assertEquals(45_200L, r.volumeMl)
         assertEquals(1459L, r.pricePerLitreMilli)
-        assertEquals(false, r.totalManual)
+        assertEquals(7L, r.vehicleId)
     }
 
-    @Test fun manualTotalOverridesCalculation() {
-        val r = (RefuelValidator.validate(form().copy(totalManual = true, total = "60,00"), existing) as FormResult.Valid).refuel
-        assertEquals(6000L, r.totalCents)
-        assertTrue(r.totalManual)
+    @Test fun otherVehiclesDoNotConstrainTheOdometer() {
+        val f = form(km = "50")
+        assertTrue(RefuelValidator.validate(f, existing, vehicleId = 8) is FormResult.Valid)
+    }
+
+    @Test fun keepsLocation() {
+        val r = (RefuelValidator.validate(form().copy(location = GeoPoint(40.4, -3.7)), existing, 7) as FormResult.Valid).refuel
+        assertEquals(40.4, r.latitude!!, 0.0)
+        assertEquals(-3.7, r.longitude!!, 0.0)
     }
 
     @Test fun rejectsMissingAndNonPositiveValues() {
         val e = errors(RefuelForm(timestamp = 2_000, station = " ", odometer = "", litres = "0", price = "-1"))
         assertEquals(setOf(FormError.Station, FormError.Odometer, FormError.Litres, FormError.Price), e)
-        assertEquals(setOf(FormError.Total), errors(form().copy(totalManual = true, total = "abc")))
     }
 
     @Test fun rejectsOdometerRegression() {
@@ -45,6 +49,6 @@ class RefuelValidatorTest {
 
     @Test fun editingARecordIgnoresItsOwnOldValue() {
         // Correcting record 2 (between 1 and nothing) to a lower but still valid reading is allowed.
-        assertTrue(RefuelValidator.validate(form(ts = 3_000, km = "10700", id = 2), existing) is FormResult.Valid)
+        assertTrue(RefuelValidator.validate(form(ts = 3_000, km = "10700", id = 2), existing, 7) is FormResult.Valid)
     }
 }

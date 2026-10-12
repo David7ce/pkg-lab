@@ -4,7 +4,10 @@ package com.deivon.fuellog.ui
 
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
+import android.content.Intent
+import android.net.Uri
 import android.text.format.DateFormat as AndroidDateFormat
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -15,6 +18,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
@@ -23,7 +27,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.filled.Place
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -32,6 +36,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.SuggestionChip
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
@@ -47,21 +52,39 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.deivon.fuellog.R
-import com.deivon.fuellog.logic.Decimals
 import com.deivon.fuellog.logic.FormError
+import com.deivon.fuellog.logic.GeoPoint
 import com.deivon.fuellog.logic.RefuelForm
+import com.deivon.fuellog.ui.map.MapPicker
 import java.util.Calendar
 
 /** Add/edit form. Ordered for fast entry: odometer, litres and price are all most fills need. */
 @Composable
-fun RefuelEditor(vm: AppViewModel, form: RefuelForm, formats: Formats) {
+fun RefuelEditor(vm: AppViewModel, form: RefuelForm, formats: Formats, showMessage: (String) -> Unit) {
     val errors = vm.formErrors
     val update = vm::updateForm
     var confirmDelete by rememberSaveable { mutableStateOf(false) }
+    var pickingLocation by rememberSaveable { mutableStateOf(false) }
+
+    if (pickingLocation) {
+        BackHandler { pickingLocation = false }
+        val start = form.location ?: vm.savedLocations().firstOrNull()
+        MapPicker(
+            initial = start ?: GeoPoint(40.4168, -3.7038), // Madrid when nothing is known yet
+            initialZoom = if (start != null) 16.0 else 5.0,
+            pins = remember { vm.savedLocations() },
+            onPick = { update(form.copy(location = it)); pickingLocation = false },
+            onClose = { pickingLocation = false },
+            showMessage = showMessage,
+        )
+        return
+    }
+    BackHandler(onBack = vm::closeForm)
     val isNew = form.id == 0L
     val lastOdometer = remember(vm.refuels, form.id) { vm.refuels.firstOrNull { it.id != form.id }?.odometerKm }
 
@@ -85,12 +108,18 @@ fun RefuelEditor(vm: AppViewModel, form: RefuelForm, formats: Formats) {
             Field(
                 form.station, { update(form.copy(station = it)) }, R.string.station,
                 error = if (FormError.Station in errors) stringResource(R.string.error_required) else null,
-                capitalize = true
+                capitalize = true, icon = AppIcons.Fuel
             )
-            val suggestions = remember(vm.refuels) { vm.recentStations() }.filter { it != form.station }
+            val suggestions = remember(vm.refuels) { vm.recentStations() }.filter { it.first != form.station }
             if (suggestions.isNotEmpty()) {
                 Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    suggestions.forEach { s -> SuggestionChip(onClick = { update(form.copy(station = s)) }, label = { Text(s) }) }
+                    suggestions.forEach { (name, point) ->
+                        SuggestionChip(
+                            onClick = { update(form.copy(station = name, location = form.location ?: point)) },
+                            label = { Text(name) },
+                            icon = { Icon(AppIcons.Fuel, null, Modifier.size(16.dp)) }
+                        )
+                    }
                 }
             }
 
@@ -102,13 +131,14 @@ fun RefuelEditor(vm: AppViewModel, form: RefuelForm, formats: Formats) {
                     FormError.OdometerNotBeforeNext in errors -> stringResource(R.string.error_odometer_next)
                     else -> null
                 },
-                hint = lastOdometer?.let { stringResource(R.string.last_odometer, formats.km(it)) }
+                hint = lastOdometer?.let { stringResource(R.string.last_odometer, formats.km(it)) },
+                icon = AppIcons.Speed
             )
             Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                 Field(
                     form.litres, { update(form.copy(litres = it)) }, R.string.litres, KeyboardType.Decimal,
                     error = if (FormError.Litres in errors) stringResource(R.string.error_positive) else null,
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(1f), icon = AppIcons.Drop
                 )
                 Field(
                     form.price, { update(form.copy(price = it)) }, R.string.price_per_litre, KeyboardType.Decimal,
@@ -116,7 +146,7 @@ fun RefuelEditor(vm: AppViewModel, form: RefuelForm, formats: Formats) {
                     modifier = Modifier.weight(1f)
                 )
             }
-            TotalField(form, formats, errors, update)
+            TotalRow(form, formats)
 
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Column(Modifier.weight(1f)) {
@@ -129,7 +159,7 @@ fun RefuelEditor(vm: AppViewModel, form: RefuelForm, formats: Formats) {
                 Switch(checked = form.fullTank, onCheckedChange = { update(form.copy(fullTank = it)) })
             }
 
-            Field(form.location, { update(form.copy(location = it)) }, R.string.location, capitalize = true)
+            LocationRow(form.location, onPick = { pickingLocation = true }, onClear = { update(form.copy(location = null)) })
             Field(form.notes, { update(form.copy(notes = it)) }, R.string.notes, singleLine = false, capitalize = true)
 
             vm.summary.byEndId[form.id]?.let {
@@ -151,34 +181,41 @@ fun RefuelEditor(vm: AppViewModel, form: RefuelForm, formats: Formats) {
     )
 }
 
-/** Total: shows the calculated value until the user types over it; then it is marked as entered. */
+/** Total is always litres × price: shown as a result, not typed. */
 @Composable
-private fun TotalField(form: RefuelForm, formats: Formats, errors: Set<FormError>, update: (RefuelForm) -> Unit) {
-    val calculated = form.calculatedTotalCents()
-    val value = if (form.totalManual) form.total else calculated?.let { Decimals.toInput(it, 2, formats.locale) } ?: ""
-    OutlinedTextField(
-        value = value,
-        onValueChange = { update(form.copy(total = it, totalManual = true)) },
-        label = { Text(stringResource(R.string.total_paid)) },
-        singleLine = true,
-        isError = FormError.Total in errors,
-        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-        supportingText = {
-            Text(
-                when {
-                    FormError.Total in errors -> stringResource(R.string.error_number)
-                    form.totalManual -> stringResource(R.string.total_manual)
-                    else -> stringResource(R.string.total_calculated)
-                }
-            )
-        },
-        trailingIcon = if (form.totalManual) {
-            { IconButton(onClick = { update(form.copy(total = "", totalManual = false)) }) {
-                Icon(Icons.Filled.Refresh, stringResource(R.string.recalculate))
-            } }
-        } else null,
-        modifier = Modifier.fillMaxWidth()
-    )
+private fun TotalRow(form: RefuelForm, formats: Formats) {
+    Surface(shape = CardShape, color = MaterialTheme.colorScheme.surfaceContainer, modifier = Modifier.fillMaxWidth()) {
+        Row(Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
+            Icon(AppIcons.Payments, null, tint = MaterialTheme.colorScheme.primary)
+            Spacer(Modifier.width(12.dp))
+            Column(Modifier.weight(1f)) {
+                Text(stringResource(R.string.total_paid), style = MaterialTheme.typography.labelMedium)
+                Text(stringResource(R.string.total_calculated), style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant)
+            }
+            Text(form.totalCents()?.let { formats.money(it) } ?: "—", style = MaterialTheme.typography.titleLarge)
+        }
+    }
+}
+
+/** Optional coordinates: pick on the map, open in another maps app, or clear. */
+@Composable
+private fun LocationRow(location: GeoPoint?, onPick: () -> Unit, onClear: () -> Unit) {
+    val context = LocalContext.current
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        OutlinedButton(onClick = onPick, modifier = Modifier.weight(1f)) {
+            Icon(if (location == null) AppIcons.Map else Icons.Filled.Place, null)
+            Spacer(Modifier.width(8.dp))
+            Text(location?.format() ?: stringResource(R.string.add_location), maxLines = 1)
+        }
+        if (location != null) {
+            IconButton(onClick = {
+                val uri = Uri.parse("geo:${location.lat},${location.lon}?q=${location.lat},${location.lon}")
+                runCatching { context.startActivity(Intent(Intent.ACTION_VIEW, uri)) }
+            }) { Icon(AppIcons.Map, stringResource(R.string.open_in_maps)) }
+            IconButton(onClick = onClear) { Icon(Icons.Filled.Close, stringResource(R.string.remove_location)) }
+        }
+    }
 }
 
 @Composable
@@ -217,11 +254,13 @@ private fun Field(
     hint: String? = null,
     singleLine: Boolean = true,
     capitalize: Boolean = false,
+    icon: ImageVector? = null,
 ) {
     OutlinedTextField(
         value = value,
         onValueChange = onChange,
         label = { Text(stringResource(label)) },
+        leadingIcon = if (icon != null) { { Icon(icon, null) } } else null,
         singleLine = singleLine,
         isError = error != null,
         keyboardOptions = KeyboardOptions(

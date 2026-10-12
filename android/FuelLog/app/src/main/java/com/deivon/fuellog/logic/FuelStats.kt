@@ -25,17 +25,48 @@ data class ConsumptionInterval(
         BigDecimal.valueOf(costCents, 2).divide(BigDecimal.valueOf(distanceKm), 3, RoundingMode.HALF_UP)
 }
 
-/** Everything the screens show, computed once per data change (off the UI thread). */
+/**
+ * Highest/lowest price per litre and best/worst consumption. Only set when there are at least two
+ * values to compare, so a single record is never labelled both "highest" and "lowest".
+ */
+data class Extremes(
+    val highestPrice: Refuel?,
+    val lowestPrice: Refuel?,
+    val worstConsumption: ConsumptionInterval?,
+    val bestConsumption: ConsumptionInterval?,
+) {
+    companion object {
+        val NONE = Extremes(null, null, null, null)
+
+        fun of(records: List<Refuel>, intervals: List<ConsumptionInterval>): Extremes {
+            val prices = records.size >= 2 && records.any { it.pricePerLitreMilli != records[0].pricePerLitreMilli }
+            val consumption = intervals.size >= 2
+            return Extremes(
+                highestPrice = if (prices) records.maxByOrNull { it.pricePerLitreMilli } else null,
+                lowestPrice = if (prices) records.minByOrNull { it.pricePerLitreMilli } else null,
+                worstConsumption = if (consumption) intervals.maxByOrNull { it.litresPer100Km } else null,
+                bestConsumption = if (consumption) intervals.minByOrNull { it.litresPer100Km } else null,
+            )
+        }
+    }
+}
+
+/** Everything the screens show for one vehicle, computed once per data change (off the UI thread). */
 data class FuelSummary(
     val intervals: List<ConsumptionInterval>,
     val averagePriceMilli: Long?,
+    val extremes: Extremes,
 ) {
     val byEndId: Map<Long, ConsumptionInterval> = intervals.associateBy { it.endId }
     val latest: ConsumptionInterval? get() = intervals.lastOrNull()
 
     companion object {
-        val EMPTY = FuelSummary(emptyList(), null)
-        fun of(records: List<Refuel>) = FuelSummary(FuelStats.intervals(records), FuelStats.averagePriceMilli(records))
+        val EMPTY = FuelSummary(emptyList(), null, Extremes.NONE)
+
+        fun of(records: List<Refuel>): FuelSummary {
+            val intervals = FuelStats.intervals(records)
+            return FuelSummary(intervals, FuelStats.averagePriceMilli(records), Extremes.of(records, intervals))
+        }
     }
 }
 

@@ -8,18 +8,15 @@ data class RefuelForm(
     val id: Long = 0,
     val timestamp: Long,
     val station: String = "",
-    val location: String = "",
     val odometer: String = "",
     val litres: String = "",
     val price: String = "",
-    /** Only meaningful when [totalManual]; otherwise the total is calculated. */
-    val total: String = "",
-    val totalManual: Boolean = false,
     val fullTank: Boolean = true,
     val notes: String = "",
+    val location: GeoPoint? = null,
 ) {
-    /** Litres × price, or null while either is missing/invalid. */
-    fun calculatedTotalCents(): Long? {
+    /** Litres × price, or null while either is missing/invalid. The total is never typed by hand. */
+    fun totalCents(): Long? {
         val ml = Decimals.parse(litres, 3) ?: return null
         val price = Decimals.parse(price, 3) ?: return null
         return totalCents(ml, price)
@@ -27,17 +24,17 @@ data class RefuelForm(
 
     companion object {
         fun from(r: Refuel, locale: Locale) = RefuelForm(
-            id = r.id, timestamp = r.timestamp, station = r.station, location = r.location,
+            id = r.id, timestamp = r.timestamp, station = r.station,
             odometer = r.odometerKm.toString(),
             litres = Decimals.toInput(r.volumeMl, 3, locale),
             price = Decimals.toInput(r.pricePerLitreMilli, 3, locale),
-            total = if (r.totalManual) Decimals.toInput(r.totalCents, 2, locale) else "",
-            totalManual = r.totalManual, fullTank = r.fullTank, notes = r.notes,
+            fullTank = r.fullTank, notes = r.notes,
+            location = GeoPoint.of(r.latitude, r.longitude),
         )
     }
 }
 
-enum class FormError { Station, Odometer, Litres, Price, Total, OdometerNotAfterPrevious, OdometerNotBeforeNext }
+enum class FormError { Station, Odometer, Litres, Price, OdometerNotAfterPrevious, OdometerNotBeforeNext }
 
 sealed interface FormResult {
     data class Valid(val refuel: Refuel) : FormResult
@@ -47,11 +44,11 @@ sealed interface FormResult {
 object RefuelValidator {
 
     /**
-     * Validates the form against the other records of the same vehicle.
+     * Validates the form against the other records of the same vehicle ([others]).
      * The odometer must be strictly between the previous and the next record by date, so an
      * impossible regression is rejected; to fix an older mistake the user edits that record.
      */
-    fun validate(form: RefuelForm, others: List<Refuel>, vehicleId: Long = 1): FormResult {
+    fun validate(form: RefuelForm, others: List<Refuel>, vehicleId: Long): FormResult {
         val errors = mutableSetOf<FormError>()
         if (form.station.isBlank()) errors += FormError.Station
 
@@ -62,11 +59,8 @@ object RefuelValidator {
         if (ml == null) errors += FormError.Litres
         if (price == null) errors += FormError.Price
 
-        val total = if (form.totalManual) Decimals.parse(form.total, 2) else if (ml != null && price != null) totalCents(ml, price) else null
-        if (form.totalManual && total == null) errors += FormError.Total
-
         if (odometer != null) {
-            val rest = others.filter { it.id != form.id }
+            val rest = others.filter { it.id != form.id && it.vehicleId == vehicleId }
             val previous = rest.filter { it.timestamp <= form.timestamp }.maxByOrNull { it.timestamp }
             val next = rest.filter { it.timestamp > form.timestamp }.minByOrNull { it.timestamp }
             if (previous != null && odometer <= previous.odometerKm) errors += FormError.OdometerNotAfterPrevious
@@ -77,10 +71,10 @@ object RefuelValidator {
         return FormResult.Valid(
             Refuel(
                 id = form.id, vehicleId = vehicleId, timestamp = form.timestamp,
-                station = form.station.trim(), location = form.location.trim(),
-                odometerKm = odometer!!, volumeMl = ml!!, pricePerLitreMilli = price!!,
-                totalCents = total!!, totalManual = form.totalManual, fullTank = form.fullTank,
-                notes = form.notes.trim(),
+                station = form.station.trim(), odometerKm = odometer!!, volumeMl = ml!!,
+                pricePerLitreMilli = price!!, totalCents = totalCents(ml, price),
+                fullTank = form.fullTank, notes = form.notes.trim(),
+                latitude = form.location?.lat, longitude = form.location?.lon,
             )
         )
     }

@@ -1,14 +1,17 @@
 # FuelLog
 
-Minimal personal fuel tracker for Android: refuellings, prices, consumption and expenses. Local only.
+Minimal personal fuel tracker for Android: several vehicles, refuellings, prices, consumption and expenses.
+Data is local only; the optional map loads OpenStreetMap tiles. 8 languages (en, es, fr, de, pt, zh, hi, ar).
 
 ## Structure
 
 ```
 app/src/main/java/com/deivon/fuellog/
 ├── data/    Models.kt (Vehicle, Refuel) · FuelDatabase.kt (SQLiteOpenHelper)
-├── logic/   Decimals.kt · FuelStats.kt · Period.kt · RefuelForm.kt (validation) · Backup.kt (JSON/CSV)
-└── ui/      MainActivity (3 tabs) · Overview · History · RefuelEditor · VehicleScreen · AppViewModel · Theme · Formats
+├── logic/   Decimals · FuelStats (+ Extremes) · Period · RefuelForm (validation) · Backup (JSON/CSV) · GeoPoint (+ Mercator)
+└── ui/      MainActivity (3 tabs) · Overview · History · RefuelEditor · VehicleEditor · SettingsScreen
+             AppViewModel · AppSettings (language, theme, currency) · AppIcons · Theme · Formats
+    ui/map/  TileMap (OSM tiles on a Canvas) · MapPicker · DeviceLocation (one-shot, platform LocationManager)
 app/src/test/…/logic/   Unit tests for everything in logic/
 ```
 
@@ -24,27 +27,33 @@ Dependency direction: `ui → logic → data`. `logic/` has no Android UI code a
 | core-ktx | AndroidX baseline required by Compose |
 | *test:* junit, org.json | Tests only; org.json replaces Android's stub on the JVM |
 
-No third-party runtime libraries. SQLite is used directly instead of Room: two tables and ~6 queries
-do not justify annotation processing plus a runtime library.
+No third-party runtime libraries. SQLite is used directly instead of Room: two tables and a few queries
+do not justify annotation processing plus a runtime library. The map is ~150 lines of Compose drawing
+OpenStreetMap tiles, cached in memory (LRU) and on disk (platform `HttpResponseCache`), instead of a map SDK
+(osmdroid/MapLibre add megabytes; Google Maps needs Play services and an API key). Vehicle and UI icons are
+~20 Material paths copied into `AppIcons` instead of `material-icons-extended`.
 
-## Database (version 1)
+## Database (version 2)
 
 ```sql
-vehicle(id PK, name, registration, fuel_type, notes)          -- one row, id = 1
-refuel(id PK AUTOINCREMENT, vehicle_id FK → vehicle,
-       timestamp INTEGER,            -- epoch millis
-       station, location,
+vehicle(id PK AUTOINCREMENT, name, type, registration, fuel_type, notes)  -- type: car, motorcycle, van, truck, bus, plane, boat, other
+refuel(id PK AUTOINCREMENT, vehicle_id FK → vehicle ON DELETE CASCADE,
+       timestamp INTEGER,             -- epoch millis
+       station,
        odometer_km INTEGER,
-       volume_ml INTEGER,            -- millilitres
-       price_per_litre_milli INTEGER,-- thousandths of currency unit per litre (1.459 → 1459)
-       total_cents INTEGER,
-       total_manual INTEGER,         -- 1 = user overrode litres × price
-       full_tank INTEGER, notes)
+       volume_ml INTEGER,             -- millilitres
+       price_per_litre_milli INTEGER, -- thousandths of currency unit per litre (1.459 → 1459)
+       total_cents INTEGER,           -- always litres × price
+       full_tank INTEGER, notes,
+       latitude REAL, longitude REAL) -- optional, display only
 INDEX refuel(vehicle_id, timestamp)
 ```
 
-All quantities are integers: no floating point in stored values or money arithmetic.
-Schema changes: bump `VERSION` in `FuelDatabase` and add an `if (oldVersion < N)` migration step.
+Money and fuel quantities are integers: no floating point in stored values or money arithmetic.
+
+**Migration 1 → 2**: vehicles get `type = 'car'`; the refuel table is rebuilt (older Android SQLite cannot
+drop columns) without `location` text and `total_manual`; any old location text is appended to the notes and
+stored totals are kept. Schema changes: bump `VERSION` in `FuelDatabase` and add an `if (oldVersion < N)` step.
 
 ## Calculations (`logic/FuelStats.kt`)
 
@@ -55,10 +64,19 @@ Schema changes: bump `VERSION` in `FuelDatabase` and add an `if (oldVersion < N)
   If the odometer does not strictly increase, the pending interval is discarded (never a misleading value).
 - **Cost per km** = cost of the fuel in the interval / km.
 - **Average price** = total paid / total litres (volume-weighted).
+- **Highlights**: highest/lowest price per litre and best/worst consumption, only when there are at least
+  two different values to compare.
 - With no valid interval the UI shows "—" with the reason, never 0.
 
 ## Backup
 
-- **JSON** (`fuellog-backup`, version 1): lossless, used for restore. Restore validates the whole file first,
+- **JSON** (`fuellog-backup`, version 2: list of vehicles with their refuellings; version 1 files still restore):
+  lossless, used for restore. Restore validates the whole file first,
   skips malformed records (and says how many), asks for confirmation, and replaces data in one transaction.
 - **CSV**: comma-separated, dot decimals, ISO dates — for spreadsheets. Export only.
+
+## Map
+
+OpenStreetMap tiles (`tile.openstreetmap.org`) with an identifying User-Agent, at most 4 downloads at once,
+disk-cached, and the required "© OpenStreetMap contributors" attribution. Fine for personal use; heavy use
+should switch to a tile provider with its own terms. Location permission is requested only for "My location".

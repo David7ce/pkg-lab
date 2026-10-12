@@ -1,31 +1,40 @@
 package com.deivon.fuellog.data
 
-/** Only one vehicle (id = 1) for now; the id column keeps the schema ready for more. */
+/** Stored as its lowercase [key]; unknown keys from newer backups fall back to [Other]. */
+enum class VehicleType(val key: String) {
+    Car("car"), Motorcycle("motorcycle"), Van("van"), Truck("truck"), Bus("bus"), Plane("plane"), Boat("boat"), Other("other");
+
+    companion object {
+        fun of(key: String?): VehicleType = entries.firstOrNull { it.key == key } ?: Other
+    }
+}
+
 data class Vehicle(
-    val id: Long = 1,
+    val id: Long = 0,
     val name: String = "",
+    val type: VehicleType = VehicleType.Car,
     val registration: String = "",
     val fuelType: String = "",
     val notes: String = "",
 )
 
 /**
- * One refuelling. All quantities are exact integers, never floating point:
+ * One refuelling. Quantities are exact integers, never floating point:
  * money in cents, volume in millilitres, price in thousandths of a currency unit per litre
- * (fuel prices usually have 3 decimals, e.g. 1.459 €/L).
+ * (fuel prices usually have 3 decimals, e.g. 1.459 €/L). [totalCents] is always litres × price.
+ * Coordinates are optional and only used for display, so Double is fine there.
  */
 data class Refuel(
     val id: Long = 0,
-    val vehicleId: Long = 1,
+    val vehicleId: Long = 0,
     val timestamp: Long, // epoch millis
     val station: String,
-    val location: String = "",
     val odometerKm: Long,
     val volumeMl: Long,
     val pricePerLitreMilli: Long,
     val totalCents: Long,
-    /** True when the user overrode the calculated total (e.g. a discount at the pump). */
-    val totalManual: Boolean = false,
     val fullTank: Boolean = true,
     val notes: String = "",
+    val latitude: Double? = null,
+    val longitude: Double? = null,
 )

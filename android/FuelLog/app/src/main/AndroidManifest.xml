@@ -1,6 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- No permissions: data stays in the app's private database; files go through the system picker. -->
+<!--
+  Data stays in the app's private database; files go through the system picker (no storage permission).
+  INTERNET: map tiles from OpenStreetMap only. Location: asked only when the user taps "My location",
+  read once, never tracked.
+-->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-feature android:name="android.hardware.location" android:required="false" />
 
     <application
         android:allowBackup="false"

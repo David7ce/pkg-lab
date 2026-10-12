@@ -2,6 +2,7 @@
 
 package com.deivon.fuellog.ui
 
+import android.content.Context
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
@@ -12,7 +13,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
@@ -38,19 +38,25 @@ import kotlinx.coroutines.launch
 class MainActivity : ComponentActivity() {
     private val vm: AppViewModel by viewModels()
 
+    override fun attachBaseContext(base: Context) = super.attachBaseContext(AppSettings.wrap(base))
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent { FuelTheme(vm.settings.theme) { FuelApp(vm) } }
     }
 }
 
-private enum class Tab(val label: Int, val icon: ImageVector) {
-    Overview(R.string.tab_overview, Icons.Filled.Home),
-    History(R.string.tab_history, Icons.AutoMirrored.Filled.List),
-    Vehicle(R.string.tab_vehicle, Icons.Filled.Settings),
+private enum class Tab(val label: Int) {
+    Overview(R.string.tab_overview), History(R.string.tab_history), Vehicles(R.string.tab_vehicle);
+
+    val icon: ImageVector get() = when (this) {
+        Overview -> Icons.Filled.Home
+        History -> Icons.AutoMirrored.Filled.List
+        Vehicles -> AppIcons.Car
+    }
 }
 
-/** Three tabs plus the add/edit form on top. Plain Compose state: no navigation library needed. */
+/** Three tabs plus full-screen forms on top. Plain Compose state: no navigation library needed. */
 @Composable
 fun FuelApp(vm: AppViewModel) {
     var tab by rememberSaveable { mutableStateOf(Tab.Overview) }
@@ -59,17 +65,20 @@ fun FuelApp(vm: AppViewModel) {
     val showMessage: (String) -> Unit = { scope.launch { snackbar.showSnackbar(it) } }
     val formats = rememberFormats(vm.settings.currency)
 
-    val form = vm.form
-    if (form != null) {
-        BackHandler(onBack = vm::closeForm)
-        RefuelEditor(vm, form, formats)
+    vm.vehicleForm?.let { v ->
+        BackHandler(onBack = vm::closeVehicle)
+        VehicleEditor(vm, v)
+        return
+    }
+    vm.form?.let { f ->
+        RefuelEditor(vm, f, formats, showMessage)
         return
     }
 
     Scaffold(
         snackbarHost = { SnackbarHost(snackbar) },
         floatingActionButton = {
-            if (tab != Tab.Vehicle) ExtendedFloatingActionButton(
+            if (tab != Tab.Vehicles) ExtendedFloatingActionButton(
                 onClick = { vm.newRefuel(formats.locale) },
                 icon = { Icon(Icons.Filled.Add, null) },
                 text = { Text(stringResource(R.string.add_refuel)) }
@@ -90,7 +99,7 @@ fun FuelApp(vm: AppViewModel) {
         when (tab) {
             Tab.Overview -> OverviewScreen(vm, formats, modifier) { vm.edit(it, formats.locale) }
             Tab.History -> HistoryScreen(vm, formats, modifier) { vm.edit(it, formats.locale) }
-            Tab.Vehicle -> VehicleScreen(vm, showMessage, modifier)
+            Tab.Vehicles -> SettingsScreen(vm, showMessage, modifier)
         }
     }
 }

@@ -20,7 +20,7 @@ android {
         val build = System.getenv("GITHUB_RUN_NUMBER")?.toIntOrNull() ?: 1
         versionCode = build * 10 + (abiCodes[targetAbi] ?: 0)
         versionName = "1.0.$build"
-        resourceConfigurations += listOf("en", "es")
+        resourceConfigurations += listOf("en", "es", "fr", "de", "pt", "zh", "hi", "ar")
     }
 
     splits {
