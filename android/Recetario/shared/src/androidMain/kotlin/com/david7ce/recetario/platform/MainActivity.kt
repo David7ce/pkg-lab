@@ -1,5 +1,6 @@
 package com.david7ce.recetario.platform
 
+import com.david7ce.shared.ui.isDark
 import android.graphics.Color
 import android.os.Bundle
 import android.view.WindowManager
@@ -11,7 +12,6 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.DisposableEffect
 import com.david7ce.recetario.RecetarioApp
 import com.david7ce.recetario.ui.Screen
-import com.david7ce.recetario.ui.isDark
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {

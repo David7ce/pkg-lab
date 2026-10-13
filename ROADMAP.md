@@ -19,6 +19,10 @@ Per-app pending work lives in each app's own README, not here (Recetario: "Deskt
 
 ## Not worth doing
 
+- **A SleepCycles background that follows the hours of daylight.** It needs the user location (a
+  permission, and a network or GPS source) to know sunrise and sunset by latitude, for a purely cosmetic
+  effect. Plain light and dark, shared with the other apps, was chosen instead.
+
 Splitting `:pkgshared` into modules, or a monorepo build tool (Nx/Bazel) — four Gradle projects
 and path-filtered CI already handle this fine. Revisit only if a 5th app needs it.
 

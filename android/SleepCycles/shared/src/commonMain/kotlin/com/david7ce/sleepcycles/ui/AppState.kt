@@ -1,5 +1,6 @@
 package com.david7ce.sleepcycles.ui
 
+import com.david7ce.shared.ui.ThemeMode
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -9,7 +10,6 @@ import com.david7ce.sleepcycles.logic.ClockFormat
 import com.david7ce.sleepcycles.logic.ClockStyle
 import com.david7ce.sleepcycles.logic.Mode
 import com.david7ce.sleepcycles.logic.Suggestion
-import com.david7ce.sleepcycles.logic.ThemeMode
 import com.david7ce.sleepcycles.logic.UserSettings
 import com.david7ce.sleepcycles.logic.clampLatency
 import com.david7ce.sleepcycles.logic.load

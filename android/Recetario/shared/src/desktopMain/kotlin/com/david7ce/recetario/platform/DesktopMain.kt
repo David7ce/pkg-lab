@@ -1,5 +1,6 @@
 package com.david7ce.recetario.platform
 
+import com.david7ce.shared.ui.isDark
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
@@ -11,7 +12,6 @@ import com.david7ce.recetario.RecetarioApp
 import com.david7ce.recetario.data.RecipeRepository
 import com.david7ce.recetario.db.RecipeDatabase
 import com.david7ce.recetario.ui.AppState
-import com.david7ce.recetario.ui.isDark
 import kotlinx.coroutines.MainScope
 import java.io.File
 import java.util.Locale

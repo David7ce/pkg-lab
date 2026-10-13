@@ -1,5 +1,6 @@
 package com.david7ce.recetario
 
+import com.david7ce.shared.ui.isDark
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -48,7 +49,6 @@ import com.david7ce.recetario.ui.RecetarioTheme
 import com.david7ce.recetario.ui.Screen
 import com.david7ce.recetario.ui.SettingsScreen
 import com.david7ce.recetario.ui.Transfer
-import com.david7ce.recetario.ui.isDark
 
 /** Root of the shared UI. Each platform provides [PlatformUi] and back handling, and calls this. */
 @Composable

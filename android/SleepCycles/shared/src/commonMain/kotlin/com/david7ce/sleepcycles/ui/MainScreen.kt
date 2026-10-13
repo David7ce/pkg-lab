@@ -1,5 +1,6 @@
 package com.david7ce.sleepcycles.ui
 
+import com.david7ce.shared.ui.isDark
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -21,12 +22,11 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -74,7 +74,14 @@ fun MainScreen(app: AppState) {
                 } else {
                     TimeField(app.anchor, app.format, app::setAnchor)
                 }
-                Button(onClick = app::sleepNow, modifier = Modifier.fillMaxWidth().height(48.dp)) { Text(s.sleepNow) }
+                // Only "go to bed at": sleeping now means going to bed now, it makes no sense for "wake up at".
+                if (app.mode == Mode.Bed) {
+                    Button(onClick = app::sleepNow, modifier = Modifier.fillMaxWidth().height(48.dp)) {
+                        Icon(SharedIcons.Bedtime, contentDescription = null)
+                        Spacer(Modifier.width(8.dp))
+                        Text(s.sleepNow)
+                    }
+                }
                 Text(
                     s.hint(app.latencyMinutes),
                     style = MaterialTheme.typography.bodySmall,
@@ -97,13 +104,12 @@ fun MainScreen(app: AppState) {
             }
         }
     }
-    // There is no Surface here, so the default content colour is black: the title and the Info and
-    // Settings icons would vanish on the night sky. Say explicitly what sits on the background.
-    val onBackground = MaterialTheme.colorScheme.onBackground
-    if (dark) NightSky { CompositionLocalProvider(LocalContentColor provides onBackground) { content() } }
-    else Box(Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)) {
-        CompositionLocalProvider(LocalContentColor provides onBackground) { content() }
-    }
+    // A Surface supplies the background and, with it, the content colour of the title and the icons.
+    Surface(
+        Modifier.fillMaxSize(),
+        color = MaterialTheme.colorScheme.background,
+        contentColor = MaterialTheme.colorScheme.onBackground,
+    ) { content() }
 }
 
 // The PWA pale lavender is unreadable on a light background; light mode uses the theme colors.
@@ -135,7 +141,7 @@ private fun SuggestionCard(item: Suggestion, app: AppState, dark: Boolean) {
         Rating.Ok -> s.ratingOk
         Rating.Low -> s.ratingLow
     }
-    val cardColor = if (dark) Color(0x1AFFFFFF) else MaterialTheme.colorScheme.surfaceContainer
+    val cardColor = MaterialTheme.colorScheme.surfaceContainer
     val shape = RoundedCornerShape(16.dp)
     val tap = if (platform.canSaveAlarm) {
         Modifier.clickable(onClickLabel = s.alarmHint) { platform.saveAlarm(item.timeOfDay, "SleepCycles") }

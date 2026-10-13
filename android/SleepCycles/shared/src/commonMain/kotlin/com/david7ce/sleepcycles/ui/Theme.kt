@@ -1,12 +1,10 @@
 package com.david7ce.sleepcycles.ui
 
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
-import com.david7ce.sleepcycles.logic.ThemeMode
 
 /** Mode accents from the PWA: warm sand for "wake up at", pale lavender for "go to bed at". */
 val WakeAccent = Color(0xFFDFB987)
@@ -64,13 +62,6 @@ private val Light = lightColorScheme(
     outlineVariant = Color(0xFFCAC3DC),
     error = Color(0xFFBA1A1A),
 )
-
-@Composable
-fun isDark(mode: ThemeMode): Boolean = when (mode) {
-    ThemeMode.System -> isSystemInDarkTheme()
-    ThemeMode.Light -> false
-    ThemeMode.Dark -> true
-}
 
 @Composable
 fun SleepCyclesTheme(dark: Boolean, content: @Composable () -> Unit) {

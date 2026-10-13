@@ -1,5 +1,6 @@
 package com.david7ce.sleepcycles.platform
 
+import com.david7ce.shared.ui.isDark
 import android.graphics.Color
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -9,7 +10,6 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.DisposableEffect
 import com.david7ce.sleepcycles.SleepCyclesApp
-import com.david7ce.sleepcycles.ui.isDark
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {

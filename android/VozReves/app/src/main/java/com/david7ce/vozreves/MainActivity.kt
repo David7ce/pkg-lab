@@ -2,6 +2,8 @@
 
 package com.david7ce.vozreves
 
+import com.david7ce.shared.ui.isDark
+import com.david7ce.shared.ui.ThemeMode
 import com.david7ce.shared.ui.SharedIcons
 import android.Manifest
 import android.app.Activity
@@ -24,7 +26,6 @@ import androidx.activity.viewModels
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -149,7 +150,7 @@ fun App(vm: MainViewModel) {
 
 @Composable
 fun AppTheme(theme: Int, content: @Composable () -> Unit) {
-    val dark = when (theme) { 1 -> false; 2 -> true; else -> isSystemInDarkTheme() }
+    val dark = isDark(ThemeMode.fromCode(theme))
     val ctx = LocalContext.current
     // Iconos de la barra de estado/navegación acordes al tema de la app, no solo al del sistema.
     DisposableEffect(dark) {

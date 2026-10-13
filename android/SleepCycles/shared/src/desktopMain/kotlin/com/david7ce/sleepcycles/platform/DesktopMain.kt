@@ -1,5 +1,6 @@
 package com.david7ce.sleepcycles.platform
 
+import com.david7ce.shared.ui.isDark
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
@@ -8,7 +9,6 @@ import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
 import com.david7ce.sleepcycles.SleepCyclesApp
 import com.david7ce.sleepcycles.ui.AppState
-import com.david7ce.sleepcycles.ui.isDark
 import java.util.Locale
 
 private const val WINDOW_TITLE = "SleepCycles"

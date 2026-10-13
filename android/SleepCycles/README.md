@@ -8,7 +8,8 @@ Multiplatform: Android, Windows, Linux and macOS. Spanish, English, French, Germ
 
 - Two modes: *go to bed at* (gives wake-up times) and *wake up at* (gives bedtimes). Results are live:
   they update as the time changes.
-- *Sleep now* (also a launcher shortcut on Android): bed mode at the current time.
+- *Sleep now*, with a moon icon and only in *go to bed at* (also a launcher shortcut on Android): bed mode at the
+  current time.
 - Android: the time is set with the system time picker (clock dial with its own keyboard toggle, or scrolling
   numbers, chosen in Settings as *Type of clock*), and tapping a result opens the system clock app on a new
   alarm at that time (permission SET_ALARM, no prompt). Desktop has neither: it keeps the typed hour and minute fields.
@@ -16,7 +17,7 @@ Multiplatform: Android, Windows, Linux and macOS. Spanish, English, French, Germ
 - Six suggestions (6 to 1 cycles). Each cycle is 90 min; your time to fall asleep (0–120 min, default 15) is added.
 - Rating by age range, shown as a face and its description: child 9–11 h, teen 8–10 h, adult 7–9 h,
   senior 7–8 h; "ok" within one cycle of the range and at 4.5 h.
-- 24-hour or 12-hour (AM/PM), light/dark/system theme (dark draws the PWA night sky). No accounts,
+- 24-hour or 12-hour (AM/PM), light/dark/system theme (the PWA night palette in dark; theme logic shared with the other apps). No accounts,
   no network, no permissions; settings stay on the device.
 
 ## Structure

@@ -1,10 +1,11 @@
 package com.david7ce.fuellog.ui
 
+import com.david7ce.shared.ui.isDark
+import com.david7ce.shared.ui.ThemeMode
 import android.graphics.Color as AndroidColor
 import androidx.activity.ComponentActivity
 import androidx.activity.SystemBarStyle
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
@@ -44,7 +45,7 @@ private val Dark = darkColorScheme(
 
 @Composable
 fun FuelTheme(theme: Int, content: @Composable () -> Unit) {
-    val dark = when (theme) { 1 -> false; 2 -> true; else -> isSystemInDarkTheme() }
+    val dark = isDark(ThemeMode.fromCode(theme))
     val context = LocalContext.current
     DisposableEffect(dark) {
         val style = SystemBarStyle.auto(AndroidColor.TRANSPARENT, AndroidColor.TRANSPARENT) { dark }

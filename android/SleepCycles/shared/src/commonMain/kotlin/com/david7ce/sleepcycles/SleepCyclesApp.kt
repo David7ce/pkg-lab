@@ -1,5 +1,6 @@
 package com.david7ce.sleepcycles
 
+import com.david7ce.shared.ui.isDark
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import com.david7ce.shared.ui.LocalSharedStrings
@@ -14,7 +15,6 @@ import com.david7ce.sleepcycles.ui.PlatformUi
 import com.david7ce.sleepcycles.ui.Screen
 import com.david7ce.sleepcycles.ui.SettingsDialog
 import com.david7ce.sleepcycles.ui.SleepCyclesTheme
-import com.david7ce.sleepcycles.ui.isDark
 
 /** Root of the shared UI. Each platform builds an [AppState], handles back, and calls this. */
 @Composable

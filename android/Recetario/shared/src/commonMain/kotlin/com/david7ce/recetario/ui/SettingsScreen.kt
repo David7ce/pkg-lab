@@ -1,5 +1,6 @@
 package com.david7ce.recetario.ui
 
+import com.david7ce.shared.ui.ThemeMode
 import com.david7ce.shared.ui.SharedIcons
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box

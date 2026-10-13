@@ -1,13 +1,10 @@
 package com.david7ce.recetario.ui
 
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
-
-enum class ThemeMode { System, Light, Dark }
 
 // Warm terracotta palette (kitchen, not office); contrast checked for text on containers.
 private val Light = lightColorScheme(
@@ -63,13 +60,6 @@ private val Dark = darkColorScheme(
     outlineVariant = Color(0xFF53433D),
     error = Color(0xFFFFB4AB),
 )
-
-@Composable
-fun isDark(mode: ThemeMode): Boolean = when (mode) {
-    ThemeMode.System -> isSystemInDarkTheme()
-    ThemeMode.Light -> false
-    ThemeMode.Dark -> true
-}
 
 @Composable
 fun RecetarioTheme(dark: Boolean, content: @Composable () -> Unit) {

@@ -1,8 +1,7 @@
 package com.david7ce.sleepcycles.logic
 
+import com.david7ce.shared.ui.ThemeMode
 import com.david7ce.sleepcycles.platform.SettingsStore
-
-enum class ThemeMode { System, Light, Dark }
 
 /** Look of the system time picker on Android: [Analog] is the clock dial, [Digital] the scrolling numbers. */
 enum class ClockStyle { Analog, Digital }

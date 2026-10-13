@@ -36,6 +36,7 @@ CompositionLocalProvider(LocalSharedStrings provides SharedStrings(
 | `ui/ConfirmDialog` | Confirmation before deleting or any irreversible action. |
 | `ui/Selection` + `SelectionActions` | Multi-select: long press, select all, delete. |
 | `ui/SubScreen`, `SectionTitle` | Top bar for a secondary screen and section titles. |
+| `ui/ThemeMode` + `isDark` | The light/dark/system choice every app offers, and whether to draw dark. `code` matches the ints FuelLog and VozReves already store. |
 | `ui/SharedIcons` | The icon vocabulary of every app (Material paths as data, no material-icons library). Rules: `.claude/skills/pkg-lab-icons`. |
 | `ui/SharedStrings` | Common text that each app fills in. |
 | `reverseText` | Reverses text by code point (doesn't break emoji). |

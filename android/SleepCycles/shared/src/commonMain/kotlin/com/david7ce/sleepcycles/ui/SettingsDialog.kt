@@ -1,5 +1,6 @@
 package com.david7ce.sleepcycles.ui
 
+import com.david7ce.shared.ui.ThemeMode
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -28,7 +29,6 @@ import com.david7ce.sleepcycles.logic.AppLanguage
 import com.david7ce.sleepcycles.logic.ClockFormat
 import com.david7ce.sleepcycles.logic.ClockStyle
 import com.david7ce.sleepcycles.logic.MAX_LATENCY_MINUTES
-import com.david7ce.sleepcycles.logic.ThemeMode
 import com.david7ce.sleepcycles.logic.parseLatency
 
 /**

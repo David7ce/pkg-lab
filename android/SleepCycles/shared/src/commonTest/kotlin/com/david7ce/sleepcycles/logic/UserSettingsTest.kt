@@ -1,5 +1,6 @@
 package com.david7ce.sleepcycles.logic
 
+import com.david7ce.shared.ui.ThemeMode
 import com.david7ce.sleepcycles.MapStore
 import kotlin.test.Test
 import kotlin.test.assertEquals
