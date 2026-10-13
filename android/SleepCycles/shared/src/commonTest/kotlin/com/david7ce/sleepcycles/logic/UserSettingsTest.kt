@@ -52,6 +52,15 @@ class UserSettingsTest {
     }
 
     @Test
+    fun deviceLanguagePicksTheFirstTranslatedOne() {
+        assertEquals("es", pickDeviceLanguage(listOf("ja", "es", "en")))
+        assertEquals("fr", pickDeviceLanguage(listOf("fr")))
+        assertEquals("pt", pickDeviceLanguage(listOf("PT-BR")))
+        assertEquals("ja", pickDeviceLanguage(listOf("ja", "ko"))) // none translated: falls back to English later
+        assertEquals("", pickDeviceLanguage(emptyList()))
+    }
+
+    @Test
     fun negativeTimeIsRejected() {
         assertEquals(UserSettings().wakeTime, MapStore(mutableMapOf("wakeTime" to "-5")).load().wakeTime)
     }

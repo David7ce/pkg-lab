@@ -1,0 +1,14 @@
+pkg-lab third-party notices
+
+The repository code is under the PolyForm Strict License 1.0.0 (see LICENSE). The items below are not
+covered by it; they keep their own licenses.
+
+Material Icons (Google)
+  The vector path data in android/shared/src/commonMain/kotlin/com/david7ce/shared/ui/SharedIcons.kt, and in
+  the apps' own icon files (AppIcons / Icons), is copied from Material Icons by Google.
+  Copyright Google LLC. Licensed under the Apache License, Version 2.0
+  (https://www.apache.org/licenses/LICENSE-2.0).
+
+Dependencies
+  Kotlin, Compose Multiplatform, Material 3, AndroidX, SQLDelight and kotlinx libraries are used under their
+  own licenses (Apache-2.0 / MIT); see each project.

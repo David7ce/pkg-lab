@@ -50,6 +50,9 @@ class AndroidPlatformUi(
             activity.startActivity(intent)
         } catch (e: ActivityNotFoundException) {
             Toast.makeText(activity, noClockApp(), Toast.LENGTH_SHORT).show()
+        } catch (e: SecurityException) {
+            // Some OEM clock apps refuse the intent from a third party; same message, no crash.
+            Toast.makeText(activity, noClockApp(), Toast.LENGTH_SHORT).show()
         }
     }
 }

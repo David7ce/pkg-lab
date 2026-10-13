@@ -1,6 +1,7 @@
 package com.david7ce.sleepcycles.platform
 
 import com.david7ce.shared.ui.isDark
+import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -10,12 +11,13 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.DisposableEffect
 import com.david7ce.sleepcycles.SleepCyclesApp
+import com.david7ce.sleepcycles.logic.pickDeviceLanguage
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val app = (application as SleepCyclesApplication).state
-        app.systemLanguage = resources.configuration.locales[0].language
+        app.systemLanguage = deviceLanguage()
         // The launcher shortcut. Only on a fresh start: a recreation (rotation) must not repeat it.
         if (savedInstanceState == null && intent?.action == ACTION_SLEEP_NOW) app.sleepNow()
         val platform = AndroidPlatformUi(this) { app.strings.noClockApp }
@@ -33,6 +35,19 @@ class MainActivity : ComponentActivity() {
             BackHandler(enabled = app.canGoBack) { app.back() }
             SleepCyclesApp(app, platform)
         }
+    }
+
+    /** The shortcut used while the app is already open: reuse this instance (launchMode singleTop). */
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        if (intent.action == ACTION_SLEEP_NOW) (application as SleepCyclesApplication).state.sleepNow()
+    }
+
+    /** The first of the device preferred languages that the app translates (not only the very first). */
+    private fun deviceLanguage(): String {
+        val locales = resources.configuration.locales
+        return pickDeviceLanguage((0 until locales.size()).map { locales[it].language })
     }
 
     companion object {

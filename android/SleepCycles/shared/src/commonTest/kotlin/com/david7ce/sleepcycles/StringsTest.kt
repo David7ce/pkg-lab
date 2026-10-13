@@ -23,7 +23,7 @@ class StringsTest {
                 s.ratingGood to en.ratingGood, s.ratingOk to en.ratingOk, s.ratingLow to en.ratingLow,
                 s.ageLabel(AgeRange.Adult) to en.ageLabel(AgeRange.Adult),
                 s.settings to en.settings, s.ageRange to en.ageRange, s.fallAsleepTime to en.fallAsleepTime,
-                s.timeFormat to en.timeFormat, s.format12 to en.format12, s.theme to en.theme,
+                s.timeFormat to en.timeFormat, s.saveAlarm to en.saveAlarm, s.theme to en.theme,
                 s.themeDark to en.themeDark, s.language to en.language, s.languageSystem to en.languageSystem,
                 s.howItWorks to en.howItWorks, s.gotIt to en.gotIt, s.done to en.done,
                 s.howItWorksParagraphs to en.howItWorksParagraphs, s.howItWorksNote to en.howItWorksNote,

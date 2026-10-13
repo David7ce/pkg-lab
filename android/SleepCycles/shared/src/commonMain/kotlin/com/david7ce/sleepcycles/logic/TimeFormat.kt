@@ -41,3 +41,16 @@ fun formatHours(minutes: Int, separator: Char): String {
 /** The PWA field: empty, negative or non-numeric counts as 0; above its maximum is capped. */
 fun parseLatency(text: String): Int =
     text.trim().toLongOrNull()?.coerceIn(0L, MAX_LATENCY_MINUTES.toLong())?.toInt() ?: 0
+
+/**
+ * What the latency field shows after an edit, so the text always matches the value in use: "500" becomes
+ * "120", a pasted "-5" becomes "0", and letters are dropped. Empty stays empty (it counts as 0).
+ */
+fun latencyText(raw: String): String {
+    val digits = raw.filter { it.isDigit() }.take(3)
+    return when {
+        raw.trim().startsWith("-") -> "0"
+        digits.isEmpty() -> ""
+        else -> parseLatency(digits).toString()
+    }
+}

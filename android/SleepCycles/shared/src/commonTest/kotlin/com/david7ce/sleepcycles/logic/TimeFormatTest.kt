@@ -73,4 +73,16 @@ class TimeFormatTest {
         assertEquals(120, parseLatency("500"))
         assertEquals(120, parseLatency("99999999999"))
     }
+
+    @Test
+    fun latencyFieldShowsTheValueActuallyUsed() {
+        assertEquals("15", latencyText("15"))
+        assertEquals("120", latencyText("500"))
+        assertEquals("120", latencyText("99999999999"))
+        assertEquals("0", latencyText("-5"))
+        assertEquals("7", latencyText("007"))
+        assertEquals("12", latencyText("12a"))
+        assertEquals("", latencyText(""))
+        assertEquals("", latencyText("abc"))
+    }
 }

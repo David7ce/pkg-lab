@@ -31,6 +31,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import com.david7ce.shared.ui.SegmentedChoice
@@ -144,7 +145,10 @@ private fun SuggestionCard(item: Suggestion, app: AppState, dark: Boolean) {
     val cardColor = MaterialTheme.colorScheme.surfaceContainer
     val shape = RoundedCornerShape(16.dp)
     val tap = if (platform.canSaveAlarm) {
-        Modifier.clickable(onClickLabel = s.alarmHint) { platform.saveAlarm(item.timeOfDay, "SleepCycles") }
+        // A short verb phrase: TalkBack reads it as "double tap to <label>".
+        Modifier.clickable(onClickLabel = s.saveAlarm, role = Role.Button) {
+            platform.saveAlarm(item.timeOfDay, "SleepCycles")
+        }
     } else {
         Modifier
     }

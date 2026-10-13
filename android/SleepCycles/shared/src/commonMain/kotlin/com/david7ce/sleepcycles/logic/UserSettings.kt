@@ -75,3 +75,12 @@ fun SettingsStore.save(settings: UserSettings) {
     put(Key.LANGUAGE, settings.language.name)
     put(Key.CLOCK_STYLE, settings.clockStyle.name)
 }
+
+/**
+ * The first language of the device list (most preferred first) that the app translates; otherwise the
+ * first one, which then falls back to English. A device set to Japanese then Spanish gets Spanish.
+ */
+fun pickDeviceLanguage(deviceLanguages: List<String>): String {
+    val supported = AppLanguage.entries.mapNotNull { it.code }
+    return deviceLanguages.firstOrNull { it.lowercase().take(2) in supported } ?: deviceLanguages.firstOrNull().orEmpty()
+}

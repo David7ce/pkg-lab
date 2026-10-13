@@ -45,8 +45,8 @@ open class Strings {
 
     open val fallAsleepTime = "Time to fall asleep (minutes)"
     open val timeFormat = "Time format"
-    open val format24 = "24-hour"
-    open val format12 = "12-hour (AM/PM)"
+    open val format24 = "24 h"
+    open val format12 = "12 h"
     open val clockType = "Type of clock"
     open val clockAnalog = "Analog"
     open val clockDigital = "Digital"
@@ -83,6 +83,7 @@ open class Strings {
 
     // Android alarm and clock
     open val alarmHint = "Tap a time to save it as an alarm in your clock app"
+    open val saveAlarm = "Save as alarm"
     open val pickTime = "Pick the time with the clock"
     open val noClockApp = "No clock app found"
 

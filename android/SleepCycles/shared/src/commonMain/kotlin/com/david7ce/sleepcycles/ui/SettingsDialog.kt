@@ -29,6 +29,7 @@ import com.david7ce.sleepcycles.logic.AppLanguage
 import com.david7ce.sleepcycles.logic.ClockFormat
 import com.david7ce.sleepcycles.logic.ClockStyle
 import com.david7ce.sleepcycles.logic.MAX_LATENCY_MINUTES
+import com.david7ce.sleepcycles.logic.latencyText
 import com.david7ce.sleepcycles.logic.parseLatency
 
 /**
@@ -108,7 +109,7 @@ private fun LatencyField(minutes: Int, onChange: (Int) -> Unit) {
     OutlinedTextField(
         value = text,
         onValueChange = {
-            text = it.filter(Char::isDigit).take(3)
+            text = latencyText(it) // shows the value actually used: "500" turns into "120"
             onChange(parseLatency(text))
         },
         supportingText = { Text("0–$MAX_LATENCY_MINUTES") },
