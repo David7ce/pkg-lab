@@ -2,9 +2,10 @@
 # - Push to main: builds only the apps whose folder changed.
 # - Manual (Actions -> Android -> Run workflow): one specific app, or all of them.
 # Each app builds IN PARALLEL for arm64-v8a, armeabi-v7a and universal, and publishes to its
-# "<app>-latest" release with all three APKs. Recetario shares that release with desktop.yml's
-# installers (see "Publish to Releases" below) - same release, Android + Windows/Linux/macOS
-# together, so the publish step never does a destructive delete-and-recreate.
+# "<app>-latest" release with all three APKs. Recetario and SleepCycles share that release (named
+# "<app, lower case>-latest") with desktop.yml's installers (see "Publish to Releases" below) - same
+# release, Android + Windows/Linux/macOS together, so the publish step never does a destructive
+# delete-and-recreate.
 name: Android
 
 on:
@@ -180,10 +181,13 @@ jobs:
           APP: ${{ matrix.app }}
         run: |
           ls -lh apks
-          # Recetario ships Android + desktop (Windows/Linux/macOS) on one release, published by
-          # both this workflow and desktop.yml - never destructively, since either can run first
-          # and neither should delete what the other already uploaded.
-          if [ "$APP" = "Recetario" ]; then TAG="recetario-latest"; else TAG="android-${APP}-latest"; fi
+          # Apps that also ship desktop installers (Windows/Linux/macOS) keep Android and desktop on one
+          # release, published by both this workflow and desktop.yml - never destructively, since either
+          # can run first and neither should delete what the other already uploaded.
+          # Keep this list in sync with desktop.yml's detect job.
+          MULTI=" Recetario SleepCycles "
+          IS_MULTI=false
+          if [[ "$MULTI" == *" $APP "* ]]; then IS_MULTI=true; TAG="${APP,,}-latest"; else TAG="android-${APP}-latest"; fi
 
           # <App>-android-<version>-<abi>.apk → <version>
           version=$(ls apks/*.apk | head -1 | sed -E "s#.*/${APP}-android-(.*)-(arm64-v8a|armeabi-v7a|universal)\.apk#\1#")
@@ -201,9 +205,9 @@ jobs:
             echo "- **…-arm64-v8a.apk**: most phones (64-bit)."
             echo "- **…-armeabi-v7a.apk**: older 32-bit phones."
             echo "- **…-universal.apk**: works on any of them."
-            if [ "$APP" = "Recetario" ]; then
+            if [ "$IS_MULTI" = true ]; then
               echo "- **.msi**: Windows (64-bit)."
-              echo "- **.tar.gz**: Linux (64-bit). Unpack and run \`Recetario/bin/Recetario\`. Includes Java, nothing to install."
+              echo "- **.tar.gz**: Linux (64-bit). Unpack and run \`${APP}/bin/${APP}\`. Includes Java, nothing to install."
               echo "- **.dmg**: macOS (Apple Silicon)."
             fi
             if [ -n "$log" ]; then
@@ -214,7 +218,7 @@ jobs:
           } > "$RUNNER_TEMP/notes.md"
 
           # Adds/replaces this app's APKs without touching another platform's assets on the same
-          # release (Recetario's desktop installers, published independently by desktop.yml) -
+          # release (the desktop installers, published independently by desktop.yml) -
           # deletes only this app's own old-versioned APKs, not matched by the new filenames.
           publish() {
             new_names=$(basename -a apks/*.apk)

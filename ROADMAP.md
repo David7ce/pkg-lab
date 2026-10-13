@@ -5,6 +5,10 @@ Per-app pending work lives in each app's own README, not here (Recetario: "Deskt
 
 ## Open items
 
+- **Watch the first CI runs of SleepCycles.** Written without an Android SDK or any local build (this
+  machine has none), so the first `android.yml` and `desktop.yml` runs are its first compile. Also watch
+  the new per-app `desktop.yml` matrix and `sleepcycles-latest` end to end (and re-run Recetario through
+  it), and check the app once on a real phone: Sleep now shortcut, 12-hour input, language switch.
 - **Watch the first real release under the merged-release change.** `android.yml` and `desktop.yml`
   now both publish Recetario to the same `recetario-latest` release (Android + desktop together,
   see Reference below) instead of two separate ones, without ever deleting the other's assets.
@@ -15,13 +19,13 @@ Per-app pending work lives in each app's own README, not here (Recetario: "Deskt
 
 ## Not worth doing
 
-Splitting `:pkgshared` into modules, or a monorepo build tool (Nx/Bazel) — three Gradle projects
-and path-filtered CI already handle this fine. Revisit only if a 4th app needs it.
+Splitting `:pkgshared` into modules, or a monorepo build tool (Nx/Bazel) — four Gradle projects
+and path-filtered CI already handle this fine. Revisit only if a 5th app needs it.
 
 ## Reference
 
 - **Releases** are rolling `latest` tags per app (`android-<App>-latest`; Recetario's is
-  `recetario-latest`, shared by Android and desktop), not a version history — intentional, not a
+  `recetario-latest`, SleepCycles has `sleepcycles-latest`, each shared by Android and desktop), not a version history — intentional, not a
   gap. Titles are `<App> <version>`, no platform suffix — the asset filenames already say that.
 - **Signing**: one key (alias `pkglab`), encrypted at `.github/signing/release.jks.enc`, password
   in the `ANDROID_KEYSTORE_PASSWORD` GitHub secret *and* a password manager (reset 2026-10-13 —

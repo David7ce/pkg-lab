@@ -1,8 +1,10 @@
-# Recetario for desktop. Only the minimum, each format on the system that produces it:
+# Desktop installers for the apps that have a desktop target (Recetario, SleepCycles). Only the
+# minimum, each format on the system that produces it:
 #   Windows x64  → .msi
 #   Linux x64    → tar.gz with the app and its bundled Java (nothing to install, any x64 distro)
 #   macOS arm64  → .dmg (arm runner)
 # Deliberately left out: Linux arm64, iOS (needs an Apple Developer account to install on an iPhone).
+# Each app publishes to its own "<app, lower case>-latest" release, shared with android.yml's APKs.
 name: Desktop
 
 on:
@@ -10,34 +12,83 @@ on:
     branches: [main]
     paths:
       - "android/Recetario/**"
+      - "android/SleepCycles/**"
       - "android/shared/**"
       - ".github/workflows/desktop.yml"
   workflow_dispatch:
+    inputs:
+      app:
+        description: "App folder inside android/ (empty = every app with a desktop target)"
+        required: false
+        default: ""
 
 permissions:
   contents: write
 
 jobs:
+  detect:
+    runs-on: ubuntu-latest
+    outputs:
+      apps: ${{ steps.list.outputs.apps }}
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - id: list
+        env:
+          EVENT: ${{ github.event_name }}
+          INPUT_APP: ${{ github.event.inputs.app }}
+          BEFORE: ${{ github.event.before }}
+        run: |
+          # Keep this list in sync with android.yml's MULTI.
+          ALL="Recetario SleepCycles"
+
+          if [ "$EVENT" = "workflow_dispatch" ]; then
+            if [ -n "$INPUT_APP" ]; then apps="$INPUT_APP"; else apps="$ALL"; fi
+          elif [ -z "$BEFORE" ] || [ "$BEFORE" = "0000000000000000000000000000000000000000" ] \
+               || ! git cat-file -e "$BEFORE^{commit}" 2>/dev/null; then
+            apps="$ALL"   # first push, or rewritten history
+          else
+            changed=$(git diff --name-only "$BEFORE" HEAD)
+            if echo "$changed" | grep -qE '^(\.github/workflows/desktop\.yml|android/shared/)'; then
+              apps="$ALL"
+            else
+              apps=$(echo "$changed" | grep '^android/' | cut -d/ -f2 | sort -u)
+            fi
+          fi
+
+          # Only apps from the list above that exist
+          json=$(for a in $apps; do
+                   case " $ALL " in *" $a "*) [ -f "android/$a/gradlew" ] && echo "$a";; esac
+                 done | jq -R . | jq -sc .)
+          echo "Desktop apps: $json"
+          echo "apps=$json" >> "$GITHUB_OUTPUT"
+
   build:
+    needs: detect
+    if: needs.detect.outputs.apps != '[]'
     strategy:
       fail-fast: false
       matrix:
+        app: ${{ fromJson(needs.detect.outputs.apps) }}
+        os: [windows-latest, ubuntu-latest, macos-14]
         include:
           - os: windows-latest
             task: packageMsi
             glob: "*.msi"
           - os: ubuntu-latest
             task: createDistributable
-            glob: "Recetario-linux-x64.tar.gz"
+            glob: "*-linux-x64.tar.gz"
           - os: macos-14
             task: packageDmg
             glob: "*.dmg"
     runs-on: ${{ matrix.os }}
-    name: build (${{ matrix.os }})
+    name: build (${{ matrix.app }}, ${{ matrix.os }})
     defaults:
       run:
         shell: bash
-        working-directory: android/Recetario
+        working-directory: android/${{ matrix.app }}
     steps:
       - uses: actions/checkout@v5
 
@@ -58,14 +109,16 @@ jobs:
 
       # The plugin leaves each format in its own subfolder; find it and copy it to a fixed folder.
       - name: Locate installer
+        env:
+          APP: ${{ matrix.app }}
         run: |
           mkdir -p "$RUNNER_TEMP/installers"
           if [ "$RUNNER_OS" = "Linux" ]; then
             # createDistributable leaves app/<Name>/bin/<Name>; the whole folder gets packaged.
-            bin=$(find shared/build/compose -type f -path '*/bin/Recetario' | head -1)
+            bin=$(find shared/build/compose -type f -path "*/bin/$APP" | head -1)
             [ -n "$bin" ] || { echo "::error::The Linux app wasn't generated"; find shared/build/compose -maxdepth 4 | head -50; exit 1; }
             appdir=$(dirname "$(dirname "$bin")")
-            tar -czf "$RUNNER_TEMP/installers/${{ matrix.glob }}" -C "$(dirname "$appdir")" "$(basename "$appdir")"
+            tar -czf "$RUNNER_TEMP/installers/$APP-linux-x64.tar.gz" -C "$(dirname "$appdir")" "$(basename "$appdir")"
             ls -lh "$RUNNER_TEMP/installers/"
           else
             found=$(find shared/build/compose -type f -name '${{ matrix.glob }}' | head -1)
@@ -77,13 +130,18 @@ jobs:
       - name: Save installer
         uses: actions/upload-artifact@v5
         with:
-          name: desktop-${{ matrix.os }}
+          name: desktop-${{ matrix.app }}-${{ matrix.os }}
           path: ${{ runner.temp }}/installers/${{ matrix.glob }}
           if-no-files-found: error
 
   release:
-    needs: build
+    needs: [detect, build]
+    if: ${{ !cancelled() && needs.detect.outputs.apps != '[]' }}
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        app: ${{ fromJson(needs.detect.outputs.apps) }}
     steps:
       - uses: actions/checkout@v5
         with:
@@ -91,7 +149,7 @@ jobs:
 
       - uses: actions/download-artifact@v5
         with:
-          pattern: desktop-*
+          pattern: desktop-${{ matrix.app }}-*
           merge-multiple: true
           path: dist
 
@@ -99,23 +157,24 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GH_REPO: ${{ github.repository }}
+          APP: ${{ matrix.app }}
         run: |
           set -o pipefail
           files=$(find dist -type f \( -name '*.msi' -o -name '*.tar.gz' -o -name '*.dmg' \))
           echo "::notice title=Installers::$(echo $files | tr '\n' ' ')"
           [ -n "$files" ] || { echo "::error::No installers to publish"; exit 1; }
 
-          # Same release as android.yml's Recetario build (Android + desktop together) - never a
+          # Same release as android.yml's build for this app (Android + desktop together) - never a
           # destructive delete, since android.yml's own APKs may already be on it, or may land
           # after this runs. This workflow doesn't know Android's versionName, so it never sets
           # the release title itself except as a fallback on a brand new release.
-          TAG="recetario-latest"
+          TAG="${APP,,}-latest"
 
           # Commits since the last desktop release (none on a first-ever release).
           prev=$(gh release view "$TAG" --json targetCommitish -q .targetCommitish 2>/dev/null || true)
           log=""
           if [ -n "$prev" ] && git cat-file -e "$prev^{commit}" 2>/dev/null; then
-            log=$(git log "$prev..$GITHUB_SHA" --oneline --no-decorate -- android/Recetario android/shared 2>/dev/null)
+            log=$(git log "$prev..$GITHUB_SHA" --oneline --no-decorate -- "android/$APP" android/shared 2>/dev/null)
           fi
 
           {
@@ -123,7 +182,7 @@ jobs:
             echo
             echo "- **…-arm64-v8a.apk / …-armeabi-v7a.apk / …-universal.apk**: Android."
             echo "- **.msi**: Windows (64-bit)."
-            echo "- **.tar.gz**: Linux (64-bit). Unpack and run \`Recetario/bin/Recetario\`. Includes Java, nothing to install."
+            echo "- **.tar.gz**: Linux (64-bit). Unpack and run \`${APP}/bin/${APP}\`. Includes Java, nothing to install."
             echo "- **.dmg**: macOS (Apple Silicon)."
             if [ -n "$log" ]; then
               echo
@@ -133,7 +192,7 @@ jobs:
           } > "$RUNNER_TEMP/notes.md"
 
           # Adds/replaces the installers without touching the Android APKs already on the same
-          # release - deletes only this platform's own old-versioned installers.
+          # release - deletes only this app's own old-versioned installers.
           publish() {
             new_names=$(basename -a $files)
             gh release view "$TAG" --json assets -q '.assets[].name' 2>/dev/null \
@@ -147,8 +206,8 @@ jobs:
           if gh release view "$TAG" >/dev/null 2>&1; then
             publish
           elif gh release create "$TAG" $files \
-                --target "$GITHUB_SHA" --title "Recetario" --notes-file "$RUNNER_TEMP/notes.md" 2>"$RUNNER_TEMP/create.err"; then
-            : # created fresh (android.yml will set the real "Recetario <version>" title if it runs too)
+                --target "$GITHUB_SHA" --title "$APP" --notes-file "$RUNNER_TEMP/notes.md" 2>"$RUNNER_TEMP/create.err"; then
+            : # created fresh (android.yml will set the real "<App> <version>" title if it runs too)
           elif grep -qi "already exists" "$RUNNER_TEMP/create.err"; then
             publish # lost the race: android.yml created it first
           else

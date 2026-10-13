@@ -42,7 +42,7 @@ Dependency direction `ui → logic`; platform pieces sit behind the interfaces i
 Time is minutes of the day (0..1439); results wrap modulo 1440. No date library.
 
 - Cycle = 90 min. Suggestions for `n` in `[6, 5, 4, 3, 2, 1]` (hours = `n * 1.5`).
-- Latency: minutes to fall asleep; invalid or negative input counts as 0.
+- Latency: minutes to fall asleep; invalid or negative input counts as 0; the range is 0..120 like the PWA input and above is capped.
 - Mode *wake at* (input = wake time): bedtime = `wake − (latency + n·90)`.
 - Mode *go to bed at* (input = bed time): wake time = `bed + latency + n·90`.
 - Age ranges (recommended hours): child 9–11, teen 8–10, adult 7–9, senior 7–8; unknown → adult.
@@ -55,9 +55,9 @@ Time is minutes of the day (0..1439); results wrap modulo 1440. No date library.
 
 - **Main (single screen):** `SegmentedChoice` for the mode (each with its own accent); time picker (AM/PM
   toggle when format is 12 h); *Sleep now* button; six cards, each with time, "n cycles · X h" and a
-  rating face. Hint line "1 cycle = 90 min · includes N min to fall asleep".
+  rating face. Results are live: no Calculate button, the cards update as the time changes. Hint line "1 cycle = 90 min · includes N min to fall asleep".
 - **Settings** (`SubScreen`, most-used first): age (`ChoiceDropdown`), time to fall asleep, 12/24 h,
-  theme, language ("System default" first; change recreates the activity on Android), version at the bottom.
+  theme, language ("System default" first; applied live, no activity recreation, as in Recetario), version at the bottom.
 - **How does it work?** a dialog.
 - **Rating faces** are drawn with `Canvas` (as the PWA draws SVG faces), not emoji: color emoji render
   badly on desktop JVM/Linux. Selected state never relies on color alone.

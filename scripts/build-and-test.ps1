@@ -7,8 +7,9 @@ much faster once it's warm; pass -NoDaemon for a CI-faithful cold run.
 Usage:
   .\scripts\build-and-test.ps1                    # build + test every Android app
   .\scripts\build-and-test.ps1 -App FuelLog        # just one app
-  .\scripts\build-and-test.ps1 -Desktop            # also run Recetario's :shared:desktopTest
-  .\scripts\build-and-test.ps1 -Package            # also build the Windows .msi installer
+  .\scripts\build-and-test.ps1 -Desktop            # also run :shared:desktopTest for every desktop app
+  .\scripts\build-and-test.ps1 -Package            # also build the Windows .msi for those apps
+  .\scripts\build-and-test.ps1 -Desktop -App SleepCycles   # desktop tests for just one
   .\scripts\build-and-test.ps1 -Install -App FuelLog  # also adb-install + launch on a running device/emulator
   .\scripts\build-and-test.ps1 -NoDaemon           # cold build, same flags CI uses
 #>
@@ -46,16 +47,23 @@ foreach ($a in $apps) {
     } finally { Pop-Location }
 }
 
+# Apps under android/ that have a desktop target (jvm("desktop") in their shared module).
+$desktopApps = @("Recetario", "SleepCycles")
+
 if ($Desktop -or $Package) {
-    Push-Location (Join-Path $PSScriptRoot "..\android\Recetario")
-    try {
-        if ($Desktop) {
-            Write-Host "`n=== Recetario : desktopTest ===" -ForegroundColor Cyan
-            if ($daemonFlag) { ./gradlew.bat :shared:desktopTest $daemonFlag } else { ./gradlew.bat :shared:desktopTest }
-        }
-        if ($Package) {
-            Write-Host "`n=== Recetario : packageMsi (Windows installer) ===" -ForegroundColor Cyan
-            if ($daemonFlag) { ./gradlew.bat :shared:packageMsi $daemonFlag } else { ./gradlew.bat :shared:packageMsi }
-        }
-    } finally { Pop-Location }
+    $targets = if ($App) { $desktopApps | Where-Object { $_ -eq $App } } else { $desktopApps }
+    if (-not $targets) { throw "-Desktop/-Package: '$App' has no desktop target (have: $($desktopApps -join ', '))" }
+    foreach ($t in $targets) {
+        Push-Location (Join-Path $PSScriptRoot "..\android\$t")
+        try {
+            if ($Desktop) {
+                Write-Host "`n=== $t : desktopTest ===" -ForegroundColor Cyan
+                if ($daemonFlag) { ./gradlew.bat :shared:desktopTest $daemonFlag } else { ./gradlew.bat :shared:desktopTest }
+            }
+            if ($Package) {
+                Write-Host "`n=== $t : packageMsi (Windows installer) ===" -ForegroundColor Cyan
+                if ($daemonFlag) { ./gradlew.bat :shared:packageMsi $daemonFlag } else { ./gradlew.bat :shared:packageMsi }
+            }
+        } finally { Pop-Location }
+    }
 }

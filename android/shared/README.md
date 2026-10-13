@@ -1,7 +1,7 @@
 # shared (`:pkgshared`)
 
 Common code for the Kotlin apps under `android/`: **multiplatform** (commonMain = plain Compose).
-Used by VozReves, FuelLog and Recetario. Has no Android resources: text is passed in from each app.
+Used by VozReves, FuelLog, Recetario and SleepCycles. Has no Android resources: text is passed in from each app.
 
 ## How to include it
 
