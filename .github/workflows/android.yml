@@ -223,7 +223,7 @@ jobs:
           publish() {
             new_names=$(basename -a apks/*.apk)
             gh release view "$TAG" --json assets -q '.assets[].name' 2>/dev/null \
-              | grep -E "^${APP}-android-.*\.apk\$" | while IFS= read -r old; do
+              | { grep -E "^${APP}-android-.*\.apk\$" || true; } | while IFS= read -r old; do
                   echo "$new_names" | grep -qx "$old" || gh release delete-asset "$TAG" "$old" --yes
                 done
             gh release upload "$TAG" apks/*.apk --clobber

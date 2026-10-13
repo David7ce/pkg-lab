@@ -196,7 +196,7 @@ jobs:
           publish() {
             new_names=$(basename -a $files)
             gh release view "$TAG" --json assets -q '.assets[].name' 2>/dev/null \
-              | grep -E '\.(msi|dmg)$|\.tar\.gz$' | while IFS= read -r old; do
+              | { grep -E '\.(msi|dmg)$|\.tar\.gz$' || true; } | while IFS= read -r old; do
                   echo "$new_names" | grep -qx "$old" || gh release delete-asset "$TAG" "$old" --yes
                 done
             gh release upload "$TAG" $files --clobber
