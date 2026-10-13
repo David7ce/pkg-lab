@@ -11,6 +11,10 @@ dependencyResolutionManagement {
         google()
         mavenCentral()
     }
+    // Shared by every app under android/ and android/shared (see android/gradle/libs.versions.toml).
+    versionCatalogs {
+        create("libs") { from(files("../gradle/libs.versions.toml")) }
+    }
 }
 
 rootProject.name = "Recetario"

@@ -28,7 +28,6 @@ on a first run.
 
 ```
 Recetario/
-├── gradle/libs.versions.toml     versions, checked 2026-10-12 (see "Dependencies")
 ├── sample-recipes/               starter recipe collection, importable as-is (see its README)
 ├── app/                          Android packaging only: id, version, signing, ABI splits, icon, manifest
 └── shared/                       all code (Kotlin Multiplatform library)
@@ -56,6 +55,9 @@ Dependency direction: `ui → data → logic → model`; `platform` interfaces a
 `platform/Services.kt` or in `PlatformUi` (pickers, saving files, opening links).
 
 ## Dependencies
+
+Versions are pinned in [`android/gradle/libs.versions.toml`](../gradle/libs.versions.toml), shared
+with FuelLog, VozReves and `android/shared`.
 
 | Dependency | Version | Why |
 |---|---|---|

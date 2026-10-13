@@ -49,12 +49,10 @@ private fun createAppState(): AppState {
         clock = System::currentTimeMillis,
     )
 
-    // A new database gets the latest schema. Upgrading an existing desktop database will need a
-    // migration step here when the schema changes (Android already has the migrations in androidMain).
+    // The schema-aware constructor creates a new database at the latest version, or migrates an
+    // existing older one through RecipeDatabase.Schema.migrate (same .sqm files Android uses).
     val dbFile = File(dataDir, "recetario.db")
-    val isNew = !dbFile.exists() // checked before opening: opening a SQLite file creates it
-    val driver = JdbcSqliteDriver("jdbc:sqlite:${dbFile.absolutePath}")
-    if (isNew) RecipeDatabase.Schema.create(driver)
+    val driver = JdbcSqliteDriver("jdbc:sqlite:${dbFile.absolutePath}", schema = RecipeDatabase.Schema)
     val database = RecipeDatabase(driver)
 
     val repository = RecipeRepository(database, services.images, services.clock, services.newId)

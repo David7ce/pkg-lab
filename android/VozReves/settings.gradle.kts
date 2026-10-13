@@ -11,10 +11,14 @@ dependencyResolutionManagement {
         google()
         mavenCentral()
     }
+    // Shared by every app under android/ and android/shared (see android/gradle/libs.versions.toml).
+    versionCatalogs {
+        create("libs") { from(files("../gradle/libs.versions.toml")) }
+    }
 }
 
 rootProject.name = "VozReves"
 include(":app")
-// Módulo compartido por todas las apps (android/shared).
+// Module shared by every app (android/shared).
 include(":pkgshared")
 project(":pkgshared").projectDir = file("../shared")

@@ -1,9 +1,9 @@
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
-    id("com.android.application")
-    id("org.jetbrains.kotlin.android")
-    id("org.jetbrains.kotlin.plugin.compose")
+    alias(libs.plugins.android.application)
+    alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.compose.compiler)
 }
 
 val targetAbi: String? = (findProperty("abi") as String?)?.takeIf { it != "universal" }
@@ -17,16 +17,17 @@ android {
         applicationId = "com.david7ce.vozreves"
         minSdk = 26
         targetSdk = 35
-        // En GitHub Actions el número de compilación sube solo, así cada APK actualiza a la anterior.
-        // ×10 + código de ABI para que las APKs por arquitectura no choquen entre sí.
+        // On GitHub Actions the build number keeps rising, so every APK updates over the last one.
+        // ×10 + ABI code so the per-architecture APKs don't collide with each other.
         val build = System.getenv("GITHUB_RUN_NUMBER")?.toIntOrNull() ?: 1
         versionCode = build * 10 + (abiCodes[targetAbi] ?: 0)
-        versionName = "1.0.$build"
-        // Solo los 5 idiomas de la app: quita las traducciones sobrantes de las librerías.
+        // Hand-bumped on meaningful changes; versionCode (above) is what makes every build installable.
+        versionName = "1.0"
+        // Only the app's 5 languages: drops the extra translations that come from libraries.
         resourceConfigurations += listOf("en", "es", "zh", "hi", "ar")
     }
 
-    // -Pabi=arm64-v8a | armeabi-v7a | universal (el workflow compila cada una en paralelo).
+    // -Pabi=arm64-v8a | armeabi-v7a | universal (the workflow builds each one in parallel).
     splits {
         abi {
             isEnable = targetAbi != null
@@ -65,19 +66,22 @@ android {
     kotlin { compilerOptions { jvmTarget.set(JvmTarget.JVM_17) } }
     buildFeatures { compose = true }
 
-    // APK más ligera: fuera metadatos que la app no usa en ejecución.
+    // Lighter APK: drop metadata the app doesn't use at runtime.
     packaging {
         resources.excludes += setOf("META-INF/*.version", "DebugProbesKt.bin", "kotlin-tooling-metadata.json")
     }
-    // Sin el bloque de dependencias cifrado de Google (no aporta nada fuera de Play; F-Droid lo pide).
+    // No Google's encrypted dependency block (adds nothing outside Play; F-Droid asks for its absence).
     dependenciesInfo {
         includeInApk = false
         includeInBundle = false
     }
+    testOptions {
+        unitTests.isIncludeAndroidResources = true // Robolectric needs real resources, not stubs
+    }
 }
 
 dependencies {
-    // Compose (runtime, ui, material3) llega desde :pkgshared (api, Compose Multiplatform 1.11.1).
+    // Compose (runtime, ui, material3) comes in through :pkgshared (api, Compose Multiplatform 1.11.1).
     implementation("androidx.compose.material:material-icons-core:1.7.8")
     implementation("androidx.activity:activity-compose:1.9.3")
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.7")
@@ -86,4 +90,10 @@ dependencies {
     implementation(project(":pkgshared"))
 
     testImplementation("junit:junit:4.13.2")
+    // Compose smoke tests on the JVM (no emulator): Robolectric hosts the Activity, ui-test-junit4
+    // drives it.
+    testImplementation("androidx.compose.ui:ui-test-junit4:1.7.8")
+    testImplementation("androidx.test.ext:junit:1.2.1")
+    testImplementation("org.robolectric:robolectric:4.16")
+    debugImplementation("androidx.compose.ui:ui-test-manifest:1.7.8")
 }

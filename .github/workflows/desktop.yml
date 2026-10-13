@@ -85,6 +85,10 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0 # full history, so the commit log below can reach an old release's commit
+
       - uses: actions/download-artifact@v5
         with:
           pattern: desktop-*
@@ -100,13 +104,27 @@ jobs:
           files=$(find dist -type f \( -name '*.msi' -o -name '*.tar.gz' -o -name '*.dmg' \))
           echo "::notice title=Installers::$(echo $files | tr '\n' ' ')"
           [ -n "$files" ] || { echo "::error::No installers to publish"; exit 1; }
-          cat > "$RUNNER_TEMP/notes.md" <<NOTES
-          Built automatically from ${GITHUB_SHA::7}.
 
-          - **.msi**: Windows (64-bit).
-          - **.tar.gz**: Linux (64-bit). Unpack and run `Recetario/bin/Recetario`. Includes Java, nothing to install.
-          - **.dmg**: macOS (Apple Silicon).
-          NOTES
+          # Commits since the last desktop release (none on a first-ever release).
+          prev=$(gh release view desktop-recetario-latest --json targetCommitish -q .targetCommitish 2>/dev/null || true)
+          log=""
+          if [ -n "$prev" ] && git cat-file -e "$prev^{commit}" 2>/dev/null; then
+            log=$(git log "$prev..$GITHUB_SHA" --oneline --no-decorate -- android/Recetario android/shared 2>/dev/null)
+          fi
+
+          {
+            echo "Built automatically from ${GITHUB_SHA::7}."
+            echo
+            echo "- **.msi**: Windows (64-bit)."
+            echo "- **.tar.gz**: Linux (64-bit). Unpack and run \`Recetario/bin/Recetario\`. Includes Java, nothing to install."
+            echo "- **.dmg**: macOS (Apple Silicon)."
+            if [ -n "$log" ]; then
+              echo
+              echo "Changes:"
+              echo "$log" | sed 's/^/- /'
+            fi
+          } > "$RUNNER_TEMP/notes.md"
+
           gh release delete desktop-recetario-latest --yes --cleanup-tag >/dev/null 2>&1 || true
           if ! out=$(gh release create desktop-recetario-latest $files \
                 --target "$GITHUB_SHA" \

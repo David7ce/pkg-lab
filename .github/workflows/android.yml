@@ -161,6 +161,10 @@ jobs:
       matrix:
         app: ${{ fromJson(needs.detect.outputs.apps) }}
     steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0 # full history, so the commit log below can reach an old release's commit
+
       - uses: actions/download-artifact@v5
         with:
           pattern: ${{ matrix.app }}-*
@@ -177,12 +181,28 @@ jobs:
           ls -lh apks
           # <App>-android-<version>-<abi>.apk → <version>
           version=$(ls apks/*.apk | head -1 | sed -E "s#.*/${APP}-android-(.*)-(arm64-v8a|armeabi-v7a|universal)\.apk#\1#")
+
+          # Commits since the last release of this app (none on a first-ever release for it).
+          prev=$(gh release view "$TAG" --json targetCommitish -q .targetCommitish 2>/dev/null || true)
+          log=""
+          if [ -n "$prev" ] && git cat-file -e "$prev^{commit}" 2>/dev/null; then
+            log=$(git log "$prev..$GITHUB_SHA" --oneline --no-decorate -- "android/$APP" "android/shared" 2>/dev/null)
+          fi
+
           gh release delete "$TAG" --yes --cleanup-tag || true
+          {
+            echo "Built automatically from ${GITHUB_SHA::7}."
+            echo
+            echo "- **…-arm64-v8a.apk**: most phones (64-bit)."
+            echo "- **…-armeabi-v7a.apk**: older 32-bit phones."
+            echo "- **…-universal.apk**: works on any of them."
+            if [ -n "$log" ]; then
+              echo
+              echo "Changes:"
+              echo "$log" | sed 's/^/- /'
+            fi
+          } > "$RUNNER_TEMP/notes.md"
           gh release create "$TAG" apks/*.apk \
             --target "$GITHUB_SHA" \
             --title "$APP ${version} (Android)" \
-            --notes "Built automatically from ${GITHUB_SHA::7}.
-
-          - **…-arm64-v8a.apk**: most phones (64-bit).
-          - **…-armeabi-v7a.apk**: older 32-bit phones.
-          - **…-universal.apk**: works on any of them."
+            --notes-file "$RUNNER_TEMP/notes.md"

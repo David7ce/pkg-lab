@@ -9,11 +9,13 @@ const val MAX_RELEASE_JSON_BYTES = 256 * 1024
 
 data class UpdateInfo(val version: String, val url: String)
 
-private val VERSION_IN_ASSET_NAME = Regex("""-(\d+\.\d+\.\d+)[-.]""")
+// Matches a run of 2+ dot-separated numbers: "1.0" (hand-set Android versionName) and
+// "1.0.42" (CI-run-number desktop packageVersion) alike.
+private val VERSION_IN_ASSET_NAME = Regex("""-(\d+(?:\.\d+)+)[-.]""")
 
 /**
  * Parses the JSON from GitHub's "get a release by tag" endpoint and compares the version baked
- * into its asset filenames (e.g. Recetario-android-1.0.42-arm64-v8a.apk, Recetario-1.0.42.msi)
+ * into its asset filenames (e.g. Recetario-android-1.0-arm64-v8a.apk, Recetario-1.0.42.msi)
  * against [currentVersion]. Null when nothing is parseable or nothing is newer.
  */
 fun parseUpdateCheck(releaseJson: String, currentVersion: String): UpdateInfo? {
@@ -28,9 +30,14 @@ fun parseUpdateCheck(releaseJson: String, currentVersion: String): UpdateInfo? {
     return UpdateInfo(version, htmlUrl)
 }
 
-/** "1.0.42" vs "1.0.7": compares the trailing CI run number numerically, not lexically. */
+/** Numeric, segment-by-segment comparison ("1.10" > "1.9", "2.0" > "1.9"), not lexical or last-segment-only. */
 private fun isNewer(remote: String, current: String): Boolean {
-    val r = remote.substringAfterLast('.').toIntOrNull() ?: return false
-    val c = current.substringAfterLast('.').toIntOrNull() ?: return false
-    return r > c
+    val r = remote.split('.').map { it.toIntOrNull() ?: return false }
+    val c = current.split('.').map { it.toIntOrNull() ?: return false }
+    for (i in 0 until maxOf(r.size, c.size)) {
+        val rv = r.getOrElse(i) { 0 }
+        val cv = c.getOrElse(i) { 0 }
+        if (rv != cv) return rv > cv
+    }
+    return false
 }

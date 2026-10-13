@@ -1,8 +1,11 @@
-# Versions checked on 2026-10-12 (latest stable unless noted).
+# Shared by every app under android/ (FuelLog, VozReves, Recetario) and android/shared, via
+# dependencyResolutionManagement.versionCatalogs in each app's settings.gradle.kts. Keeps the
+# versions that have to match for :pkgshared to compile (Kotlin, AGP, Compose Multiplatform,
+# Material3) in one place instead of 4. Checked 2026-10-12 (latest stable unless noted).
 [versions]
 agp = "8.13.2"                 # last 8.x; the KMP + com.android.library layout below needs AGP 8
 kotlin = "2.4.21"
-compose = "1.11.1"             # Compose Multiplatform. 1.12 needs compileSdk 37 → AGP 9 (see README)
+compose = "1.11.1"             # Compose Multiplatform. 1.12 needs compileSdk 37 → AGP 9 (see Recetario's README)
 material3 = "1.9.0"            # last stable multiplatform Material 3 (1.10+ are alpha)
 sqldelight = "2.4.1"
 serialization = "1.11.0"
@@ -28,6 +31,7 @@ jna-platform = { module = "net.java.dev.jna:jna-platform", version.ref = "jna" }
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 android-library = { id = "com.android.library", version.ref = "agp" }
+kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 compose-multiplatform = { id = "org.jetbrains.compose", version.ref = "compose" }

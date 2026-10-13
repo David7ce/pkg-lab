@@ -1,9 +1,9 @@
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
-    id("com.android.application")
-    id("org.jetbrains.kotlin.android")
-    id("org.jetbrains.kotlin.plugin.compose")
+    alias(libs.plugins.android.application)
+    alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.compose.compiler)
 }
 
 // -Pabi=arm64-v8a | armeabi-v7a | universal (the CI workflow builds each one in parallel).
@@ -21,7 +21,8 @@ android {
         // CI run number ×10 + ABI code: every build installs over the previous one.
         val build = System.getenv("GITHUB_RUN_NUMBER")?.toIntOrNull() ?: 1
         versionCode = build * 10 + (abiCodes[targetAbi] ?: 0)
-        versionName = "1.0.$build"
+        // Hand-bumped on meaningful changes; versionCode (above) is what makes every build installable.
+        versionName = "1.0"
         resourceConfigurations += listOf("en", "es", "fr", "de", "pt", "zh", "hi", "ar")
     }
 
@@ -69,6 +70,9 @@ android {
         includeInApk = false
         includeInBundle = false
     }
+    testOptions {
+        unitTests.isIncludeAndroidResources = true // Robolectric needs real resources, not stubs
+    }
 }
 
 dependencies {
@@ -84,4 +88,10 @@ dependencies {
     // Tests only (not shipped): JUnit, and the real org.json so backup parsing runs on the JVM.
     testImplementation("junit:junit:4.13.2")
     testImplementation("org.json:json:20240303")
+    // Compose smoke tests on the JVM (no emulator): Robolectric hosts the Activity, ui-test-junit4
+    // drives it.
+    testImplementation("androidx.compose.ui:ui-test-junit4:1.7.8")
+    testImplementation("androidx.test.ext:junit:1.2.1")
+    testImplementation("org.robolectric:robolectric:4.16")
+    debugImplementation("androidx.compose.ui:ui-test-manifest:1.7.8")
 }

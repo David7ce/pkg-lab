@@ -47,52 +47,40 @@ code:
   depends on the CI run-number versioning scheme (#4) staying monotonic per workflow; if that's
   ever replaced with hand-set semantic versions, `isNewer()` in `UpdateCheck.kt` needs to compare
   on the full version, not just the trailing number.
+- **#1 — Shared version catalog.** One `android/gradle/libs.versions.toml` now, referenced by all
+  three apps' `settings.gradle.kts` via `dependencyResolutionManagement.versionCatalogs`, and by
+  `android/shared/build.gradle.kts` (Compose deps are now `libs.compose.*` instead of hardcoded
+  strings). Verified by building and testing all three apps plus the desktop target individually.
+- **#3 — Desktop DB migrations.** `DesktopMain.kt`'s `createAppState()` now uses
+  `JdbcSqliteDriver`'s schema-aware constructor (`JdbcSqliteDriver(url, schema = Schema)`), which
+  creates a fresh database at the latest version or migrates an existing one through
+  `RecipeDatabase.Schema.migrate` — the same `.sqm` files Android already uses. No more manual
+  `isNew` check.
+- **#4 — Meaningful `versionName` + release notes, with a caveat.** Each Android app's
+  `versionName` is now a hand-set string (starting at `"1.0"`); `versionCode` is untouched (still
+  CI-run-number-based — that's what makes every build installable, not `versionName`). **Desktop's
+  `packageVersion` was deliberately left as the CI-run-number scheme**: on Windows/macOS, that
+  version number is also what the installer uses to detect an upgrade, so freezing it between hand
+  bumps would make consecutive CI builds collide instead of cleanly upgrading. `UpdateCheck.kt`'s
+  `isNewer()` was rewritten to compare version tuples segment-by-segment (so "2.0" correctly beats
+  "1.9" — a trailing-segment-only compare would have gotten that backwards) and its regex now
+  accepts both 2-part ("1.0") and 3-part ("1.0.42") versions. `android.yml`/`desktop.yml` now add a
+  commit-log section to each release's notes (commits since that app's last release, scoped to its
+  own paths) — this part is reasoned through carefully and YAML-validated, but **not live-tested**
+  against the real `gh` CLI/API, since that needs an actual push to `main`. Worth watching the next
+  real release for this specifically.
+- **#2 — Smoke tests, Robolectric on the JVM.** One Compose smoke test per app (`MainActivitySmokeTest`
+  for FuelLog/VozReves, `MainScreenSmokeTest` for Recetario), running in the existing
+  `testDebugUnitTest` step — no CI changes, no emulator. Recetario's needed the real
+  `AndroidSqliteDriver` instead of the JVM JDBC one the other repository tests use: `DriverManager`'s
+  driver auto-registration doesn't cross Robolectric's sandboxed classloader. All three verified
+  green locally; Compose-on-Robolectric is still less battle-tested than a real device, so a
+  real-device sanity check is worth doing before leaning on these heavily.
 
 ## Improvements worth doing
 
 Ranked by how concrete and repo-wide the payoff is — not a generic best-practices checklist.
-
-### 1. Version numbers live in 4 places by hand
-`android/Recetario` uses a Gradle version catalog (`gradle/libs.versions.toml`). FuelLog and
-VozReves hardcode the same Kotlin/AGP versions directly in their root `build.gradle.kts`, and
-`android/shared/build.gradle.kts` hardcodes its own Compose/Material3 versions again. The README
-already states the rule ("las apps deben usar la misma versión para poder compartir el módulo")
-but nothing enforces it — a future Compose bump means editing 4 files and hoping none is missed.
-- **Fix:** one `gradle/libs.versions.toml` at the repo root (or in `android/shared`, included via
-  `dependencyResolutionManagement` from each app's `settings.gradle.kts`), referenced by all three
-  apps and `shared`. Mechanical change, no behavior change — low risk, worth doing before the next
-  version bump rather than during one.
-
-### 2. No instrumented/UI tests anywhere
-All three apps test `logic/`/`data/` on the JVM only (confirmed: no `androidTest` directory in the
-repo). That's the right call for pure logic, but screen-level regressions (a dialog that doesn't
-open, a button that's unreachable after a refactor) aren't caught by CI and rely on the manual
-"test on a real phone before calling it good" note in VozReves's README.
-- **Fix, scoped:** not a full Compose UI test suite (that's real ongoing cost for a solo-maintainer
-  lab). A handful of `createAndroidComposeRule` smoke tests per app — app launches, main screen
-  renders, one add/edit/delete round-trip — would catch the regressions that actually happen
-  (crash on launch, broken navigation) without chasing full coverage.
-
-### 3. Desktop (Recetario) has no DB migration path
-Per its own README: "Migraciones de esquema de la base de datos de escritorio (hoy solo se crea la
-base nueva)." Android has versioned `.sqm` migrations (v1→v2→v3); desktop does not. Harmless today
-(schema v3, no desktop users yet with old data), but it's the kind of gap that's cheap to close
-*before* the first desktop schema change ships, and expensive to retrofit after users have data on
-disk.
-- **Fix:** point `desktopMain`'s SQLDelight driver at the same `.sqm` migration files Android
-  already has (they're schema-only, not Android-specific) instead of "create new" — likely a small
-  diff since the migrations already exist.
-
-### 4. `versionName` isn't meaningful
-Every app sets `versionName = "1.0.$build"` where `$build` is the CI run number. It satisfies
-Android's "must increase to update" requirement, but it means nothing to a user reading
-Settings/About, and GitHub Releases notes just say "compilada desde \<sha\>" — there's no changelog
-connecting a version number to what changed.
-- **Fix, cheap:** keep the CI-run-number scheme for `versionCode` (it works, don't touch it), but
-  let each app set a real `versionName` (e.g. `"1.2"`) bumped by hand on meaningful changes, and
-  add one line to the release notes step in `android.yml`/`desktop.yml` that surfaces the commits
-  since the last release tag (`git log <last-tag>..HEAD --oneline`). Skip a full CHANGELOG.md —
-  the git log already is a changelog for a repo this size; just surface it at release time.
+(#1–#4 from the original list are done — see "Shipped since this was written" above.)
 
 ### 5. Signing secret has a single point of failure
 The README itself flags this ("sin la contraseña... no podrán actualizarse"): one
@@ -116,16 +104,13 @@ actually been done, since every installed APK depends on it.
 ## Roadmap
 
 Grouped by effort, not calendar dates (solo maintainer, CI-only — "when there's time" is the real
-schedule). Items reference the numbered improvements above.
+schedule).
 
-**Next (cheap, do before the next version-sensitive change):**
-- Shared version catalog (#1) — do this *before* the next Compose/AGP bump, not during.
-- Desktop DB migrations (#3) — do this *before* Recetario's next schema change (v4), while it's
-  still free of real desktop user data.
-
-**Soon (adds real safety, moderate effort):**
-- A few Compose smoke tests per app (#2).
-- Meaningful `versionName` + commit-log release notes (#4).
+**Next (cheap):**
+- Confirm `ANDROID_KEYSTORE_PASSWORD` is actually saved in a password manager (#5) — the one open
+  item from the original list; everything else on it (#1–#4) is done.
+- Watch the first real release after the git-log release-notes change (#4) — reasoned through and
+  YAML-validated, not live-tested against the real `gh` CLI.
 
 **Per-app items already tracked, not repeated here:**
 - Recetario desktop: EXIF rotation, keyboard shortcuts (Esc/Alt+←), PDF export via PDFBox.

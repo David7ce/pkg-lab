@@ -19,7 +19,8 @@ android {
         // CI run number ×10 + ABI code: every build installs over the previous one.
         val build = System.getenv("GITHUB_RUN_NUMBER")?.toIntOrNull() ?: 1
         versionCode = build * 10 + (abiCodes[targetAbi] ?: 0)
-        versionName = "1.0.$build"
+        // Hand-bumped on meaningful changes; versionCode (above) is what makes every build installable.
+        versionName = "1.0"
     }
 
     androidResources {

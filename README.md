@@ -8,6 +8,7 @@ pkg-lab/
 ├── .github/workflows/
 │   └── android.yml        ← builds everything under android/
 ├── android/
+│   ├── gradle/libs.versions.toml  ← versions shared by every app below and android/shared
 │   ├── shared/            ← common module (Kotlin Multiplatform, Compose): shared UI components
 │   ├── VozReves/          ← each app is its own independent Gradle project
 │   ├── FuelLog/           ← fuel refill and consumption tracker
@@ -30,8 +31,10 @@ pkg-lab/
   sub-screens and common text. Every app includes it and shares the same UX behavior; only
   colors, icon and app-specific features differ. Changes in that folder rebuild every app. Details and how to
   include it in `android/shared/README.md`.
-- **Common versions:** Kotlin 2.4.21, Compose Multiplatform 1.11.1 (Material 3 1.9.0), AGP 8.13.2, Gradle 8.14.3,
-  compileSdk 36, minSdk 26. Apps must use the same version to be able to share the module.
+- **Common versions:** kept in one place, [`android/gradle/libs.versions.toml`](android/gradle/libs.versions.toml)
+  (Kotlin, AGP, Compose Multiplatform, Material3…), referenced by every app's `settings.gradle.kts`.
+  Gradle itself is pinned per app's `gradle/wrapper/gradle-wrapper.properties` (currently 8.14.3);
+  compileSdk 36, minSdk 26. Apps must use the same versions to be able to share the module.
 - **Building:** every push to `main` builds only the apps that changed. Also by hand from
   *Actions → Android → Run workflow* (type the folder name, or leave it empty for all of them).
 - **Downloading:** *Releases → `android-<AppName>-latest`*. Each app builds in parallel for

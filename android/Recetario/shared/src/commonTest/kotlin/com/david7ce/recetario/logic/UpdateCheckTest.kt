@@ -35,4 +35,18 @@ class UpdateCheckTest {
         val json = releaseJson(listOf("Recetario-linux-x64.tar.gz"))
         assertNull(parseUpdateCheck(json, currentVersion = "1.0.1"))
     }
+
+    @Test
+    fun handSetTwoPartVersionAlsoParses() {
+        val json = releaseJson(listOf("Recetario-android-1.1-universal.apk"))
+        assertEquals("1.1", parseUpdateCheck(json, currentVersion = "1.0")?.version)
+        assertNull(parseUpdateCheck(json, currentVersion = "1.1"))
+    }
+
+    @Test
+    fun majorVersionBumpBeatsATrailingSegmentThatLooksSmaller() {
+        // A naive "compare the last segment" check would wrongly see "0" < "9" here.
+        val json = releaseJson(listOf("Recetario-android-2.0-universal.apk"))
+        assertEquals("2.0", parseUpdateCheck(json, currentVersion = "1.9")?.version)
+    }
 }

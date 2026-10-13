@@ -75,6 +75,12 @@ kotlin {
             dependencies {
                 // Real SQLite on the JVM, so repository and backup tests run against the actual schema.
                 implementation(libs.sqldelight.sqlite.driver)
+                // Compose smoke test on the JVM (no emulator): Robolectric hosts it, ui-test-junit4
+                // drives it, ui-test-manifest supplies the host activity createComposeRule() needs.
+                implementation("androidx.compose.ui:ui-test-junit4:1.7.8")
+                implementation("androidx.compose.ui:ui-test-manifest:1.7.8")
+                implementation("androidx.test.ext:junit:1.2.1")
+                implementation("org.robolectric:robolectric:4.16")
             }
         }
     }
@@ -84,6 +90,9 @@ android {
     namespace = "com.david7ce.recetario.shared"
     compileSdk = 36
     defaultConfig { minSdk = 26 }
+    testOptions {
+        unitTests.isIncludeAndroidResources = true // Robolectric needs real resources, not stubs
+    }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
