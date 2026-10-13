@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">SleepCycles</string>
+    <string name="shortcut_sleep_now">Sleep now</string>
+</resources>

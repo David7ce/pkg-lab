@@ -1,0 +1,4 @@
+<resources>
+    <!-- Window theme only; colours come from Compose (SleepCyclesTheme). -->
+    <style name="Theme.SleepCycles" parent="android:Theme.Material.Light.NoActionBar" />
+</resources>

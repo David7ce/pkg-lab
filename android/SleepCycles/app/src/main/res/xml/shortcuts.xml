@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shortcuts xmlns:android="http://schemas.android.com/apk/res/android">
+    <shortcut
+        android:shortcutId="sleep_now"
+        android:enabled="true"
+        android:icon="@mipmap/ic_launcher"
+        android:shortcutShortLabel="@string/shortcut_sleep_now"
+        android:shortcutLongLabel="@string/shortcut_sleep_now">
+        <intent
+            android:action="com.david7ce.sleepcycles.SLEEP_NOW"
+            android:targetPackage="com.david7ce.sleepcycles"
+            android:targetClass="com.david7ce.sleepcycles.platform.MainActivity" />
+    </shortcut>
+</shortcuts>
