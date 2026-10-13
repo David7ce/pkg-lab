@@ -1,5 +1,6 @@
 package com.david7ce.recetario.ui
 
+import com.david7ce.shared.ui.SharedIcons
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -78,7 +79,7 @@ fun LibraryScreen(app: AppState) {
             TopAppBar(
                 title = { Text(s.appName) },
                 actions = {
-                    IconButton(onClick = app::openSettings) { Icon(AppIcons.Settings, contentDescription = s.settings) }
+                    IconButton(onClick = app::openSettings) { Icon(SharedIcons.Settings, contentDescription = s.settings) }
                 },
             )
         },
@@ -92,18 +93,18 @@ fun LibraryScreen(app: AppState) {
                 !app.loaded -> Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { CircularProgressIndicator() }
                 app.recipes.isEmpty() -> MessageState(s.emptyTitle, s.emptyBody) {
                     Button(onClick = app::newRecipe) {
-                        Icon(AppIcons.Edit, contentDescription = null, modifier = Modifier.size(18.dp))
+                        Icon(SharedIcons.Edit, contentDescription = null, modifier = Modifier.size(18.dp))
                         Spacer(Modifier.width(8.dp))
                         Text(s.addManually)
                     }
                     OutlinedButton(onClick = app::newFromUrl) {
-                        Icon(AppIcons.Link, contentDescription = null, modifier = Modifier.size(18.dp))
+                        Icon(SharedIcons.Link, contentDescription = null, modifier = Modifier.size(18.dp))
                         Spacer(Modifier.width(8.dp))
                         Text(s.importFromUrl)
                     }
                 }
                 visible.isEmpty() -> MessageState(s.noMatches, null) {
-                    IconTextButton(s.clearFilters, AppIcons.Reset, onClick = { app.query = query.cleared() })
+                    IconTextButton(s.clearFilters, SharedIcons.Reset, onClick = { app.query = query.cleared() })
                 }
                 else -> LazyVerticalGrid(
                     columns = GridCells.Adaptive(160.dp),
@@ -133,7 +134,7 @@ private fun UpdateBanner(info: UpdateInfo, app: AppState) {
         Row(Modifier.padding(start = 16.dp), verticalAlignment = Alignment.CenterVertically) {
             Text(s.updateAvailable(info.version), style = MaterialTheme.typography.bodyMedium, modifier = Modifier.weight(1f))
             TextButton(onClick = { platform.openUrl(info.url) }) { Text(s.viewUpdate) }
-            IconButton(onClick = app::dismissUpdate) { Icon(AppIcons.Close, contentDescription = s.close) }
+            IconButton(onClick = app::dismissUpdate) { Icon(SharedIcons.Close, contentDescription = s.close) }
         }
     }
 }
@@ -151,11 +152,11 @@ private fun SearchRow(app: AppState, query: LibraryQuery, openFilters: () -> Uni
             value = query.text,
             onValueChange = { app.query = query.copy(text = it) },
             placeholder = { Text(s.searchHint, maxLines = 1, overflow = TextOverflow.Ellipsis) },
-            leadingIcon = { Icon(AppIcons.Search, contentDescription = null) },
+            leadingIcon = { Icon(SharedIcons.Search, contentDescription = null) },
             trailingIcon = {
                 if (query.text.isNotEmpty()) {
                     IconButton(onClick = { app.query = query.copy(text = "") }) {
-                        Icon(AppIcons.Close, contentDescription = s.clearSearch)
+                        Icon(SharedIcons.Close, contentDescription = s.clearSearch)
                     }
                 }
             },
@@ -166,7 +167,7 @@ private fun SearchRow(app: AppState, query: LibraryQuery, openFilters: () -> Uni
         )
         IconButton(onClick = openFilters) {
             BadgedBox(badge = { if (query.panelFilterCount > 0) Badge { Text("${query.panelFilterCount}") } }) {
-                Icon(AppIcons.Filter, contentDescription = s.filters)
+                Icon(SharedIcons.Filter, contentDescription = s.filters)
             }
         }
         IconToggleButton(
@@ -174,7 +175,7 @@ private fun SearchRow(app: AppState, query: LibraryQuery, openFilters: () -> Uni
             onCheckedChange = { app.query = query.copy(favoritesOnly = it) },
         ) {
             Icon(
-                if (query.favoritesOnly) AppIcons.Favorite else AppIcons.FavoriteOutline,
+                if (query.favoritesOnly) SharedIcons.Favorite else SharedIcons.FavoriteOutline,
                 contentDescription = s.favoritesOnly,
                 tint = if (query.favoritesOnly) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
             )
@@ -190,15 +191,15 @@ private fun AddMenuButton(app: AppState) {
     Box {
         ExtendedFloatingActionButton(
             onClick = { open = true },
-            icon = { Icon(AppIcons.Add, contentDescription = null) },
+            icon = { Icon(SharedIcons.Add, contentDescription = null) },
             text = { Text(s.addRecipe) },
         )
         DropdownMenu(expanded = open, onDismissRequest = { open = false }) {
-            MenuItem(s.addManually, AppIcons.Edit) {
+            MenuItem(s.addManually, SharedIcons.Edit) {
                 open = false
                 app.newRecipe()
             }
-            MenuItem(s.importFromUrl, AppIcons.Link) {
+            MenuItem(s.importFromUrl, SharedIcons.Link) {
                 open = false
                 app.newFromUrl()
             }
@@ -216,24 +217,24 @@ private fun FilterSheet(app: AppState, onClose: () -> Unit) {
     ModalBottomSheet(onDismissRequest = onClose) {
         Column(Modifier.padding(horizontal = 24.dp).padding(bottom = 32.dp).verticalScroll(rememberScrollState())) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(AppIcons.Filter, contentDescription = null)
+                Icon(SharedIcons.Filter, contentDescription = null)
                 Spacer(Modifier.width(12.dp))
                 Text(s.filters, style = MaterialTheme.typography.titleLarge, modifier = Modifier.weight(1f))
-                if (query.isFiltering) IconTextButton(s.clearFilters, AppIcons.Reset, onClick = { app.query = query.cleared() })
+                if (query.isFiltering) IconTextButton(s.clearFilters, SharedIcons.Reset, onClick = { app.query = query.cleared() })
             }
 
-            SectionTitle(s.sort, icon = AppIcons.Sort)
+            SectionTitle(s.sort, icon = SharedIcons.Sort)
             Column(Modifier.selectableGroup()) {
                 listOf(
-                    Triple(SortOrder.Modified, s.sortByModified, AppIcons.Clock),
-                    Triple(SortOrder.Name, s.sortByName, AppIcons.Sort),
-                    Triple(SortOrder.Rating, s.sortByRating, AppIcons.Star),
+                    Triple(SortOrder.Modified, s.sortByModified, SharedIcons.Clock),
+                    Triple(SortOrder.Name, s.sortByName, SharedIcons.Sort),
+                    Triple(SortOrder.Rating, s.sortByRating, SharedIcons.Star),
                 ).forEach { (order, label, icon) ->
                     OptionRow(label, icon, selected = query.sort == order) { app.query = query.copy(sort = order) }
                 }
             }
 
-            SectionTitle(s.minRating, icon = AppIcons.Star)
+            SectionTitle(s.minRating, icon = SharedIcons.Star)
             FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 (0..5).forEach { stars ->
                     FilterChip(
@@ -241,7 +242,7 @@ private fun FilterSheet(app: AppState, onClose: () -> Unit) {
                         onClick = { app.query = query.copy(minRating = stars) },
                         label = { Text(if (stars == 0) s.anyRating else "$stars+") },
                         leadingIcon = if (stars > 0) {
-                            { Icon(AppIcons.Star, contentDescription = null, modifier = Modifier.size(18.dp)) }
+                            { Icon(SharedIcons.Star, contentDescription = null, modifier = Modifier.size(18.dp)) }
                         } else {
                             null
                         },
@@ -250,7 +251,7 @@ private fun FilterSheet(app: AppState, onClose: () -> Unit) {
             }
 
             if (allTags.isNotEmpty()) {
-                SectionTitle(s.tags, icon = AppIcons.Label)
+                SectionTitle(s.tags, icon = SharedIcons.Label)
                 val selected = query.tags.map(TextUtil::fold).toSet()
                 FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     allTags.forEach { tag ->
@@ -267,7 +268,7 @@ private fun FilterSheet(app: AppState, onClose: () -> Unit) {
                             },
                             label = { Text(tag) },
                             leadingIcon = if (isOn) {
-                                { Icon(AppIcons.Check, contentDescription = null, modifier = Modifier.size(18.dp)) }
+                                { Icon(SharedIcons.Check, contentDescription = null, modifier = Modifier.size(18.dp)) }
                             } else {
                                 null
                             },
@@ -310,7 +311,7 @@ private fun RecipeCard(app: AppState, recipe: Recipe) {
                         modifier = Modifier.align(Alignment.TopEnd).padding(6.dp),
                     ) {
                         Icon(
-                            AppIcons.Favorite,
+                            SharedIcons.Favorite,
                             contentDescription = null,
                             tint = MaterialTheme.colorScheme.primary,
                             modifier = Modifier.padding(4.dp).size(18.dp),
@@ -329,7 +330,7 @@ private fun RecipeCard(app: AppState, recipe: Recipe) {
                 recipe.totalMinutes?.let { minutes ->
                     Row(Modifier.padding(top = 4.dp), verticalAlignment = Alignment.CenterVertically) {
                         Icon(
-                            AppIcons.Clock,
+                            SharedIcons.Clock,
                             contentDescription = null,
                             modifier = Modifier.size(14.dp),
                             tint = MaterialTheme.colorScheme.onSurfaceVariant,

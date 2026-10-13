@@ -1,5 +1,6 @@
 package com.david7ce.recetario.ui
 
+import com.david7ce.shared.ui.SharedIcons
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -71,7 +72,7 @@ fun RecipeImage(
 }
 
 @Composable
-fun BackButton(app: AppState, icon: ImageVector = AppIcons.Back) {
+fun BackButton(app: AppState, icon: ImageVector = SharedIcons.ArrowBack) {
     IconButton(onClick = app::back) { Icon(icon, contentDescription = LocalStrings.current.back) }
 }
 
@@ -117,7 +118,7 @@ fun StarRating(rating: Int?, modifier: Modifier = Modifier, starSize: Dp = 16.dp
     Row(modifier, verticalAlignment = Alignment.CenterVertically) {
         for (star in 1..5) {
             val filled = star <= value
-            val icon = if (filled) AppIcons.Star else AppIcons.StarOutline
+            val icon = if (filled) SharedIcons.Star else SharedIcons.StarOutline
             val tint = if (filled) MaterialTheme.colorScheme.tertiary else MaterialTheme.colorScheme.outline
             if (onRate != null) {
                 IconButton(onClick = { onRate(star) }) {

@@ -1,5 +1,6 @@
 package com.david7ce.recetario.ui
 
+import com.david7ce.shared.ui.SharedIcons
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -42,10 +43,10 @@ fun CookingScreen(app: AppState, screen: Screen.Cooking) {
         topBar = {
             TopAppBar(
                 title = { Text(recipe.title, maxLines = 1, overflow = TextOverflow.Ellipsis) },
-                navigationIcon = { BackButton(app, AppIcons.Close) },
+                navigationIcon = { BackButton(app, SharedIcons.Close) },
                 actions = {
                     IconButton(onClick = { screen.showIngredients = true }) {
-                        Icon(AppIcons.Checklist, contentDescription = s.ingredients)
+                        Icon(SharedIcons.Checklist, contentDescription = s.ingredients)
                     }
                 },
             )
@@ -74,7 +75,7 @@ fun CookingScreen(app: AppState, screen: Screen.Cooking) {
                         enabled = step > 0,
                         modifier = Modifier.weight(1f).heightIn(min = 56.dp),
                     ) {
-                        Icon(AppIcons.Previous, contentDescription = null)
+                        Icon(SharedIcons.Previous, contentDescription = null)
                         Text(s.previous)
                     }
                     Button(
@@ -82,7 +83,7 @@ fun CookingScreen(app: AppState, screen: Screen.Cooking) {
                         modifier = Modifier.weight(1f).heightIn(min = 56.dp),
                     ) {
                         Text(if (step < total - 1) s.next else s.finish)
-                        Icon(if (step < total - 1) AppIcons.Next else AppIcons.Check, contentDescription = null)
+                        Icon(if (step < total - 1) SharedIcons.Next else SharedIcons.Check, contentDescription = null)
                     }
                 }
             }
@@ -93,7 +94,7 @@ fun CookingScreen(app: AppState, screen: Screen.Cooking) {
         ModalBottomSheet(onDismissRequest = { screen.showIngredients = false }) {
             val shown = Quantities.scale(recipe.ingredients, screen.factor)
             Column(Modifier.padding(horizontal = 24.dp).padding(bottom = 32.dp).verticalScroll(rememberScrollState())) {
-                SectionTitle(s.ingredients, icon = AppIcons.Checklist)
+                SectionTitle(s.ingredients, icon = SharedIcons.Checklist)
                 val details = listOfNotNull(
                     recipe.servings?.let { "${s.servings}: ${Quantities.format(it * screen.factor, s.decimalSeparator)}" },
                     s.scaledBy(Quantities.format(screen.factor, s.decimalSeparator)).takeIf { screen.factor != 1.0 },

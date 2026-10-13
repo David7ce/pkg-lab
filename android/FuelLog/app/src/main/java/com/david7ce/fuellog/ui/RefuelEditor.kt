@@ -2,6 +2,7 @@
 
 package com.david7ce.fuellog.ui
 
+import com.david7ce.shared.ui.SharedIcons
 import android.content.Intent
 import android.net.Uri
 import android.text.format.DateFormat as AndroidDateFormat
@@ -196,7 +197,7 @@ fun RefuelEditor(vm: AppViewModel, form: RefuelForm, formats: Formats, showMessa
             SwitchRow(R.string.missed_previous, R.string.missed_previous_hint, form.missedPrevious) { update(form.copy(missedPrevious = it)) }
 
             LocationRow(form.location, onPick = { pickingLocation = true }, onClear = { update(form.copy(location = null)) })
-            Field(form.notes, { update(form.copy(notes = it)) }, R.string.notes, singleLine = false, capitalize = true, icon = AppIcons.Notes)
+            Field(form.notes, { update(form.copy(notes = it)) }, R.string.notes, singleLine = false, capitalize = true, icon = SharedIcons.Notes)
 
             vm.summary.byEndId[form.id]?.let {
                 Text(
@@ -274,7 +275,7 @@ private fun LocationRow(location: GeoPoint?, onPick: () -> Unit, onClear: () -> 
     val context = LocalContext.current
     Row(verticalAlignment = Alignment.CenterVertically) {
         OutlinedButton(onClick = onPick, modifier = Modifier.weight(1f)) {
-            Icon(if (location == null) AppIcons.Map else Icons.Filled.Place, null)
+            Icon(if (location == null) SharedIcons.Map else Icons.Filled.Place, null)
             Spacer(Modifier.width(8.dp))
             Text(location?.format() ?: stringResource(R.string.add_location), maxLines = 1)
         }
@@ -282,7 +283,7 @@ private fun LocationRow(location: GeoPoint?, onPick: () -> Unit, onClear: () -> 
             IconButton(onClick = {
                 val uri = Uri.parse("geo:${location.lat},${location.lon}?q=${location.lat},${location.lon}")
                 runCatching { context.startActivity(Intent(Intent.ACTION_VIEW, uri)) }
-            }) { Icon(AppIcons.Map, stringResource(R.string.open_in_maps)) }
+            }) { Icon(SharedIcons.Map, stringResource(R.string.open_in_maps)) }
             IconButton(onClick = onClear) { Icon(Icons.Filled.Close, stringResource(R.string.remove_location)) }
         }
     }

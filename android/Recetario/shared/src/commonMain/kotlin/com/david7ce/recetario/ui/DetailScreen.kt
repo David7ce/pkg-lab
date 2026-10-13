@@ -1,5 +1,6 @@
 package com.david7ce.recetario.ui
 
+import com.david7ce.shared.ui.SharedIcons
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -66,12 +67,12 @@ fun DetailScreen(app: AppState, screen: Screen.Detail) {
                 actions = {
                     IconButton(onClick = { app.toggleFavorite(recipe.id) }) {
                         Icon(
-                            if (recipe.favorite) AppIcons.Favorite else AppIcons.FavoriteOutline,
+                            if (recipe.favorite) SharedIcons.Favorite else SharedIcons.FavoriteOutline,
                             contentDescription = if (recipe.favorite) s.removeFavorite else s.addFavorite,
                             tint = if (recipe.favorite) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
                         )
                     }
-                    IconButton(onClick = { app.edit(recipe.id) }) { Icon(AppIcons.Edit, contentDescription = s.edit) }
+                    IconButton(onClick = { app.edit(recipe.id) }) { Icon(SharedIcons.Edit, contentDescription = s.edit) }
                     DetailMenu(app, recipe, screen)
                 },
             )
@@ -80,7 +81,7 @@ fun DetailScreen(app: AppState, screen: Screen.Detail) {
             if (recipe.steps.isNotEmpty()) {
                 ExtendedFloatingActionButton(
                     onClick = { app.startCooking(recipe.id, factor) },
-                    icon = { Icon(AppIcons.Play, contentDescription = null) },
+                    icon = { Icon(SharedIcons.Play, contentDescription = null) },
                     text = { Text(s.startCooking) },
                 )
             }
@@ -106,9 +107,9 @@ fun DetailScreen(app: AppState, screen: Screen.Detail) {
                 if (recipe.tags.isNotEmpty()) Tags(recipe.tags)
 
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    SectionTitle(s.ingredients, Modifier.weight(1f), icon = AppIcons.Checklist)
+                    SectionTitle(s.ingredients, Modifier.weight(1f), icon = SharedIcons.Checklist)
                     if (recipe.ingredients.any { it.quantity != null }) {
-                        IconTextButton(s.adjustQuantities, AppIcons.Tune, onClick = { screen.showAdjust = true }, modifier = Modifier.padding(top = 12.dp))
+                        IconTextButton(s.adjustQuantities, SharedIcons.Tune, onClick = { screen.showAdjust = true }, modifier = Modifier.padding(top = 12.dp))
                     }
                 }
                 if (factor != 1.0) {
@@ -119,7 +120,7 @@ fun DetailScreen(app: AppState, screen: Screen.Detail) {
                                 style = MaterialTheme.typography.labelLarge,
                                 modifier = Modifier.weight(1f),
                             )
-                            IconTextButton(s.originalQuantities, AppIcons.Reset, onClick = { screen.factor = 1.0 })
+                            IconTextButton(s.originalQuantities, SharedIcons.Reset, onClick = { screen.factor = 1.0 })
                         }
                     }
                     Spacer(Modifier.height(8.dp))
@@ -128,17 +129,17 @@ fun DetailScreen(app: AppState, screen: Screen.Detail) {
                 if (shown.isEmpty()) Text(s.noIngredients, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 shown.forEach { IngredientRow(it, s) }
 
-                SectionTitle(s.steps, icon = AppIcons.Play)
+                SectionTitle(s.steps, icon = SharedIcons.Play)
                 if (recipe.steps.isEmpty()) Text(s.noSteps, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 recipe.steps.forEachIndexed { i, step -> StepRow(i + 1, step) }
 
                 recipe.notes?.let { notes ->
-                    SectionTitle(s.notes, icon = AppIcons.Notes)
+                    SectionTitle(s.notes, icon = SharedIcons.Notes)
                     Text(notes, style = MaterialTheme.typography.bodyLarge)
                 }
 
                 recipe.sourceUrl?.let { url ->
-                    SectionTitle(s.source, icon = AppIcons.Link)
+                    SectionTitle(s.source, icon = SharedIcons.Link)
                     val platform = LocalPlatform.current
                     TextButton(onClick = { platform.openUrl(url) }) {
                         Text(url, maxLines = 1, overflow = TextOverflow.Ellipsis)
@@ -187,7 +188,7 @@ private fun AdjustQuantitiesDialog(baseServings: Int?, current: Double, onApply:
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        icon = { Icon(AppIcons.Tune, contentDescription = null) },
+        icon = { Icon(SharedIcons.Tune, contentDescription = null) },
         title = { Text(s.adjustQuantities) },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -195,18 +196,18 @@ private fun AdjustQuantitiesDialog(baseServings: Int?, current: Double, onApply:
                 if (baseServings != null) {
                     val servings = baseServings * factor
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(AppIcons.People, contentDescription = null, tint = MaterialTheme.colorScheme.onSurfaceVariant)
+                        Icon(SharedIcons.People, contentDescription = null, tint = MaterialTheme.colorScheme.onSurfaceVariant)
                         Spacer(Modifier.width(8.dp))
                         Text(s.servings, modifier = Modifier.weight(1f))
                         IconButton(
                             onClick = { factor = (servings.roundToInt() - 1).coerceAtLeast(1).toDouble() / baseServings },
                             enabled = servings > 1,
-                        ) { Icon(AppIcons.Minus, contentDescription = s.fewer) }
+                        ) { Icon(SharedIcons.Minus, contentDescription = s.fewer) }
                         Text(Quantities.format(servings, s.decimalSeparator), style = MaterialTheme.typography.titleMedium)
                         IconButton(
                             onClick = { factor = (servings.roundToInt() + 1).toDouble() / baseServings },
                             enabled = servings < MAX_SERVINGS,
-                        ) { Icon(AppIcons.Add, contentDescription = s.moreServings) }
+                        ) { Icon(SharedIcons.Add, contentDescription = s.moreServings) }
                     }
                 }
                 Text(s.factor, style = MaterialTheme.typography.labelLarge)
@@ -240,7 +241,7 @@ private fun AdjustQuantitiesDialog(baseServings: Int?, current: Double, onApply:
         },
         confirmButton = {
             TextButton(onClick = { onApply(factor) }, enabled = !customError) {
-                Icon(AppIcons.Check, contentDescription = null, modifier = Modifier.size(18.dp))
+                Icon(SharedIcons.Check, contentDescription = null, modifier = Modifier.size(18.dp))
                 Spacer(Modifier.width(8.dp))
                 Text(s.apply)
             }
@@ -257,11 +258,11 @@ private const val MAX_SERVINGS = 999
 @Composable
 private fun Meta(recipe: Recipe, factor: Double, s: Strings) {
     val items = listOfNotNull(
-        recipe.servings?.let { Triple(AppIcons.People, s.servings, Quantities.format(it * factor, s.decimalSeparator)) },
-        recipe.prepMinutes?.let { Triple(AppIcons.Clock, s.prep, s.duration(it)) },
-        recipe.cookMinutes?.let { Triple(AppIcons.Clock, s.cook, s.duration(it)) },
+        recipe.servings?.let { Triple(SharedIcons.People, s.servings, Quantities.format(it * factor, s.decimalSeparator)) },
+        recipe.prepMinutes?.let { Triple(SharedIcons.Clock, s.prep, s.duration(it)) },
+        recipe.cookMinutes?.let { Triple(SharedIcons.Clock, s.cook, s.duration(it)) },
         recipe.totalMinutes?.takeIf { recipe.prepMinutes != null && recipe.cookMinutes != null }
-            ?.let { Triple(AppIcons.Clock, s.total, s.duration(it)) },
+            ?.let { Triple(SharedIcons.Clock, s.total, s.duration(it)) },
     )
     if (items.isEmpty()) return
     FlowRow(
@@ -284,7 +285,7 @@ private fun Tags(tags: List<String>) {
         tags.forEach {
             Surface(color = MaterialTheme.colorScheme.secondaryContainer, shape = RoundedCornerShape(8.dp)) {
                 Row(Modifier.padding(horizontal = 10.dp, vertical = 6.dp), verticalAlignment = Alignment.CenterVertically) {
-                    Icon(AppIcons.Label, contentDescription = null, modifier = Modifier.size(14.dp))
+                    Icon(SharedIcons.Label, contentDescription = null, modifier = Modifier.size(14.dp))
                     Spacer(Modifier.width(6.dp))
                     Text(it, style = MaterialTheme.typography.labelLarge)
                 }
@@ -324,11 +325,11 @@ private fun DetailMenu(app: AppState, recipe: Recipe, screen: Screen.Detail) {
         action()
     }
     Box {
-        IconButton(onClick = { open = true }) { Icon(AppIcons.More, contentDescription = s.more) }
+        IconButton(onClick = { open = true }) { Icon(SharedIcons.More, contentDescription = s.more) }
         DropdownMenu(expanded = open, onDismissRequest = { open = false }) {
-            MenuItem(s.duplicate, AppIcons.Copy, close { app.duplicate(recipe.id) })
-            if (app.transfer.canExportPdf) MenuItem(s.exportPdf, AppIcons.Pdf, close { app.transfer.exportRecipePdf(recipe, platform) })
-            MenuItem(s.delete, AppIcons.Delete, close { screen.confirmDelete = true })
+            MenuItem(s.duplicate, SharedIcons.Copy, close { app.duplicate(recipe.id) })
+            if (app.transfer.canExportPdf) MenuItem(s.exportPdf, SharedIcons.Pdf, close { app.transfer.exportRecipePdf(recipe, platform) })
+            MenuItem(s.delete, SharedIcons.Delete, close { screen.confirmDelete = true })
         }
     }
 }

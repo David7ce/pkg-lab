@@ -2,6 +2,7 @@
 
 package com.david7ce.fuellog.ui
 
+import com.david7ce.shared.ui.SharedIcons
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
@@ -165,7 +166,7 @@ fun VehicleEditor(vm: AppViewModel, original: Vehicle) {
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                 modifier = Modifier.fillMaxWidth()
             )
-            Input(notes, { notes = it }, R.string.notes, AppIcons.Notes, singleLine = false)
+            Input(notes, { notes = it }, R.string.notes, SharedIcons.Notes, singleLine = false)
         }
     }
 

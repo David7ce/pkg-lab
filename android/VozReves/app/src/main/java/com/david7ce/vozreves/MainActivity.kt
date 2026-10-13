@@ -2,6 +2,7 @@
 
 package com.david7ce.vozreves
 
+import com.david7ce.shared.ui.SharedIcons
 import android.Manifest
 import android.app.Activity
 import android.content.Context
@@ -211,7 +212,7 @@ private fun MainScreen(vm: MainViewModel, onPhrases: () -> Unit, onHistory: () -
                     Icon(AppIcons.Quote, stringResource(R.string.phrases))
                 }
                 IconButton(onClick = onHistory, enabled = !recording) {
-                    Icon(AppIcons.History, stringResource(R.string.history))
+                    Icon(SharedIcons.History, stringResource(R.string.history))
                 }
                 IconButton(onClick = onSettings, enabled = !recording) {
                     Icon(Icons.Filled.Settings, stringResource(R.string.settings))
@@ -255,7 +256,7 @@ private fun MainScreen(vm: MainViewModel, onPhrases: () -> Unit, onHistory: () -
                 ) else ButtonDefaults.buttonColors()
             ) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Icon(if (recording) AppIcons.Stop else AppIcons.Mic, null, Modifier.size(40.dp))
+                    Icon(if (recording) SharedIcons.Stop else AppIcons.Mic, null, Modifier.size(40.dp))
                     Text(stringResource(if (recording) R.string.stop else R.string.record), fontSize = 18.sp)
                 }
             }
@@ -279,13 +280,13 @@ private fun MainScreen(vm: MainViewModel, onPhrases: () -> Unit, onHistory: () -
                 Spacer(Modifier.height(16.dp))
                 Row(horizontalArrangement = Arrangement.spacedBy(20.dp), verticalAlignment = Alignment.CenterVertically) {
                     IconButton(onClick = vm::stop, enabled = playing) {
-                        Icon(AppIcons.Stop, stringResource(R.string.stop))
+                        Icon(SharedIcons.Stop, stringResource(R.string.stop))
                     }
                     FilledIconButton(onClick = vm::togglePlay, modifier = Modifier.size(64.dp)) {
                         val isPlaying = vm.mode == Mode.Playing
                         Icon(
                             when {
-                                isPlaying -> AppIcons.Pause
+                                isPlaying -> SharedIcons.Pause
                                 vm.reverse -> AppIcons.PlayReverse // el triángulo mira atrás: suena al revés
                                 else -> Icons.Filled.PlayArrow
                             },
@@ -297,7 +298,7 @@ private fun MainScreen(vm: MainViewModel, onPhrases: () -> Unit, onHistory: () -
                         Icon(Icons.Filled.Share, stringResource(R.string.share))
                     }
                     IconButton(onClick = { saveToDevice() }, enabled = !playing) {
-                        Icon(AppIcons.Download, stringResource(R.string.save_to_device))
+                        Icon(SharedIcons.Download, stringResource(R.string.save_to_device))
                     }
                 }
             }
@@ -355,7 +356,7 @@ private fun DirectionChoice(reverse: Boolean, enabled: Boolean = true, onSelect:
             options = listOf(true to stringResource(R.string.reverse), false to stringResource(R.string.normal)),
             selected = reverse,
             enabled = enabled,
-            icons = mapOf<Boolean, ImageVector>(true to AppIcons.Rewind, false to AppIcons.Forward),
+            icons = mapOf<Boolean, ImageVector>(true to SharedIcons.Rewind, false to SharedIcons.Forward),
             onSelect = onSelect
         )
     }

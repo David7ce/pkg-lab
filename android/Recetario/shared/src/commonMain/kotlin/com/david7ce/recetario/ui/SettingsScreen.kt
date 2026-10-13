@@ -1,5 +1,6 @@
 package com.david7ce.recetario.ui
 
+import com.david7ce.shared.ui.SharedIcons
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -45,15 +46,15 @@ fun SettingsScreen(app: AppState) {
                 Modifier.widthIn(max = 720.dp).fillMaxWidth().verticalScroll(rememberScrollState())
                     .padding(horizontal = 16.dp).padding(bottom = 32.dp),
             ) {
-                SectionTitle(s.data, icon = AppIcons.Save)
-                ActionRow(s.importFile, AppIcons.Upload) { t.importFile(platform) }
-                ActionRow(s.importFromUrl, AppIcons.Link) { t.startUrlImport() }
-                ActionRow(s.exportLibrary, AppIcons.Download) { t.exportLibrary(platform) }
-                ActionRow(s.backup, AppIcons.Save) { t.backup(platform) }
-                if (t.canExportPdf) ActionRow(s.cookbookPdf, AppIcons.Pdf) { t.cookbook(platform) }
+                SectionTitle(s.data, icon = SharedIcons.Save)
+                ActionRow(s.importFile, SharedIcons.Upload) { t.importFile(platform) }
+                ActionRow(s.importFromUrl, SharedIcons.Link) { t.startUrlImport() }
+                ActionRow(s.exportLibrary, SharedIcons.Download) { t.exportLibrary(platform) }
+                ActionRow(s.backup, SharedIcons.Save) { t.backup(platform) }
+                if (t.canExportPdf) ActionRow(s.cookbookPdf, SharedIcons.Pdf) { t.cookbook(platform) }
 
                 HorizontalDivider(Modifier.padding(top = 12.dp))
-                SectionTitle(s.theme, icon = AppIcons.Theme)
+                SectionTitle(s.theme, icon = SharedIcons.Theme)
                 SegmentedChoice(
                     options = listOf(ThemeMode.System to s.themeSystem, ThemeMode.Light to s.themeLight, ThemeMode.Dark to s.themeDark),
                     selected = app.themeMode,
@@ -61,7 +62,7 @@ fun SettingsScreen(app: AppState) {
                 )
 
                 HorizontalDivider(Modifier.padding(top = 12.dp))
-                SectionTitle(s.language, icon = AppIcons.Language)
+                SectionTitle(s.language, icon = SharedIcons.Language)
                 ChoiceDropdown(
                     options = AppLanguage.entries.map { it to (if (it == AppLanguage.System) s.languageSystem else it.nativeName) },
                     selected = app.language,
@@ -69,7 +70,7 @@ fun SettingsScreen(app: AppState) {
                 )
 
                 HorizontalDivider(Modifier.padding(top = 12.dp))
-                SectionTitle(s.about, icon = AppIcons.Info)
+                SectionTitle(s.about, icon = SharedIcons.Info)
                 Text(
                     s.aboutData,
                     style = MaterialTheme.typography.bodyMedium,

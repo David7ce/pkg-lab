@@ -2,6 +2,7 @@
 
 package com.david7ce.fuellog.ui
 
+import com.david7ce.shared.ui.SharedIcons
 import android.app.Activity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -109,10 +110,10 @@ private fun VehicleList(vm: AppViewModel) {
 @Composable
 private fun LanguagePicker(settings: AppSettings) {
     val activity = LocalContext.current as Activity
-    SectionTitle(stringResource(R.string.language), AppIcons.Language)
+    SectionTitle(stringResource(R.string.language), SharedIcons.Language)
     DropdownField(
         label = stringResource(R.string.language),
-        icon = AppIcons.Language,
+        icon = SharedIcons.Language,
         options = listOf("" to stringResource(R.string.system_default)) + AppSettings.LANGUAGES,
         selected = settings.language,
         onSelect = { code -> if (settings.language != code) { settings.updateLanguage(code); activity.recreate() } },
@@ -121,7 +122,7 @@ private fun LanguagePicker(settings: AppSettings) {
 
 @Composable
 private fun AppearanceAndCurrency(settings: AppSettings) {
-    SectionTitle(stringResource(R.string.appearance), AppIcons.Palette)
+    SectionTitle(stringResource(R.string.appearance), SharedIcons.Palette)
     val themes = listOf(R.string.theme_system, R.string.theme_light, R.string.theme_dark)
     SegmentedChoice(
         options = themes.mapIndexed { i, res -> i to stringResource(res) },
@@ -187,14 +188,14 @@ private fun DataSection(vm: AppViewModel, showMessage: (String) -> Unit) {
         uri?.let { runFileAction({ pendingRestore = vm.readBackup(it) }, null) }
     }
 
-    SectionTitle(stringResource(R.string.data), AppIcons.Storage)
+    SectionTitle(stringResource(R.string.data), SharedIcons.Storage)
     Text(stringResource(R.string.data_hint), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
     Spacer(Modifier.height(8.dp))
     val stamp = LocalDate.now().toString()
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        DataButton(AppIcons.Table, R.string.export_csv) { exportCsv.launch("fuellog-$stamp.csv") }
-        DataButton(AppIcons.Download, R.string.export_json) { exportJson.launch("fuellog-backup-$stamp.json") }
-        DataButton(AppIcons.Restore, R.string.restore_json) {
+        DataButton(SharedIcons.Table, R.string.export_csv) { exportCsv.launch("fuellog-$stamp.csv") }
+        DataButton(SharedIcons.Download, R.string.export_json) { exportJson.launch("fuellog-backup-$stamp.json") }
+        DataButton(SharedIcons.History, R.string.restore_json) {
             importJson.launch(arrayOf("application/json", "text/plain", "application/octet-stream"))
         }
     }

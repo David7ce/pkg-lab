@@ -2,6 +2,7 @@
 
 package com.david7ce.fuellog.ui.map
 
+import com.david7ce.shared.ui.SharedIcons
 import android.Manifest
 import android.content.pm.PackageManager
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -107,8 +108,8 @@ fun MapPicker(
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     FilledTonalIconButton(onClick = { moveTo(center, zoom + 1) }) { Icon(Icons.Filled.Add, stringResource(R.string.zoom_in)) }
-                    FilledTonalIconButton(onClick = { moveTo(center, zoom - 1) }) { Icon(AppIcons.Remove, stringResource(R.string.zoom_out)) }
-                    FilledTonalIconButton(onClick = { onMyLocation() }) { Icon(AppIcons.MyLocation, stringResource(R.string.my_location)) }
+                    FilledTonalIconButton(onClick = { moveTo(center, zoom - 1) }) { Icon(SharedIcons.Minus, stringResource(R.string.zoom_out)) }
+                    FilledTonalIconButton(onClick = { onMyLocation() }) { Icon(SharedIcons.MyLocation, stringResource(R.string.my_location)) }
                 }
                 // Required attribution for OpenStreetMap data.
                 Text(

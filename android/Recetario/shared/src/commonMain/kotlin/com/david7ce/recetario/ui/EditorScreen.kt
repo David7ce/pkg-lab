@@ -1,5 +1,6 @@
 package com.david7ce.recetario.ui
 
+import com.david7ce.shared.ui.SharedIcons
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -63,10 +64,10 @@ fun EditorScreen(app: AppState, state: EditorState) {
                         },
                     )
                 },
-                navigationIcon = { BackButton(app, AppIcons.Close) },
+                navigationIcon = { BackButton(app, SharedIcons.Close) },
                 actions = {
                     TextButton(onClick = { app.save(state) }, enabled = !state.saving) {
-                        Icon(AppIcons.Check, contentDescription = null, modifier = Modifier.size(18.dp))
+                        Icon(SharedIcons.Check, contentDescription = null, modifier = Modifier.size(18.dp))
                         Spacer(Modifier.width(8.dp))
                         Text(s.save)
                     }
@@ -117,7 +118,7 @@ fun EditorScreen(app: AppState, state: EditorState) {
                     modifier = Modifier.fillMaxWidth(),
                 )
 
-                SectionTitle(s.ingredients, icon = AppIcons.Checklist)
+                SectionTitle(s.ingredients, icon = SharedIcons.Checklist)
                 draft.ingredients.forEachIndexed { index, row ->
                     IngredientEditor(
                         row = row,
@@ -131,11 +132,11 @@ fun EditorScreen(app: AppState, state: EditorState) {
                     )
                 }
                 OutlinedButton(onClick = { state.update { it.withIngredient() } }) {
-                    Icon(AppIcons.Add, contentDescription = null)
+                    Icon(SharedIcons.Add, contentDescription = null)
                     Text(s.addIngredient, Modifier.padding(start = 8.dp))
                 }
 
-                SectionTitle(s.steps, icon = AppIcons.Play)
+                SectionTitle(s.steps, icon = SharedIcons.Play)
                 draft.steps.forEachIndexed { index, step ->
                     Row(verticalAlignment = Alignment.Top) {
                         OutlinedTextField(
@@ -158,7 +159,7 @@ fun EditorScreen(app: AppState, state: EditorState) {
                     }
                 }
                 OutlinedButton(onClick = { state.update { it.withStep() } }) {
-                    Icon(AppIcons.Add, contentDescription = null)
+                    Icon(SharedIcons.Add, contentDescription = null)
                     Text(s.addStep, Modifier.padding(start = 8.dp))
                 }
 
@@ -233,7 +234,7 @@ private fun PhotoField(app: AppState, state: EditorState) {
     }
     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
         OutlinedButton(onClick = { app.pickImage(state, platform) }) {
-            Icon(AppIcons.Photo, contentDescription = null)
+            Icon(SharedIcons.Photo, contentDescription = null)
             Text(if (hasImage) s.changePhoto else s.addPhoto, Modifier.padding(start = 8.dp))
         }
         if (hasImage) {
@@ -320,9 +321,9 @@ private fun RowActions(
     vertical: Boolean = true,
 ) {
     val content: @Composable () -> Unit = {
-        IconButton(onClick = { onMove(-1) }, enabled = canUp) { Icon(AppIcons.Up, contentDescription = s.moveUp) }
-        IconButton(onClick = { onMove(1) }, enabled = canDown) { Icon(AppIcons.Down, contentDescription = s.moveDown) }
-        IconButton(onClick = onRemove) { Icon(AppIcons.Delete, contentDescription = s.remove) }
+        IconButton(onClick = { onMove(-1) }, enabled = canUp) { Icon(SharedIcons.Up, contentDescription = s.moveUp) }
+        IconButton(onClick = { onMove(1) }, enabled = canDown) { Icon(SharedIcons.Down, contentDescription = s.moveDown) }
+        IconButton(onClick = onRemove) { Icon(SharedIcons.Delete, contentDescription = s.remove) }
     }
     if (vertical) Column { content() } else Row { content() }
 }
