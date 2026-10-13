@@ -4,6 +4,7 @@ import com.david7ce.sleepcycles.FakeClock
 import com.david7ce.sleepcycles.MapStore
 import com.david7ce.sleepcycles.logic.AgeRange
 import com.david7ce.sleepcycles.logic.ClockFormat
+import com.david7ce.sleepcycles.logic.ClockStyle
 import com.david7ce.sleepcycles.logic.Mode
 import com.david7ce.sleepcycles.logic.load
 import com.david7ce.sleepcycles.platform.Services
@@ -59,7 +60,9 @@ class AppStateTest {
         first.selectAge(AgeRange.Teen)
         first.setLatency(30)
         first.selectFormat(ClockFormat.H12)
+        first.selectClockStyle(ClockStyle.Digital)
         val second = state(store)
+        assertEquals(ClockStyle.Digital, second.clockStyle)
         assertEquals(AgeRange.Teen, second.age)
         assertEquals(30, second.latencyMinutes)
         assertEquals(ClockFormat.H12, second.format)

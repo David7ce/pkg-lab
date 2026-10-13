@@ -47,6 +47,9 @@ open class Strings {
     open val timeFormat = "Time format"
     open val format24 = "24-hour"
     open val format12 = "12-hour (AM/PM)"
+    open val clockType = "Type of clock"
+    open val clockAnalog = "Analog"
+    open val clockDigital = "Digital"
     open val theme = "Theme"
     open val themeSystem = "System"
     open val themeLight = "Light"
@@ -60,20 +63,20 @@ open class Strings {
 
     /** **Double asterisks** mark bold runs (see splitBold). */
     open val howItWorksParagraphs = listOf(
-        "Sleep is not uniform: it moves through repeating **cycles of roughly 90 minutes**, each passing " +
-            "through light sleep, deep sleep and REM (when most dreaming happens).",
-        "Waking up **in the middle of a cycle**, especially during deep sleep, causes sleep inertia: that " +
+        "Sleep isn't uniform — it moves through repeating **cycles of roughly 90 minutes**, each passing " +
+            "through light sleep, deep sleep, and REM (when most dreaming happens).",
+        "Waking up **in the middle of a cycle** — especially during deep sleep — causes sleep inertia: that " +
             "groggy, heavy feeling that can linger for a while. Waking **between cycles**, when sleep is " +
             "lightest, makes getting up much easier.",
         "This calculator counts backward or forward in 90-minute steps, plus the time it takes you to fall " +
-            "asleep (about **15 minutes** on average, adjustable in settings), so your alarm lands at the end " +
+            "asleep (about **15 minutes** on average — adjustable in settings), so your alarm lands at the end " +
             "of a cycle instead of the middle.",
         "How many cycles you need depends on age. The National Sleep Foundation recommends **7–9 hours** " +
             "(about 5–6 cycles) for adults, more for teens and children, slightly less for seniors. Each card " +
-            "shows a face for how close that option is to your recommended range.",
+            "has a face colored by how close that option is to your recommended range.",
     )
     open val howItWorksNote =
-        "90 minutes is an average: real cycles range from about 70 to 120 minutes and vary night to night. " +
+        "90 minutes is an average — real cycles range from about 70 to 120 minutes and vary night to night. " +
             "Treat the suggestions as good targets, not exact science."
     open val gotIt = "Got it"
     open val done = "Done"

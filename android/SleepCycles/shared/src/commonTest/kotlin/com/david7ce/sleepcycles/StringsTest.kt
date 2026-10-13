@@ -28,6 +28,7 @@ class StringsTest {
                 s.howItWorks to en.howItWorks, s.gotIt to en.gotIt, s.done to en.done,
                 s.howItWorksParagraphs to en.howItWorksParagraphs, s.howItWorksNote to en.howItWorksNote,
                 s.alarmHint to en.alarmHint, s.pickTime to en.pickTime, s.noClockApp to en.noClockApp,
+                s.clockType to en.clockType, // clockAnalog is "Analog" in German too
                 s.back to en.back, s.close to en.close, s.cancel to en.cancel,
             ).forEach { (translated, original) -> assertNotEquals(original, translated, "${language.name}: $translated") }
             assertEquals(',', s.decimalSeparator, language.name)

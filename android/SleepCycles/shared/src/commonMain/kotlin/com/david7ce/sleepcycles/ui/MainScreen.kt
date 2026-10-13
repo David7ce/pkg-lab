@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -21,6 +22,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -55,15 +57,20 @@ fun MainScreen(app: AppState) {
                     selected = app.mode,
                     onSelect = app::selectMode,
                 )
-                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                    TimeField(app.anchor, app.format, app::setAnchor, Modifier.weight(1f))
-                    if (platform.canPickTime) {
-                        IconButton(
-                            onClick = {
-                                platform.pickTime(app.anchor, app.format == ClockFormat.H24, app::setAnchor)
-                            },
-                        ) { Icon(SharedIcons.Clock, contentDescription = s.pickTime) }
+                if (platform.canPickTime) {
+                    // Android: the system picker (dial or numbers, with its own keyboard toggle).
+                    OutlinedButton(
+                        onClick = {
+                            platform.pickTime(app.anchor, app.format == ClockFormat.H24, app.clockStyle, dark, app::setAnchor)
+                        },
+                        modifier = Modifier.fillMaxWidth().height(72.dp),
+                    ) {
+                        Icon(SharedIcons.Clock, contentDescription = s.pickTime)
+                        Spacer(Modifier.width(12.dp))
+                        Text(formatTime(app.anchor, app.format, s.am, s.pm), style = MaterialTheme.typography.headlineMedium)
                     }
+                } else {
+                    TimeField(app.anchor, app.format, app::setAnchor)
                 }
                 Button(onClick = app::sleepNow, modifier = Modifier.fillMaxWidth().height(48.dp)) { Text(s.sleepNow) }
                 Text(

@@ -23,6 +23,7 @@ class UserSettingsTest {
         val saved = UserSettings(
             mode = Mode.Bed, wakeTime = 6 * 60 + 30, bedTime = 22 * 60 + 10, age = AgeRange.Senior,
             latencyMinutes = 40, format = ClockFormat.H12, theme = ThemeMode.Dark, language = AppLanguage.De,
+            clockStyle = ClockStyle.Digital,
         )
         store.save(saved)
         assertEquals(saved, store.load())
@@ -33,7 +34,7 @@ class UserSettingsTest {
         val store = MapStore(
             mutableMapOf(
                 "mode" to "Sideways", "wakeTime" to "soon", "bedTime" to "1440", "age" to "Martian",
-                "latency" to "999", "format" to "H12", "theme" to "", "language" to "Klingon",
+                "latency" to "999", "format" to "H12", "theme" to "", "language" to "Klingon", "clockStyle" to "Hourglass",
             )
         )
         val s = store.load()
@@ -46,6 +47,7 @@ class UserSettingsTest {
         assertEquals(ClockFormat.H12, s.format)
         assertEquals(d.theme, s.theme)
         assertEquals(d.language, s.language)
+        assertEquals(ClockStyle.Analog, s.clockStyle)
     }
 
     @Test

@@ -6,6 +6,7 @@ import androidx.compose.runtime.setValue
 import com.david7ce.sleepcycles.logic.AgeRange
 import com.david7ce.sleepcycles.logic.AppLanguage
 import com.david7ce.sleepcycles.logic.ClockFormat
+import com.david7ce.sleepcycles.logic.ClockStyle
 import com.david7ce.sleepcycles.logic.Mode
 import com.david7ce.sleepcycles.logic.Suggestion
 import com.david7ce.sleepcycles.logic.ThemeMode
@@ -47,6 +48,8 @@ class AppState(
     var theme by mutableStateOf(saved.theme)
         private set
     var language by mutableStateOf(saved.language)
+        private set
+    var clockStyle by mutableStateOf(saved.clockStyle)
         private set
 
     /** The device language (ISO 639 code), updated by the platform; used when [language] is System. */
@@ -107,6 +110,11 @@ class AppState(
         persist()
     }
 
+    fun selectClockStyle(value: ClockStyle) {
+        clockStyle = value
+        persist()
+    }
+
     fun openSettings() {
         screen = Screen.Settings
     }
@@ -126,7 +134,7 @@ class AppState(
 
     private fun persist() {
         services.settings.save(
-            UserSettings(mode, wakeTime, bedTime, age, latencyMinutes, format, theme, language)
+            UserSettings(mode, wakeTime, bedTime, age, latencyMinutes, format, theme, language, clockStyle)
         )
     }
 }

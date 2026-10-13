@@ -26,6 +26,7 @@ import com.david7ce.shared.ui.SegmentedChoice
 import com.david7ce.sleepcycles.logic.AgeRange
 import com.david7ce.sleepcycles.logic.AppLanguage
 import com.david7ce.sleepcycles.logic.ClockFormat
+import com.david7ce.sleepcycles.logic.ClockStyle
 import com.david7ce.sleepcycles.logic.MAX_LATENCY_MINUTES
 import com.david7ce.sleepcycles.logic.ThemeMode
 import com.david7ce.sleepcycles.logic.parseLatency
@@ -37,6 +38,7 @@ import com.david7ce.sleepcycles.logic.parseLatency
 @Composable
 fun SettingsDialog(app: AppState) {
     val s = LocalStrings.current
+    val platform = LocalPlatform.current
     AlertDialog(
         onDismissRequest = app::back,
         title = { Text(s.settings) },
@@ -59,6 +61,16 @@ fun SettingsDialog(app: AppState) {
                     selected = app.format,
                     onSelect = app::selectFormat,
                 )
+
+                // Only where the OS has its own time picker (Android); desktop types the time.
+                if (platform.canPickTime) {
+                    SectionTitle(s.clockType)
+                    SegmentedChoice(
+                        options = listOf(ClockStyle.Analog to s.clockAnalog, ClockStyle.Digital to s.clockDigital),
+                        selected = app.clockStyle,
+                        onSelect = app::selectClockStyle,
+                    )
+                }
 
                 SectionTitle(s.theme)
                 SegmentedChoice(

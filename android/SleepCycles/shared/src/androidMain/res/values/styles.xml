@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Digital time picker: numbers you scroll, instead of the clock dial. -->
+    <style name="SleepCyclesTimePickerSpinner" parent="android:Widget.Material.TimePicker">
+        <item name="android:timePickerMode">spinner</item>
+    </style>
+
+    <!-- One dialog theme per (style, light/dark): the app theme can differ from the system one. -->
+    <style name="SleepCyclesPickerClockLight" parent="android:Theme.Material.Light.Dialog.Alert" />
+    <style name="SleepCyclesPickerClockDark" parent="android:Theme.Material.Dialog.Alert" />
+
+    <style name="SleepCyclesPickerSpinnerLight" parent="android:Theme.Material.Light.Dialog.Alert">
+        <item name="android:timePickerStyle">@style/SleepCyclesTimePickerSpinner</item>
+    </style>
+    <style name="SleepCyclesPickerSpinnerDark" parent="android:Theme.Material.Dialog.Alert">
+        <item name="android:timePickerStyle">@style/SleepCyclesTimePickerSpinner</item>
+    </style>
+</resources>

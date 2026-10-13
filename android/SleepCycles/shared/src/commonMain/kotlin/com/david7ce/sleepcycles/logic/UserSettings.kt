@@ -4,6 +4,9 @@ import com.david7ce.sleepcycles.platform.SettingsStore
 
 enum class ThemeMode { System, Light, Dark }
 
+/** Look of the system time picker on Android: [Analog] is the clock dial, [Digital] the scrolling numbers. */
+enum class ClockStyle { Analog, Digital }
+
 /** Languages the app offers. [code] is the ISO 639 code; System follows the device. Names are shown in their own language. */
 enum class AppLanguage(val code: String?, val nativeName: String) {
     System(null, ""),
@@ -25,6 +28,7 @@ data class UserSettings(
     val format: ClockFormat = ClockFormat.H24,
     val theme: ThemeMode = ThemeMode.System,
     val language: AppLanguage = AppLanguage.System,
+    val clockStyle: ClockStyle = ClockStyle.Analog,
 )
 
 private object Key {
@@ -36,6 +40,7 @@ private object Key {
     const val FORMAT = "format"
     const val THEME = "theme"
     const val LANGUAGE = "language"
+    const val CLOCK_STYLE = "clockStyle"
 }
 
 private inline fun <reified E : Enum<E>> enumOr(name: String?, default: E): E =
@@ -56,6 +61,7 @@ fun SettingsStore.load(): UserSettings {
         format = enumOr(get(Key.FORMAT), d.format),
         theme = enumOr(get(Key.THEME), d.theme),
         language = enumOr(get(Key.LANGUAGE), d.language),
+        clockStyle = enumOr(get(Key.CLOCK_STYLE), d.clockStyle),
     )
 }
 
@@ -68,4 +74,5 @@ fun SettingsStore.save(settings: UserSettings) {
     put(Key.FORMAT, settings.format.name)
     put(Key.THEME, settings.theme.name)
     put(Key.LANGUAGE, settings.language.name)
+    put(Key.CLOCK_STYLE, settings.clockStyle.name)
 }
