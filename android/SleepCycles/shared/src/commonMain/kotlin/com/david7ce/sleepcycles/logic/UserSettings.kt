@@ -82,5 +82,6 @@ fun SettingsStore.save(settings: UserSettings) {
  */
 fun pickDeviceLanguage(deviceLanguages: List<String>): String {
     val supported = AppLanguage.entries.mapNotNull { it.code }
-    return deviceLanguages.firstOrNull { it.lowercase().take(2) in supported } ?: deviceLanguages.firstOrNull().orEmpty()
+    val codes = deviceLanguages.map { it.lowercase().take(2) } // "pt-BR" -> "pt"
+    return codes.firstOrNull { it in supported } ?: codes.firstOrNull().orEmpty()
 }
