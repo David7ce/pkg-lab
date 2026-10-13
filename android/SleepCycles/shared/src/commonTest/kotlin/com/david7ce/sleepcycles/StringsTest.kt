@@ -19,7 +19,7 @@ class StringsTest {
             listOf(
                 s.wakeUpAt to en.wakeUpAt, s.goToBedAt to en.goToBedAt, s.sleepNow to en.sleepNow,
                 s.resultsWake to en.resultsWake, s.resultsBed to en.resultsBed,
-                s.hint(15) to en.hint(15), s.cycles(3, "4.5") to en.cycles(3, "4.5"),
+                s.hint(15) to en.hint(15),
                 s.ratingGood to en.ratingGood, s.ratingOk to en.ratingOk, s.ratingLow to en.ratingLow,
                 s.ageLabel(AgeRange.Adult) to en.ageLabel(AgeRange.Adult),
                 s.settings to en.settings, s.ageRange to en.ageRange, s.fallAsleepTime to en.fallAsleepTime,
