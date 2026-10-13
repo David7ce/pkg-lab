@@ -117,7 +117,7 @@ compose.desktop {
             packageName = "Recetario"
             // Installers need MAJOR.MINOR.PATCH with a number in MAJOR; CI run number keeps each build newer.
             packageVersion = appVersion
-            vendor = "deivon"
+            vendor = "david7ce"
             description = "Recetario: recetario personal"
             windows {
                 menuGroup = "Recetario"

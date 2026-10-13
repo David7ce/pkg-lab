@@ -12,7 +12,7 @@ App Android (Kotlin + Jetpack Compose + Material 3) para grabarte y escucharte a
 ## Estructura
 
 ```
-app/src/main/java/com/deivon/vozreves/
+app/src/main/java/com/david7ce/vozreves/
 ├── AudioEngine.kt    – grabar y reproducir PCM 16 bits (normal/invertido), pausa y tramos
 ├── Wav.kt            – escribir/leer WAV, decodificar y remuestrear
 ├── History.kt        – grabaciones guardadas (un WAV por grabación, títulos en titles.properties)

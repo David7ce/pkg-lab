@@ -9,7 +9,7 @@ Shared UI (selectors, confirmations, multi-select, dropdowns) comes from `androi
 
 
 ```
-app/src/main/java/com/deivon/fuellog/
+app/src/main/java/com/david7ce/fuellog/
 ├── data/    Models.kt (Vehicle, Refuel) · FuelDatabase.kt (SQLiteOpenHelper)
 ├── logic/   Decimals · FuelStats (+ Extremes) · Period · RefuelForm (validation, warnings, pay-by-amount)
 │            Units (metric / UK / US) · Backup (JSON/CSV) · GeoPoint (+ Mercator)
