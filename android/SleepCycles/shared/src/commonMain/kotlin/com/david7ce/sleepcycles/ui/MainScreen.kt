@@ -48,7 +48,7 @@ fun MainScreen(app: AppState) {
                 SegmentedChoice(
                     options = listOf(Mode.Bed to s.goToBedAt, Mode.Wake to s.wakeUpAt),
                     selected = app.mode,
-                    onSelect = app::setMode,
+                    onSelect = app::selectMode,
                 )
                 TimeField(app.anchor, app.format, app::setAnchor)
                 Button(onClick = app::sleepNow, modifier = Modifier.fillMaxWidth().height(48.dp)) { Text(s.sleepNow) }

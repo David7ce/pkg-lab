@@ -43,7 +43,7 @@ fun SettingsScreen(app: AppState) {
                 options = AgeRange.entries.map { it to s.ageLabel(it) },
                 selected = app.age,
                 modifier = Modifier.fillMaxWidth(),
-                onSelect = app::setAge,
+                onSelect = app::selectAge,
             )
 
             SectionTitle(s.fallAsleepTime)
@@ -53,7 +53,7 @@ fun SettingsScreen(app: AppState) {
             SegmentedChoice(
                 options = listOf(ClockFormat.H24 to s.format24, ClockFormat.H12 to s.format12),
                 selected = app.format,
-                onSelect = app::setFormat,
+                onSelect = app::selectFormat,
             )
 
             SectionTitle(s.theme)
@@ -62,7 +62,7 @@ fun SettingsScreen(app: AppState) {
                     ThemeMode.System to s.themeSystem, ThemeMode.Light to s.themeLight, ThemeMode.Dark to s.themeDark,
                 ),
                 selected = app.theme,
-                onSelect = app::setTheme,
+                onSelect = app::selectTheme,
             )
 
             SectionTitle(s.language)
@@ -70,7 +70,7 @@ fun SettingsScreen(app: AppState) {
                 options = AppLanguage.entries.map { it to (if (it == AppLanguage.System) s.languageSystem else it.nativeName) },
                 selected = app.language,
                 modifier = Modifier.fillMaxWidth(),
-                onSelect = app::setLanguage,
+                onSelect = app::selectLanguage,
             )
 
             Spacer(Modifier.height(32.dp))

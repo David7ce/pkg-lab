@@ -65,7 +65,7 @@ class AppState(
     val suggestions: List<Suggestion> get() = calculateSuggestions(mode, anchor, latencyMinutes, age)
     val canGoBack: Boolean get() = showHelp || screen != Screen.Main
 
-    fun setMode(value: Mode) {
+    fun selectMode(value: Mode) {
         mode = value
         persist()
     }
@@ -82,7 +82,7 @@ class AppState(
         persist()
     }
 
-    fun setAge(value: AgeRange) {
+    fun selectAge(value: AgeRange) {
         age = value
         persist()
     }
@@ -92,17 +92,17 @@ class AppState(
         persist()
     }
 
-    fun setFormat(value: ClockFormat) {
+    fun selectFormat(value: ClockFormat) {
         format = value
         persist()
     }
 
-    fun setTheme(value: ThemeMode) {
+    fun selectTheme(value: ThemeMode) {
         theme = value
         persist()
     }
 
-    fun setLanguage(value: AppLanguage) {
+    fun selectLanguage(value: AppLanguage) {
         language = value
         persist()
     }
