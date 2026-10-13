@@ -30,6 +30,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import com.david7ce.shared.ui.SegmentedChoice
+import com.david7ce.shared.ui.SharedIcons
 import com.david7ce.sleepcycles.logic.ClockFormat
 import com.david7ce.sleepcycles.logic.Mode
 import com.david7ce.sleepcycles.logic.Rating
@@ -61,7 +62,7 @@ fun MainScreen(app: AppState) {
                             onClick = {
                                 platform.pickTime(app.anchor, app.format == ClockFormat.H24, app::setAnchor)
                             },
-                        ) { Icon(AppIcons.Clock, contentDescription = s.pickTime) }
+                        ) { Icon(SharedIcons.Clock, contentDescription = s.pickTime) }
                     }
                 }
                 Button(onClick = app::sleepNow, modifier = Modifier.fillMaxWidth().height(48.dp)) { Text(s.sleepNow) }
@@ -105,8 +106,8 @@ private fun TopRow(app: AppState) {
     val s = LocalStrings.current
     Row(Modifier.fillMaxWidth().padding(top = 8.dp), verticalAlignment = Alignment.CenterVertically) {
         Text("SleepCycles", style = MaterialTheme.typography.titleLarge, modifier = Modifier.weight(1f))
-        IconButton(onClick = app::openHelp) { Icon(AppIcons.Info, contentDescription = s.howItWorks) }
-        IconButton(onClick = app::openSettings) { Icon(AppIcons.Settings, contentDescription = s.settings) }
+        IconButton(onClick = app::openHelp) { Icon(SharedIcons.Info, contentDescription = s.howItWorks) }
+        IconButton(onClick = app::openSettings) { Icon(SharedIcons.Settings, contentDescription = s.settings) }
     }
 }
 

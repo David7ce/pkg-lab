@@ -36,7 +36,7 @@ CompositionLocalProvider(LocalSharedStrings provides SharedStrings(
 | `ui/ConfirmDialog` | Confirmation before deleting or any irreversible action. |
 | `ui/Selection` + `SelectionActions` | Multi-select: long press, select all, delete. |
 | `ui/SubScreen`, `SectionTitle` | Top bar for a secondary screen and section titles. |
-| `ui/SharedIcons` | Own Material icons (not material-icons, which isn't multiplatform). |
+| `ui/SharedIcons` | Own Material icons (not material-icons, which is not multiplatform): close, back, delete, check, select all, info, clock, settings. |
 | `ui/SharedStrings` | Common text that each app fills in. |
 | `reverseText` | Reverses text by code point (doesn't break emoji). |
 
