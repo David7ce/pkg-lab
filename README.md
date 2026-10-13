@@ -57,6 +57,28 @@ over it: you'd have to uninstall first. That's why every app is signed with a sh
 To decrypt it locally: `openssl enc -d -aes-256-cbc -pbkdf2 -iter 200000 -in release.jks.enc -out release.jks`.
 Apps read the signing config from `SIGNING_*` env vars in their `app/build.gradle.kts` (see VozReves as an example).
 
+## Local development loop
+
+CI stays the source of truth for releases, but round-tripping through a push is slow for everyday
+iteration. With the Android SDK installed (Android Studio or standalone), everything below runs
+locally, no push needed:
+
+- **Build + unit test:** `.\scripts\build-and-test.ps1` (`-App <Name>` for just one,
+  `-Desktop`/`-Package` for Recetario's desktop target, `-NoDaemon` to match CI exactly). Uses the
+  Gradle daemon by default — much faster on repeat runs than CI's `--no-daemon`.
+- **See it running (Android):** an emulator, since none comes preinstalled.
+  One-time setup — SDK Manager → install "Android SDK Command-line Tools", then:
+  ```
+  sdkmanager --licenses
+  avdmanager create avd --name pkglab-pixel --package "system-images;android-36;google_apis_playstore;x86_64" --device pixel_7
+  ```
+  Then any time: `emulator -avd pkglab-pixel` (first boot is slow; it snapshots on close, later
+  boots are fast), and `.\scripts\build-and-test.ps1 -App <Name> -Install` builds, installs, and
+  launches on whatever's running.
+- **See it running (Recetario desktop):** `./gradlew.bat :shared:run` — a real window, no
+  emulator. (`:shared:hotRunDesktop`, Compose Hot Reload, exists but failed to launch standalone
+  from the CLI when tried — needs IDE integration, not a reliable fit for this loop yet.)
+
 ## Other platforms
 
 For a new platform: a `<os>/` folder + a `<os>.yml` workflow with `paths: ["<os>/**"]`,
