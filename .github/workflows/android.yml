@@ -1,8 +1,10 @@
 # Builds the apps under android/<App>/ on GitHub (no PC needed).
 # - Push to main: builds only the apps whose folder changed.
 # - Manual (Actions -> Android -> Run workflow): one specific app, or all of them.
-# Each app builds IN PARALLEL for arm64-v8a, armeabi-v7a and universal,
-# and publishes to its "android-<App>-latest" release with all three APKs.
+# Each app builds IN PARALLEL for arm64-v8a, armeabi-v7a and universal, and publishes to its
+# "<app>-latest" release with all three APKs. Recetario shares that release with desktop.yml's
+# installers (see "Publish to Releases" below) - same release, Android + Windows/Linux/macOS
+# together, so the publish step never does a destructive delete-and-recreate.
 name: Android
 
 on:
@@ -176,9 +178,13 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GH_REPO: ${{ github.repository }}
           APP: ${{ matrix.app }}
-          TAG: android-${{ matrix.app }}-latest
         run: |
           ls -lh apks
+          # Recetario ships Android + desktop (Windows/Linux/macOS) on one release, published by
+          # both this workflow and desktop.yml - never destructively, since either can run first
+          # and neither should delete what the other already uploaded.
+          if [ "$APP" = "Recetario" ]; then TAG="recetario-latest"; else TAG="android-${APP}-latest"; fi
+
           # <App>-android-<version>-<abi>.apk → <version>
           version=$(ls apks/*.apk | head -1 | sed -E "s#.*/${APP}-android-(.*)-(arm64-v8a|armeabi-v7a|universal)\.apk#\1#")
 
@@ -189,20 +195,45 @@ jobs:
             log=$(git log "$prev..$GITHUB_SHA" --oneline --no-decorate -- "android/$APP" "android/shared" 2>/dev/null)
           fi
 
-          gh release delete "$TAG" --yes --cleanup-tag || true
           {
             echo "Built automatically from ${GITHUB_SHA::7}."
             echo
             echo "- **…-arm64-v8a.apk**: most phones (64-bit)."
             echo "- **…-armeabi-v7a.apk**: older 32-bit phones."
             echo "- **…-universal.apk**: works on any of them."
+            if [ "$APP" = "Recetario" ]; then
+              echo "- **.msi**: Windows (64-bit)."
+              echo "- **.tar.gz**: Linux (64-bit). Unpack and run \`Recetario/bin/Recetario\`. Includes Java, nothing to install."
+              echo "- **.dmg**: macOS (Apple Silicon)."
+            fi
             if [ -n "$log" ]; then
               echo
               echo "Changes:"
               echo "$log" | sed 's/^/- /'
             fi
           } > "$RUNNER_TEMP/notes.md"
-          gh release create "$TAG" apks/*.apk \
-            --target "$GITHUB_SHA" \
-            --title "$APP ${version} (Android)" \
-            --notes-file "$RUNNER_TEMP/notes.md"
+
+          # Adds/replaces this app's APKs without touching another platform's assets on the same
+          # release (Recetario's desktop installers, published independently by desktop.yml) -
+          # deletes only this app's own old-versioned APKs, not matched by the new filenames.
+          publish() {
+            new_names=$(basename -a apks/*.apk)
+            gh release view "$TAG" --json assets -q '.assets[].name' 2>/dev/null \
+              | grep -E "^${APP}-android-.*\.apk\$" | while IFS= read -r old; do
+                  echo "$new_names" | grep -qx "$old" || gh release delete-asset "$TAG" "$old" --yes
+                done
+            gh release upload "$TAG" apks/*.apk --clobber
+            gh release edit "$TAG" --target "$GITHUB_SHA" --title "$APP ${version}" --notes-file "$RUNNER_TEMP/notes.md"
+          }
+
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            publish
+          elif gh release create "$TAG" apks/*.apk \
+                --target "$GITHUB_SHA" --title "$APP ${version}" --notes-file "$RUNNER_TEMP/notes.md" 2>"$RUNNER_TEMP/create.err"; then
+            : # created fresh with assets, title and notes already set
+          elif grep -qi "already exists" "$RUNNER_TEMP/create.err"; then
+            publish # lost the race: desktop.yml (Recetario) created it first
+          else
+            cat "$RUNNER_TEMP/create.err" >&2
+            exit 1
+          fi

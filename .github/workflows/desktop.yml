@@ -105,8 +105,14 @@ jobs:
           echo "::notice title=Installers::$(echo $files | tr '\n' ' ')"
           [ -n "$files" ] || { echo "::error::No installers to publish"; exit 1; }
 
+          # Same release as android.yml's Recetario build (Android + desktop together) - never a
+          # destructive delete, since android.yml's own APKs may already be on it, or may land
+          # after this runs. This workflow doesn't know Android's versionName, so it never sets
+          # the release title itself except as a fallback on a brand new release.
+          TAG="recetario-latest"
+
           # Commits since the last desktop release (none on a first-ever release).
-          prev=$(gh release view desktop-recetario-latest --json targetCommitish -q .targetCommitish 2>/dev/null || true)
+          prev=$(gh release view "$TAG" --json targetCommitish -q .targetCommitish 2>/dev/null || true)
           log=""
           if [ -n "$prev" ] && git cat-file -e "$prev^{commit}" 2>/dev/null; then
             log=$(git log "$prev..$GITHUB_SHA" --oneline --no-decorate -- android/Recetario android/shared 2>/dev/null)
@@ -115,6 +121,7 @@ jobs:
           {
             echo "Built automatically from ${GITHUB_SHA::7}."
             echo
+            echo "- **…-arm64-v8a.apk / …-armeabi-v7a.apk / …-universal.apk**: Android."
             echo "- **.msi**: Windows (64-bit)."
             echo "- **.tar.gz**: Linux (64-bit). Unpack and run \`Recetario/bin/Recetario\`. Includes Java, nothing to install."
             echo "- **.dmg**: macOS (Apple Silicon)."
@@ -125,12 +132,26 @@ jobs:
             fi
           } > "$RUNNER_TEMP/notes.md"
 
-          gh release delete desktop-recetario-latest --yes --cleanup-tag >/dev/null 2>&1 || true
-          if ! out=$(gh release create desktop-recetario-latest $files \
-                --target "$GITHUB_SHA" \
-                --title "Recetario (desktop)" \
-                --notes-file "$RUNNER_TEMP/notes.md" 2>&1); then
-            echo "::error title=Publish to Releases::$out"
+          # Adds/replaces the installers without touching the Android APKs already on the same
+          # release - deletes only this platform's own old-versioned installers.
+          publish() {
+            new_names=$(basename -a $files)
+            gh release view "$TAG" --json assets -q '.assets[].name' 2>/dev/null \
+              | grep -E '\.(msi|dmg)$|\.tar\.gz$' | while IFS= read -r old; do
+                  echo "$new_names" | grep -qx "$old" || gh release delete-asset "$TAG" "$old" --yes
+                done
+            gh release upload "$TAG" $files --clobber
+            gh release edit "$TAG" --target "$GITHUB_SHA" --notes-file "$RUNNER_TEMP/notes.md"
+          }
+
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            publish
+          elif gh release create "$TAG" $files \
+                --target "$GITHUB_SHA" --title "Recetario" --notes-file "$RUNNER_TEMP/notes.md" 2>"$RUNNER_TEMP/create.err"; then
+            : # created fresh (android.yml will set the real "Recetario <version>" title if it runs too)
+          elif grep -qi "already exists" "$RUNNER_TEMP/create.err"; then
+            publish # lost the race: android.yml created it first
+          else
+            cat "$RUNNER_TEMP/create.err" >&2
             exit 1
           fi
-          echo "$out"

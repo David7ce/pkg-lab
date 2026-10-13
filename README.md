@@ -37,10 +37,16 @@ pkg-lab/
   compileSdk 36, minSdk 26. Apps must use the same versions to be able to share the module.
 - **Building:** every push to `main` builds only the apps that changed. Also by hand from
   *Actions → Android → Run workflow* (type the folder name, or leave it empty for all of them).
-- **Downloading:** *Releases → `android-<AppName>-latest`*. Each app builds in parallel for
-  `arm64-v8a` (almost every phone), `armeabi-v7a` (old 32-bit) and `universal`.
-  For an app to produce per-architecture APKs, its `app/build.gradle.kts` must read `-Pabi`
-  (see VozReves); otherwise all three come out identical.
+- **Downloading:** *Releases → `android-<AppName>-latest`* (Recetario: `recetario-latest`, see
+  below). Each app builds in parallel for `arm64-v8a` (almost every phone), `armeabi-v7a` (old
+  32-bit) and `universal`. For an app to produce per-architecture APKs, its `app/build.gradle.kts`
+  must read `-Pabi` (see VozReves); otherwise all three come out identical.
+- **Release titles** are just `<App> <version>` — no platform suffix, since the asset filenames
+  already say that (`.apk` vs `.msi`/`.dmg`/`.tar.gz`). An app with more than one platform (only
+  Recetario today) publishes all of them to *one* release instead of one per platform: `android.yml`
+  and `desktop.yml` both publish to `recetario-latest`, each only touching its own asset types
+  (`*.apk` vs `*.msi`/`*.dmg`/`*.tar.gz`) so neither ever deletes what the other just uploaded —
+  whichever runs first creates the release, the other adds to it.
 - **APK naming:** `<App>-android-<version>-<architecture>.apk` (the version is read from the APK itself).
 
 ### Signing (recommended)

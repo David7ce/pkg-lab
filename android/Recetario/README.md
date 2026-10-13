@@ -155,7 +155,8 @@ CI (`.github/workflows/android.yml`, shared by every app in `android/`) runs, fr
 ```
 
 Locally the same commands need JDK 17+ and an Android SDK with platform 36. The APKs end up in
-*Releases → `android-Recetario-latest`*.
+*Releases → `recetario-latest`* (shared with the desktop installers below — one release, every
+platform, see the root README's "Release titles").
 
 Tests (`shared/src/commonTest`, `shared/src/androidUnitTest`) cover quantity parsing/formatting/scaling,
 ingredient line parsing, editor validation, the JSON format (round trip, versions, duplicates, invalid data),
@@ -178,7 +179,8 @@ the same way on every OS (Material 3 style, no native system widgets).
   generic task with no `mainClass` configured and fails with "No main class specified"), `:shared:desktopTest` (tests).
   Installers: `:shared:packageMsi` (Windows), `:shared:packageDmg` (macOS), `:shared:createDistributable` (Linux: an app folder, packaged into a tar.gz).
 - CI: `.github/workflows/desktop.yml`: `.msi` on `windows-latest` (x64), `.tar.gz` on `ubuntu-latest` (x64) and
-  `.dmg` on `macos-14` (Apple Silicon). Publishes all three to the `desktop-recetario-latest` release.
+  `.dmg` on `macos-14` (Apple Silicon). Publishes all three to `recetario-latest`, alongside the
+  Android APKs `android.yml` publishes there too.
   Left out for now: Linux arm64 (uncommon) and iOS (needs an Apple Developer account to install on an iPhone).
 
 Desktop pending work:
