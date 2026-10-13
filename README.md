@@ -89,3 +89,10 @@ locally, no push needed:
 
 For a new platform: a `<os>/` folder + a `<os>.yml` workflow with `paths: ["<os>/**"]`,
 following the same pattern (detect changes → build in a matrix → release `<os>-<App>-latest`).
+
+## License
+
+Source-available under the [PolyForm Strict License 1.0.0](LICENSE): you may read the code and use the
+apps for noncommercial purposes, but not modify or redistribute them. Third-party dependencies keep
+their own licenses. The original web version, `sleep-cycles-calc`, was published under Apache-2.0 and
+those published versions keep that license.
