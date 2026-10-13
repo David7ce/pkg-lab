@@ -21,10 +21,12 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -95,8 +97,13 @@ fun MainScreen(app: AppState) {
             }
         }
     }
-    if (dark) NightSky { content() }
-    else Box(Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)) { content() }
+    // There is no Surface here, so the default content colour is black: the title and the Info and
+    // Settings icons would vanish on the night sky. Say explicitly what sits on the background.
+    val onBackground = MaterialTheme.colorScheme.onBackground
+    if (dark) NightSky { CompositionLocalProvider(LocalContentColor provides onBackground) { content() } }
+    else Box(Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)) {
+        CompositionLocalProvider(LocalContentColor provides onBackground) { content() }
+    }
 }
 
 // The PWA pale lavender is unreadable on a light background; light mode uses the theme colors.
