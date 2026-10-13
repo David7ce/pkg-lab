@@ -18,6 +18,7 @@ class MainActivity : ComponentActivity() {
         app.systemLanguage = resources.configuration.locales[0].language
         // The launcher shortcut. Only on a fresh start: a recreation (rotation) must not repeat it.
         if (savedInstanceState == null && intent?.action == ACTION_SLEEP_NOW) app.sleepNow()
+        val platform = AndroidPlatformUi(this) { app.strings.noClockApp }
         enableEdgeToEdge()
         setContent {
             // System bar icons follow the app theme, which can differ from the system one.
@@ -30,7 +31,7 @@ class MainActivity : ComponentActivity() {
                 onDispose { }
             }
             BackHandler(enabled = app.canGoBack) { app.back() }
-            SleepCyclesApp(app)
+            SleepCyclesApp(app, platform)
         }
     }
 

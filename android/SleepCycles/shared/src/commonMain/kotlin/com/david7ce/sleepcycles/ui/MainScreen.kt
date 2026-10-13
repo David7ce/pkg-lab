@@ -1,6 +1,7 @@
 package com.david7ce.sleepcycles.ui
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -24,10 +25,12 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import com.david7ce.shared.ui.SegmentedChoice
+import com.david7ce.sleepcycles.logic.ClockFormat
 import com.david7ce.sleepcycles.logic.Mode
 import com.david7ce.sleepcycles.logic.Rating
 import com.david7ce.sleepcycles.logic.Suggestion
@@ -37,6 +40,7 @@ import com.david7ce.sleepcycles.logic.formatTime
 @Composable
 fun MainScreen(app: AppState) {
     val s = LocalStrings.current
+    val platform = LocalPlatform.current
     val dark = isDark(app.theme)
     val content: @Composable () -> Unit = {
         Box(Modifier.fillMaxSize().statusBarsPadding().navigationBarsPadding(), contentAlignment = Alignment.TopCenter) {
@@ -50,7 +54,16 @@ fun MainScreen(app: AppState) {
                     selected = app.mode,
                     onSelect = app::selectMode,
                 )
-                TimeField(app.anchor, app.format, app::setAnchor)
+                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                    TimeField(app.anchor, app.format, app::setAnchor, Modifier.weight(1f))
+                    if (platform.canPickTime) {
+                        IconButton(
+                            onClick = {
+                                platform.pickTime(app.anchor, app.format == ClockFormat.H24, app::setAnchor)
+                            },
+                        ) { Icon(AppIcons.Clock, contentDescription = s.pickTime) }
+                    }
+                }
                 Button(onClick = app::sleepNow, modifier = Modifier.fillMaxWidth().height(48.dp)) { Text(s.sleepNow) }
                 Text(
                     s.hint(app.latencyMinutes),
@@ -62,6 +75,13 @@ fun MainScreen(app: AppState) {
                     style = MaterialTheme.typography.titleMedium,
                     color = accentFor(app.mode, dark),
                 )
+                if (platform.canSaveAlarm) {
+                    Text(
+                        s.alarmHint,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
                 app.suggestions.forEach { SuggestionCard(it, app, dark) }
                 Spacer(Modifier.height(24.dp))
             }
@@ -90,19 +110,29 @@ private fun TopRow(app: AppState) {
     }
 }
 
+/** Tapping a card hands that time to the system clock app as a new alarm (where the platform can). */
 @Composable
 private fun SuggestionCard(item: Suggestion, app: AppState, dark: Boolean) {
     val s = LocalStrings.current
+    val platform = LocalPlatform.current
     val description = when (item.rating) {
         Rating.Good -> s.ratingGood
         Rating.Ok -> s.ratingOk
         Rating.Low -> s.ratingLow
     }
     val cardColor = if (dark) Color(0x1AFFFFFF) else MaterialTheme.colorScheme.surfaceContainer
+    val shape = RoundedCornerShape(16.dp)
+    val tap = if (platform.canSaveAlarm) {
+        Modifier.clickable(onClickLabel = s.alarmHint) { platform.saveAlarm(item.timeOfDay, "SleepCycles") }
+    } else {
+        Modifier
+    }
     Row(
         Modifier
             .fillMaxWidth()
-            .background(cardColor, RoundedCornerShape(16.dp))
+            .clip(shape)
+            .background(cardColor)
+            .then(tap)
             .padding(horizontal = 16.dp, vertical = 12.dp)
             .semantics(mergeDescendants = true) {},
         verticalAlignment = Alignment.CenterVertically,

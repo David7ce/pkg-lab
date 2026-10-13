@@ -1,9 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  No permissions: settings stay in the app private SharedPreferences, no network.
+  Only SET_ALARM (normal, no prompt): lets a tapped time open the clock app on a new alarm. Settings stay
+  in the app private SharedPreferences, no network.
   The Sleep now launcher shortcut starts MainActivity with action SLEEP_NOW.
 -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <uses-permission android:name="com.android.alarm.permission.SET_ALARM" />
 
     <application
         android:name="com.david7ce.sleepcycles.platform.SleepCyclesApplication"

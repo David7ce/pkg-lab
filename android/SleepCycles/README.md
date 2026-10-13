@@ -9,6 +9,9 @@ Multiplatform: Android, Windows, Linux and macOS. Spanish, English, French, Germ
 - Two modes: *go to bed at* (gives wake-up times) and *wake up at* (gives bedtimes). Results are live:
   they update as the time changes.
 - *Sleep now* (also a launcher shortcut on Android): bed mode at the current time.
+- Android: a clock button opens the system time picker, and tapping a result opens the system clock app on a
+  new alarm at that time (permission SET_ALARM, no prompt). Desktop has neither: it keeps the typed field.
+- Settings is a dialog with a Done button, and "How does it work?" carries the PWA full text, in six languages.
 - Six suggestions (6 to 1 cycles). Each cycle is 90 min; your time to fall asleep (0–120 min, default 15) is added.
 - Rating by age range, shown as a face and its description: child 9–11 h, teen 8–10 h, adult 7–9 h,
   senior 7–8 h; "ok" within one cycle of the range and at 4.5 h.

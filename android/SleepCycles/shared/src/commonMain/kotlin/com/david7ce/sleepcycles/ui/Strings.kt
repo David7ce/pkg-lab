@@ -57,12 +57,31 @@ open class Strings {
 
     // Help
     open val howItWorks = "How does it work?"
-    open val howItWorksBody =
-        "Sleep goes through cycles of about 90 minutes. Waking up in the middle of one leaves you groggy; " +
-            "waking up between two is much easier. The app counts back (or forward) in 90-minute steps and adds " +
-            "the time you usually need to fall asleep. Cycle length varies from person to person, so treat the " +
-            "times as a guide. The faces show how each option compares with the recommended sleep for your age range."
+
+    /** **Double asterisks** mark bold runs (see splitBold). */
+    open val howItWorksParagraphs = listOf(
+        "Sleep is not uniform: it moves through repeating **cycles of roughly 90 minutes**, each passing " +
+            "through light sleep, deep sleep and REM (when most dreaming happens).",
+        "Waking up **in the middle of a cycle**, especially during deep sleep, causes sleep inertia: that " +
+            "groggy, heavy feeling that can linger for a while. Waking **between cycles**, when sleep is " +
+            "lightest, makes getting up much easier.",
+        "This calculator counts backward or forward in 90-minute steps, plus the time it takes you to fall " +
+            "asleep (about **15 minutes** on average, adjustable in settings), so your alarm lands at the end " +
+            "of a cycle instead of the middle.",
+        "How many cycles you need depends on age. The National Sleep Foundation recommends **7–9 hours** " +
+            "(about 5–6 cycles) for adults, more for teens and children, slightly less for seniors. Each card " +
+            "shows a face for how close that option is to your recommended range.",
+    )
+    open val howItWorksNote =
+        "90 minutes is an average: real cycles range from about 70 to 120 minutes and vary night to night. " +
+            "Treat the suggestions as good targets, not exact science."
     open val gotIt = "Got it"
+    open val done = "Done"
+
+    // Android alarm and clock
+    open val alarmHint = "Tap a time to save it as an alarm in your clock app"
+    open val pickTime = "Pick the time with the clock"
+    open val noClockApp = "No clock app found"
 
     // Shared components (android/shared)
     open val back = "Back"

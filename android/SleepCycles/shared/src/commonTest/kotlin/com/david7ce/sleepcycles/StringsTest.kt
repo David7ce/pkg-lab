@@ -25,7 +25,9 @@ class StringsTest {
                 s.settings to en.settings, s.ageRange to en.ageRange, s.fallAsleepTime to en.fallAsleepTime,
                 s.timeFormat to en.timeFormat, s.format12 to en.format12, s.theme to en.theme,
                 s.themeDark to en.themeDark, s.language to en.language, s.languageSystem to en.languageSystem,
-                s.howItWorks to en.howItWorks, s.howItWorksBody to en.howItWorksBody, s.gotIt to en.gotIt,
+                s.howItWorks to en.howItWorks, s.gotIt to en.gotIt, s.done to en.done,
+                s.howItWorksParagraphs to en.howItWorksParagraphs, s.howItWorksNote to en.howItWorksNote,
+                s.alarmHint to en.alarmHint, s.pickTime to en.pickTime, s.noClockApp to en.noClockApp,
                 s.back to en.back, s.close to en.close, s.cancel to en.cancel,
             ).forEach { (translated, original) -> assertNotEquals(original, translated, "${language.name}: $translated") }
             assertEquals(',', s.decimalSeparator, language.name)
@@ -40,6 +42,21 @@ class StringsTest {
             assertTrue(s.hint(25).contains("25"), "$code hint")
             assertTrue(s.cycles(6, "9").contains("6") && s.cycles(6, "9").contains("9"), "$code cycles")
             assertTrue(s.versionLabel("1.0.7").contains("1.0.7"), "$code version")
+        }
+    }
+
+    @Test
+    fun helpParagraphsMatchEnglishAndHaveBalancedBoldMarkers() {
+        val en = EnStrings
+        AppLanguage.entries.mapNotNull { it.code }.forEach { code ->
+            val s = stringsFor(code)
+            assertEquals(en.howItWorksParagraphs.size, s.howItWorksParagraphs.size, "$code paragraph count")
+            s.howItWorksParagraphs.forEachIndexed { i, p ->
+                assertTrue(p.split("**").size % 2 == 1, "$code paragraph $i has an unmatched **")
+                assertEquals(
+                    en.howItWorksParagraphs[i].split("**").size, p.split("**").size, "$code paragraph $i bold count",
+                )
+            }
         }
     }
 

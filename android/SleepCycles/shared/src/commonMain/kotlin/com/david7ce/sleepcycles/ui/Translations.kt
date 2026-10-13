@@ -44,13 +44,27 @@ object EsStrings : Strings() {
     override val languageSystem = "Predeterminado del sistema"
     override fun versionLabel(version: String) = "Versión $version"
     override val howItWorks = "¿Cómo funciona?"
-    override val howItWorksBody =
-        "El sueño pasa por ciclos de unos 90 minutos. Despertar en mitad de uno deja una sensación de " +
-            "aturdimiento; despertar entre dos es mucho más fácil. La app cuenta hacia atrás (o hacia delante) " +
-            "en pasos de 90 minutos y suma el tiempo que sueles tardar en dormirte. La duración del ciclo varía " +
-            "de una persona a otra, así que toma las horas como una guía. Las caras indican cómo se compara cada " +
-            "opción con el sueño recomendado para tu edad."
+    override val howItWorksParagraphs = listOf(
+        "El sueño no es uniforme: pasa por **ciclos repetidos de unos 90 minutos**, cada uno con sueño ligero, " +
+            "sueño profundo y REM (cuando se produce la mayoría de los sueños).",
+        "Despertar **en mitad de un ciclo**, sobre todo durante el sueño profundo, provoca inercia del sueño: " +
+            "esa sensación de aturdimiento y pesadez que puede durar un rato. Despertar **entre ciclos**, cuando " +
+            "el sueño es más ligero, hace que levantarse sea mucho más fácil.",
+        "Esta calculadora cuenta hacia atrás o hacia delante en pasos de 90 minutos, más el tiempo que tardas " +
+            "en dormirte (unos **15 minutos** de media, ajustable en ajustes), para que la alarma caiga al final " +
+            "de un ciclo y no en medio.",
+        "Cuántos ciclos necesitas depende de la edad. La National Sleep Foundation recomienda **7–9 horas** " +
+            "(unos 5–6 ciclos) para adultos, más para adolescentes y niños, y algo menos para mayores. Cada " +
+            "tarjeta muestra una cara según lo cerca que está esa opción de tu rango recomendado.",
+    )
+    override val howItWorksNote =
+        "90 minutos es una media: los ciclos reales van de unos 70 a 120 minutos y varían cada noche. Toma las " +
+            "sugerencias como buenos objetivos, no como ciencia exacta."
     override val gotIt = "Entendido"
+    override val done = "Hecho"
+    override val alarmHint = "Toca una hora para guardarla como alarma en tu app de reloj"
+    override val pickTime = "Elegir la hora con el reloj"
+    override val noClockApp = "No se encontró ninguna app de reloj"
     override val back = "Atrás"
     override val close = "Cerrar"
     override val cancel = "Cancelar"
@@ -90,13 +104,28 @@ object FrStrings : Strings() {
     override val languageSystem = "Par défaut du système"
     override fun versionLabel(version: String) = "Version $version"
     override val howItWorks = "Comment ça marche ?"
-    override val howItWorksBody =
-        "Le sommeil se déroule en cycles d’environ 90 minutes. Se réveiller au milieu d’un cycle laisse une " +
-            "sensation de lourdeur ; se réveiller entre deux est bien plus facile. L’application compte à rebours " +
-            "(ou en avant) par tranches de 90 minutes et ajoute le temps dont vous avez besoin pour vous endormir. " +
-            "La durée d’un cycle varie d’une personne à l’autre : considérez ces heures comme un repère. Les visages " +
-            "indiquent comment chaque option se situe par rapport au sommeil recommandé pour votre âge."
+    override val howItWorksParagraphs = listOf(
+        "Le sommeil n’est pas uniforme : il traverse des **cycles répétés d’environ 90 minutes**, chacun passant " +
+            "par le sommeil léger, le sommeil profond et le sommeil paradoxal (où survient l’essentiel des rêves).",
+        "Se réveiller **au milieu d’un cycle**, surtout pendant le sommeil profond, provoque une inertie du " +
+            "sommeil : cette sensation de lourdeur et d’engourdissement qui peut durer un moment. Se réveiller " +
+            "**entre deux cycles**, quand le sommeil est le plus léger, rend le lever bien plus facile.",
+        "Ce calculateur compte à rebours ou en avant par tranches de 90 minutes, plus le temps qu’il vous faut " +
+            "pour vous endormir (environ **15 minutes** en moyenne, réglable dans les réglages), pour que votre " +
+            "alarme tombe à la fin d’un cycle et non au milieu.",
+        "Le nombre de cycles dont vous avez besoin dépend de l’âge. La National Sleep Foundation recommande " +
+            "**7 à 9 heures** (environ 5 à 6 cycles) pour les adultes, plus pour les adolescents et les enfants, " +
+            "un peu moins pour les seniors. Chaque carte affiche un visage selon la proximité de cette option " +
+            "avec votre plage recommandée.",
+    )
+    override val howItWorksNote =
+        "90 minutes est une moyenne : les cycles réels vont d’environ 70 à 120 minutes et varient d’une nuit à " +
+            "l’autre. Considérez les suggestions comme de bons objectifs, pas comme une science exacte."
     override val gotIt = "Compris"
+    override val done = "Terminé"
+    override val alarmHint = "Touchez une heure pour l’enregistrer comme alarme dans votre application Horloge"
+    override val pickTime = "Choisir l’heure avec l’horloge"
+    override val noClockApp = "Aucune application Horloge trouvée"
     override val back = "Retour"
     override val close = "Fermer"
     override val cancel = "Annuler"
@@ -136,13 +165,27 @@ object DeStrings : Strings() {
     override val languageSystem = "Systemstandard"
     override fun versionLabel(version: String) = "Version $version"
     override val howItWorks = "Wie funktioniert das?"
-    override val howItWorksBody =
-        "Schlaf verläuft in Zyklen von etwa 90 Minuten. Mitten in einem Zyklus aufzuwachen macht benommen; " +
-            "zwischen zwei Zyklen aufzuwachen fällt viel leichter. Die App rechnet in 90-Minuten-Schritten zurück " +
-            "(oder vor) und addiert die Zeit, die du zum Einschlafen brauchst. Die Zykluslänge ist von Mensch zu " +
-            "Mensch verschieden, die Zeiten sind daher ein Richtwert. Die Gesichter zeigen, wie jede Option im " +
-            "Vergleich zum empfohlenen Schlaf für dein Alter abschneidet."
+    override val howItWorksParagraphs = listOf(
+        "Schlaf ist nicht gleichförmig: Er durchläuft sich wiederholende **Zyklen von etwa 90 Minuten**, jeder " +
+            "mit leichtem Schlaf, Tiefschlaf und REM (wenn die meisten Träume entstehen).",
+        "Wer **mitten in einem Zyklus** aufwacht, besonders im Tiefschlaf, erlebt Schlafträgheit: dieses " +
+            "benommene, schwere Gefühl, das eine Weile anhalten kann. Wer **zwischen zwei Zyklen** aufwacht, " +
+            "wenn der Schlaf am leichtesten ist, steht viel leichter auf.",
+        "Dieser Rechner zählt in 90-Minuten-Schritten zurück oder vor und addiert die Zeit zum Einschlafen " +
+            "(durchschnittlich etwa **15 Minuten**, in den Einstellungen anpassbar), damit dein Wecker am Ende " +
+            "eines Zyklus klingelt und nicht mittendrin.",
+        "Wie viele Zyklen du brauchst, hängt vom Alter ab. Die National Sleep Foundation empfiehlt für " +
+            "Erwachsene **7–9 Stunden** (etwa 5–6 Zyklen), für Jugendliche und Kinder mehr, für Senioren etwas " +
+            "weniger. Jede Karte zeigt ein Gesicht dafür, wie nah diese Option an deinem empfohlenen Bereich liegt.",
+    )
+    override val howItWorksNote =
+        "90 Minuten sind ein Durchschnitt: echte Zyklen dauern etwa 70 bis 120 Minuten und schwanken von Nacht " +
+            "zu Nacht. Sieh die Vorschläge als gute Richtwerte, nicht als exakte Wissenschaft."
     override val gotIt = "Verstanden"
+    override val done = "Fertig"
+    override val alarmHint = "Tippe auf eine Zeit, um sie als Wecker in deiner Uhr-App zu speichern"
+    override val pickTime = "Zeit mit der Uhr wählen"
+    override val noClockApp = "Keine Uhr-App gefunden"
     override val back = "Zurück"
     override val close = "Schließen"
     override val cancel = "Abbrechen"
@@ -182,13 +225,27 @@ object PtStrings : Strings() {
     override val languageSystem = "Padrão do sistema"
     override fun versionLabel(version: String) = "Versão $version"
     override val howItWorks = "Como funciona?"
-    override val howItWorksBody =
-        "O sono passa por ciclos de cerca de 90 minutos. Acordar no meio de um deixa a sensação de " +
-            "atordoamento; acordar entre dois é bem mais fácil. O app conta para trás (ou para frente) em passos " +
-            "de 90 minutos e soma o tempo que você costuma levar para adormecer. A duração do ciclo varia de " +
-            "pessoa para pessoa, então use os horários como referência. Os rostos mostram como cada opção se " +
-            "compara ao sono recomendado para a sua idade."
+    override val howItWorksParagraphs = listOf(
+        "O sono não é uniforme: ele passa por **ciclos repetidos de cerca de 90 minutos**, cada um com sono " +
+            "leve, sono profundo e REM (quando ocorre a maior parte dos sonhos).",
+        "Acordar **no meio de um ciclo**, principalmente durante o sono profundo, causa inércia do sono: " +
+            "aquela sensação de atordoamento e peso que pode durar um tempo. Acordar **entre ciclos**, quando " +
+            "o sono está mais leve, torna levantar-se bem mais fácil.",
+        "Esta calculadora conta para trás ou para frente em passos de 90 minutos, mais o tempo que você leva " +
+            "para adormecer (cerca de **15 minutos** em média, ajustável nas configurações), para que o alarme " +
+            "toque no fim de um ciclo e não no meio.",
+        "Quantos ciclos você precisa depende da idade. A National Sleep Foundation recomenda **7–9 horas** " +
+            "(cerca de 5–6 ciclos) para adultos, mais para adolescentes e crianças e um pouco menos para " +
+            "idosos. Cada cartão mostra um rosto conforme a proximidade dessa opção da sua faixa recomendada.",
+    )
+    override val howItWorksNote =
+        "90 minutos é uma média: os ciclos reais vão de cerca de 70 a 120 minutos e variam de noite para " +
+            "noite. Use as sugestões como boas metas, não como ciência exata."
     override val gotIt = "Entendi"
+    override val done = "Concluído"
+    override val alarmHint = "Toque em um horário para salvá-lo como alarme no seu app de relógio"
+    override val pickTime = "Escolher a hora com o relógio"
+    override val noClockApp = "Nenhum app de relógio encontrado"
     override val back = "Voltar"
     override val close = "Fechar"
     override val cancel = "Cancelar"
@@ -228,13 +285,27 @@ object ItStrings : Strings() {
     override val languageSystem = "Predefinita di sistema"
     override fun versionLabel(version: String) = "Versione $version"
     override val howItWorks = "Come funziona?"
-    override val howItWorksBody =
-        "Il sonno attraversa cicli di circa 90 minuti. Svegliarsi nel mezzo di uno lascia storditi; " +
-            "svegliarsi tra due è molto più facile. L’app conta all’indietro (o in avanti) a passi di 90 minuti " +
-            "e aggiunge il tempo che di solito serve per addormentarsi. La durata del ciclo varia da persona a " +
-            "persona, quindi considera gli orari come un’indicazione. I volti mostrano come ogni opzione si " +
-            "confronta con il sonno consigliato per la tua età."
+    override val howItWorksParagraphs = listOf(
+        "Il sonno non è uniforme: attraversa **cicli ripetuti di circa 90 minuti**, ciascuno con sonno " +
+            "leggero, sonno profondo e REM (quando avviene la maggior parte dei sogni).",
+        "Svegliarsi **a metà di un ciclo**, soprattutto durante il sonno profondo, provoca inerzia del sonno: " +
+            "quella sensazione di stordimento e pesantezza che può durare a lungo. Svegliarsi **tra due cicli**, " +
+            "quando il sonno è più leggero, rende l’alzarsi molto più facile.",
+        "Questo calcolatore conta all’indietro o in avanti a passi di 90 minuti, più il tempo che serve per " +
+            "addormentarsi (circa **15 minuti** in media, regolabile nelle impostazioni), così la sveglia suona " +
+            "alla fine di un ciclo e non nel mezzo.",
+        "Quanti cicli servono dipende dall’età. La National Sleep Foundation raccomanda **7–9 ore** (circa " +
+            "5–6 cicli) per gli adulti, di più per adolescenti e bambini, un po’ meno per gli anziani. Ogni " +
+            "scheda mostra un volto in base a quanto l’opzione è vicina al tuo intervallo consigliato.",
+    )
+    override val howItWorksNote =
+        "90 minuti è una media: i cicli reali vanno da circa 70 a 120 minuti e variano da notte a notte. " +
+            "Considera i suggerimenti come buoni obiettivi, non come scienza esatta."
     override val gotIt = "Capito"
+    override val done = "Fatto"
+    override val alarmHint = "Tocca un orario per salvarlo come sveglia nella tua app Orologio"
+    override val pickTime = "Scegli l’ora con l’orologio"
+    override val noClockApp = "Nessuna app Orologio trovata"
     override val back = "Indietro"
     override val close = "Chiudi"
     override val cancel = "Annulla"
