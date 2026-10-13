@@ -11,7 +11,7 @@ to pkg-lab: Android plus desktop (Windows, macOS, Linux), same Compose UI on eve
 | Location / names | `android/SleepCycles/`, application id and namespace `com.david7ce.sleepcycles`, app name `SleepCycles`. |
 | Languages | es, en, fr, de, pt, it. Device language by default, or chosen in Settings. |
 | Look | Plain Material 3 in light and dark, both from the PWA palette (night purple in dark). No drawn sky: a sun-following background was considered and rejected (needs location and latitude). Theme: light / dark / system, with `ThemeMode` and `isDark` shared in `:pkgshared`. |
-| Scope | Only what the PWA has. No alarms, history or anything new. |
+| Scope | What the PWA has, plus two Android niceties asked for later: the system time picker and tapping a result to open the clock app on a new alarm (the user saves it there, the app keeps no alarms of its own). No history or notifications. |
 | Source repo | `sleep-cycles-calc` stays as is; the PWA keeps being published. |
 | Rename | `com/deivon` source folders and the `vendor` field renamed to `david7ce` (done before this spec; path-only, packages were already `com.david7ce.*`). |
 | License | PolyForm Strict 1.0.0 for all of pkg-lab (root `LICENSE`). Source-available, not OSI open source: readable and usable noncommercially, no modification or redistribution. The PWA repo keeps the Apache-2.0 it already shipped under. |
@@ -26,7 +26,7 @@ android/SleepCycles/
         ├── commonMain/kotlin/com/david7ce/sleepcycles/
         │     logic/      SleepCalc, AgeRange, Rating, TimeFormat   (pure, no UI or platform)
         │     platform/   Services: SettingsStore, Clock            (interfaces)
-        │     ui/         AppState, MainScreen, SettingsScreen, HelpDialog,
+        │     ui/         AppState, MainScreen, SettingsDialog, HelpDialog, PlatformUi,
         │                 RatingFace, Strings, Translations, Theme
         ├── androidMain/  SharedPreferences store, system clock, MainActivity, Application
         ├── desktopMain/  java.util.prefs store, system clock, DesktopMain, window title bar
@@ -56,7 +56,7 @@ Time is minutes of the day (0..1439); results wrap modulo 1440. No date library.
 - **Main (single screen):** `SegmentedChoice` for the mode (each with its own accent); time picker (AM/PM
   toggle when format is 12 h); a *Sleep now* button with a moon icon, shown only in "go to bed at"; six cards, each with time, "n cycles · X h" and a
   rating face. Results are live: no Calculate button, the cards update as the time changes. Hint line "1 cycle = 90 min · includes N min to fall asleep".
-- **Settings** (`SubScreen`, most-used first): age (`ChoiceDropdown`), time to fall asleep, 12/24 h,
+- **Settings** (a dialog with a Done button, most-used first): age (`ChoiceDropdown`), time to fall asleep, 12/24 h,
   theme, language ("System default" first; applied live, no activity recreation, as in Recetario), version at the bottom.
 - **How does it work?** a dialog.
 - **Rating faces** are drawn with `Canvas` (as the PWA draws SVG faces), not emoji: color emoji render
@@ -92,5 +92,5 @@ Time is minutes of the day (0..1439); results wrap modulo 1440. No date library.
 
 ## Out of scope
 
-Alarms or notifications, history, wearables, iOS, reproducing the PWA's service worker or install flow,
+Alarms the app itself schedules, notifications, history, wearables, iOS, reproducing the PWA's service worker or install flow,
 any change to the PWA repo.

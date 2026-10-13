@@ -181,6 +181,13 @@ jobs:
           APP: ${{ matrix.app }}
         run: |
           ls -lh apks
+          # Never publish a partial release. A failed build or test leaves fewer APKs here (the release job
+          # runs anyway), and publish() below deletes the previous good APK of any ABI missing from the new
+          # set. No new release is better than a broken one that also destroys the last good one.
+          for abi in arm64-v8a armeabi-v7a universal; do
+            ls apks/${APP}-android-*-${abi}.apk >/dev/null 2>&1 \
+              || { echo "::error::No ${abi} APK for ${APP}: not publishing, the last release is kept"; exit 1; }
+          done
           # Apps that also ship desktop installers (Windows/Linux/macOS) keep Android and desktop on one
           # release, published by both this workflow and desktop.yml - never destructively, since either
           # can run first and neither should delete what the other already uploaded.

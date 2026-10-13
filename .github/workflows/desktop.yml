@@ -163,6 +163,12 @@ jobs:
           files=$(find dist -type f \( -name '*.msi' -o -name '*.tar.gz' -o -name '*.dmg' \))
           echo "::notice title=Installers::$(echo $files | tr '\n' ' ')"
           [ -n "$files" ] || { echo "::error::No installers to publish"; exit 1; }
+          # Never publish a partial release: if one OS failed, publish() would delete that OS's previous
+          # good installer. Keep the last release instead.
+          for ext in msi dmg tar.gz; do
+            echo "$files" | grep -qE "\.${ext}( |\$)" \
+              || { echo "::error::No .${ext} installer for ${APP}: not publishing, the last release is kept"; exit 1; }
+          done
 
           # Same release as android.yml's build for this app (Android + desktop together) - never a
           # destructive delete, since android.yml's own APKs may already be on it, or may land

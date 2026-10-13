@@ -18,7 +18,8 @@ Multiplatform: Android, Windows, Linux and macOS. Spanish, English, French, Germ
 - Rating by age range, shown as a face and its description: child 9–11 h, teen 8–10 h, adult 7–9 h,
   senior 7–8 h; "ok" within one cycle of the range and at 4.5 h.
 - 24-hour or 12-hour (AM/PM), light/dark/system theme (the PWA night palette in dark; theme logic shared with the other apps). No accounts,
-  no network, no permissions; settings stay on the device.
+  no network; the only permission is SET_ALARM, used to hand a tapped time to the clock app. Settings stay
+  on the device.
 
 ## Structure
 
