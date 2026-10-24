@@ -6,9 +6,9 @@ Windows, Linux and macOS. Spanish, English, French, German, Portuguese and Itali
 default, or chosen in Settings).
 
 - **Library:** 39 built-in bodyweight exercises (push, pull, legs, core, skill) with English names and a
-  detailed how-to text (setup, execution, a cue and a regression/progression), plus custom exercises you
-  name and describe yourself. Search by name (accents ignored), filter by group and by how the exercise
-  is measured (reps or seconds).
+  detailed how-to text available in all six app languages, plus custom exercises you name and describe
+  yourself. Search by name (accents ignored), filter by group and by how the exercise is measured (reps
+  or seconds).
 - **Routines:** ordered exercises, planned sets, a target (reps or a hold in seconds) and the rest after
   each set. Create, edit, reorder, duplicate, delete. Starting a routine pre-fills every set.
 - **Workout:** start from a routine or empty; type reps/seconds and tick each set. Only ticked sets reach
@@ -40,7 +40,8 @@ Calistenia/
         ├── commonMain/
         │   ├── kotlin/…/model/       Exercise, Routine, WorkoutSession (rows as plain data)
         │   ├── kotlin/…/logic/       pure logic, no platform or UI code:
-        │   │     BuiltinExercises · ExerciseSearch · WorkoutMath (progress, week summary)
+        │   │     BuiltinExercises · BuiltinDescriptions (how-to text in six languages)
+        │   │     ExerciseSearch · WorkoutMath (progress, week summary)
         │   │     RestTimer (absolute-time state machine) · RoutineDraft (editor + validation)
         │   │     SessionLog (immutable set/exercise edits) · Backup (JSON, validation, merge plan)
         │   │     Formats · UserSettings · AppLanguage
@@ -95,9 +96,11 @@ finish, unticked sets and exercises left with no sets are dropped, then `finishe
 
 Only finished sessions are exported. Newer `version`s are rejected (an older app would otherwise drop
 fields silently); unknown fields are ignored. Version 2 adds `exercise.description`; version 1 backups
-still import, with an empty description. Import checks the format, version, unique ids, every routine
-reference, measures, bounds and the size cap (10 MB), then merges in one transaction: existing top-level
-records are skipped with their children, and only settings keys not already stored are written.
+still import, with an empty description. Built-in descriptions are exported in English (their base
+text); the app shows the translation for its current language. Import checks the format, version,
+unique ids, every routine reference, measures, bounds and the size cap (10 MB), then merges in one
+transaction: existing top-level records are skipped with their children, and only settings keys not
+already stored are written.
 
 ## Build and test
 
@@ -122,15 +125,15 @@ fresh database → import path against real SQLite.
 ## Known limitations
 
 - Not exercised on physical Android hardware or on macOS/Linux desktops yet. Verified by local debug
-  and release builds, the JVM desktop compile and 69 unit tests (including the repository, the v1 → v2
+  and release builds, the JVM desktop compile and 72 unit tests (including the repository, the v1 → v2
   migration and real SQLite).
 - The background rest notification is a delayed job in the app process: it fires while the app is in the
   background, but not if Android kills the process. It is a training aid, not an alarm; no exact-alarm
   permissions are requested.
 - Two notification channels are used (alert and silent): turning off both sound and vibration posts the
   silent one; if only one is off, the alert channel may still do both.
-- Built-in exercise names and descriptions stay in English (the common language of calisthenics
-  training); groups, units and the whole UI are translated. Images, videos and 3D models are not
-  included yet.
+- Built-in exercise names stay in English (the common language of calisthenics training); their how-to
+  descriptions follow the app language. Custom exercise descriptions are shown exactly as written.
+  Images, videos and 3D models are not included yet.
 - No per-side tracking (left/right), no added weight, no body measurements, no charts beyond the last
   ten sessions. Deliberately out of this version.

@@ -37,6 +37,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.david7ce.calistenia.logic.ExerciseProgress
+import com.david7ce.calistenia.logic.descriptionFor
 import com.david7ce.calistenia.logic.filterExercises
 import com.david7ce.calistenia.logic.formatDuration
 import com.david7ce.calistenia.logic.ProgressPoint
@@ -197,6 +198,7 @@ fun ExerciseDetailScreen(app: AppState, exerciseId: String) {
     }
     val progress = app.progressFor(exerciseId)
     val lastSets = app.lastSetsFor(exerciseId)
+    val description = exercise.descriptionFor(app.languageCode)
     var editing by remember { mutableStateOf(false) }
     var deleting by remember { mutableStateOf(false) }
 
@@ -212,7 +214,7 @@ fun ExerciseDetailScreen(app: AppState, exerciseId: String) {
                 if (exercise.isCustom) Pill(strings.custom)
             }
         }
-        if (exercise.description.isNotBlank()) {
+        if (description.isNotBlank()) {
             item {
                 Card(modifier = Modifier.fillMaxWidth()) {
                     Column(Modifier.padding(14.dp)) {
@@ -222,7 +224,7 @@ fun ExerciseDetailScreen(app: AppState, exerciseId: String) {
                             color = MaterialTheme.colorScheme.primary,
                         )
                         Text(
-                            exercise.description,
+                            description,
                             style = MaterialTheme.typography.bodyMedium,
                             modifier = Modifier.padding(top = 6.dp),
                         )

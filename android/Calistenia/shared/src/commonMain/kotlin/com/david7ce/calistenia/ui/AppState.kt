@@ -119,7 +119,9 @@ class AppState(
         private set
 
     /** Texts in the chosen language, or the device language when the choice is System. */
-    val strings: Strings get() = stringsFor(settings.language.code ?: systemLanguage)
+    val languageCode: String get() = settings.language.code ?: systemLanguage
+
+    val strings: Strings get() = stringsFor(languageCode)
 
     var tab by mutableStateOf<Tab>(Tab.Train)
         private set

@@ -223,7 +223,7 @@ open class Strings {
         "**Everything is local.** No account, no network. The backup in Settings writes one JSON file with your routines, custom exercises and finished workouts; importing it merges by id and never overwrites what you already have.",
     )
     open val helpNote =
-        "Exercise names and descriptions are in English, the common language of calisthenics training. Built-in exercises are a starting point: add your own variations whenever you need them."
+        "Exercise names are in English, the common language of calisthenics training; the how-to descriptions follow the app language. Built-in exercises are a starting point: add your own variations whenever you need them."
 }
 
 val LocalStrings = staticCompositionLocalOf<Strings> { EnStrings }

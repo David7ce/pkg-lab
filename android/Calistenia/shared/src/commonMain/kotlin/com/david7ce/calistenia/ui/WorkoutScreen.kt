@@ -41,6 +41,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.david7ce.calistenia.logic.RestState
+import com.david7ce.calistenia.logic.descriptionFor
 import com.david7ce.calistenia.logic.formatCountdown
 import com.david7ce.calistenia.logic.formatDuration
 import com.david7ce.calistenia.model.Measure
@@ -170,7 +171,7 @@ private fun WorkoutExerciseCard(
     val lastSets = app.lastSetsFor(exercise.exerciseId)
     val lastLabel = if (lastSets.isEmpty()) null else
         strings.lastTime(strings.setValues(lastSets.map { it.valueLabel(strings.secondsUnit) }))
-    val description = app.exerciseById(exercise.exerciseId)?.description.orEmpty()
+    val description = app.exerciseById(exercise.exerciseId)?.descriptionFor(app.languageCode).orEmpty()
     var showInfo by remember { mutableStateOf(false) }
 
     Card(modifier = Modifier.fillMaxWidth()) {

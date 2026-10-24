@@ -189,7 +189,7 @@ object EsStrings : Strings() {
         "**Todo es local.** Sin cuenta ni red. La copia de seguridad de Ajustes escribe un archivo JSON con tus rutinas, ejercicios personalizados y entrenamientos terminados; al importarlo se combina por id y nunca sobrescribe lo que ya tienes.",
     )
     override val helpNote =
-        "Los nombres y las descripciones de los ejercicios están en inglés, el idioma común del entrenamiento calisténico. Los ejercicios incluidos son un punto de partida: añade tus propias variantes cuando las necesites."
+        "Los nombres de los ejercicios están en inglés, el idioma común del entrenamiento calisténico; las descripciones siguen el idioma de la app. Los ejercicios incluidos son un punto de partida: añade tus propias variantes cuando las necesites."
 }
 
 object FrStrings : Strings() {
@@ -370,7 +370,7 @@ object FrStrings : Strings() {
         "**Tout est local.** Pas de compte, pas de réseau. La sauvegarde des réglages écrit un fichier JSON avec vos routines, exercices personnalisés et séances terminées ; à l'import, elle fusionne par identifiant sans jamais écraser ce que vous avez.",
     )
     override val helpNote =
-        "Les noms et les descriptions des exercices sont en anglais, la langue commune de l'entraînement calisthénique. Les exercices intégrés sont un point de départ : ajoutez vos propres variantes quand vous en avez besoin."
+        "Les noms des exercices sont en anglais, la langue commune de l'entraînement calisthénique ; les descriptions suivent la langue de l'app. Les exercices intégrés sont un point de départ : ajoutez vos propres variantes quand vous en avez besoin."
 }
 
 object DeStrings : Strings() {
@@ -551,7 +551,7 @@ object DeStrings : Strings() {
         "**Alles bleibt lokal.** Kein Konto, kein Netzwerk. Das Backup in den Einstellungen schreibt eine JSON-Datei mit Routinen, eigenen Übungen und abgeschlossenen Trainings; beim Import wird nach id zusammengeführt und nie überschrieben.",
     )
     override val helpNote =
-        "Übungsnamen und -beschreibungen sind auf Englisch, der gemeinsamen Sprache des Calisthenics-Trainings. Die enthaltenen Übungen sind ein Anfang: Füge eigene Varianten hinzu, wann immer du sie brauchst."
+        "Übungsnamen sind auf Englisch, der gemeinsamen Sprache des Calisthenics-Trainings; die Beschreibungen folgen der App-Sprache. Die enthaltenen Übungen sind ein Anfang: Füge eigene Varianten hinzu, wann immer du sie brauchst."
 }
 
 object PtStrings : Strings() {
@@ -732,7 +732,7 @@ object PtStrings : Strings() {
         "**Tudo é local.** Sem conta nem rede. A cópia de segurança das definições escreve um ficheiro JSON com as tuas rotinas, exercícios personalizados e treinos concluídos; ao importar, junta por id e nunca substitui o que já tens.",
     )
     override val helpNote =
-        "Os nomes e as descrições dos exercícios estão em inglês, a língua comum do treino calisténico. Os exercícios incluídos são um ponto de partida: acrescenta as tuas próprias variantes quando precisares."
+        "Os nomes dos exercícios estão em inglês, a língua comum do treino calisténico; as descrições seguem o idioma da app. Os exercícios incluídos são um ponto de partida: acrescenta as tuas próprias variantes quando precisares."
 }
 
 object ItStrings : Strings() {
@@ -913,5 +913,5 @@ object ItStrings : Strings() {
         "**Tutto è locale.** Nessun account, nessuna rete. Il backup nelle impostazioni scrive un file JSON con routine, esercizi personalizzati e allenamenti conclusi; all'importazione unisce per id e non sovrascrive mai ciò che hai già.",
     )
     override val helpNote =
-        "I nomi e le descrizioni degli esercizi sono in inglese, la lingua comune dell'allenamento calistenico. Gli esercizi inclusi sono un punto di partenza: aggiungi le tue varianti quando servono."
+        "I nomi degli esercizi sono in inglese, la lingua comune dell'allenamento calistenico; le descrizioni seguono la lingua dell'app. Gli esercizi inclusi sono un punto di partenza: aggiungi le tue varianti quando servono."
 }
