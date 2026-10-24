@@ -36,6 +36,8 @@ class StringsTest {
                 s.themeDark to en.themeDark,
                 s.languageSystem to en.languageSystem,
                 s.noResults to en.noResults,
+                s.exerciseHowTo to en.exerciseHowTo,
+                s.descriptionLabel to en.descriptionLabel,
             ).forEach { (translated, original) ->
                 assertNotEquals(original, translated, "${language.name}: $translated")
             }

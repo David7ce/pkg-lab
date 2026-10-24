@@ -12,7 +12,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
@@ -167,6 +170,8 @@ private fun WorkoutExerciseCard(
     val lastSets = app.lastSetsFor(exercise.exerciseId)
     val lastLabel = if (lastSets.isEmpty()) null else
         strings.lastTime(strings.setValues(lastSets.map { it.valueLabel(strings.secondsUnit) }))
+    val description = app.exerciseById(exercise.exerciseId)?.description.orEmpty()
+    var showInfo by remember { mutableStateOf(false) }
 
     Card(modifier = Modifier.fillMaxWidth()) {
         Column(Modifier.padding(14.dp)) {
@@ -184,6 +189,11 @@ private fun WorkoutExerciseCard(
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
+                }
+                if (description.isNotBlank()) {
+                    IconButton(onClick = { showInfo = true }) {
+                        Icon(SharedIcons.Info, strings.exerciseHowTo, tint = MaterialTheme.colorScheme.primary)
+                    }
                 }
                 IconButton(onClick = onRemove) {
                     Icon(SharedIcons.Delete, strings.removeExercise, tint = MaterialTheme.colorScheme.error)
@@ -223,6 +233,30 @@ private fun WorkoutExerciseCard(
                 modifier = Modifier.fillMaxWidth().padding(top = 4.dp),
             )
         }
+    }
+
+    if (showInfo) {
+        AlertDialog(
+            onDismissRequest = { showInfo = false },
+            title = { Text(exercise.name) },
+            text = {
+                Column(Modifier.verticalScroll(rememberScrollState())) {
+                    Text(
+                        strings.exerciseHowTo,
+                        style = MaterialTheme.typography.labelLarge,
+                        color = MaterialTheme.colorScheme.primary,
+                    )
+                    Text(
+                        description,
+                        style = MaterialTheme.typography.bodyMedium,
+                        modifier = Modifier.padding(top = 8.dp),
+                    )
+                }
+            },
+            confirmButton = {
+                TextButton(onClick = { showInfo = false }) { Text(strings.close) }
+            },
+        )
     }
 }
 

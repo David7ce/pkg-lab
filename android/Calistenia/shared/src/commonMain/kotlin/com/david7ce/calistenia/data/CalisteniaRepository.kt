@@ -13,6 +13,7 @@ import com.david7ce.calistenia.logic.buildBackup
 import com.david7ce.calistenia.logic.isValid
 import com.david7ce.calistenia.logic.normalized
 import com.david7ce.calistenia.model.Exercise
+import com.david7ce.calistenia.model.MAX_EXERCISE_DESCRIPTION
 import com.david7ce.calistenia.model.Measure
 import com.david7ce.calistenia.model.MuscleGroup
 import com.david7ce.calistenia.model.Routine
@@ -36,14 +37,17 @@ class CalisteniaRepository(
     // ---------------------------------------------------------------------------------------------
     // Exercises
 
-    /** Inserts any built-in missing from an older install. Never touches existing rows. */
+    /** Inserts any built-in missing from an older install and refreshes its how-to text. */
     fun seedBuiltins() {
         val now = clock()
         db.transaction {
             BuiltinExercises.all.forEach { exercise ->
                 q.insertExerciseIgnore(
                     exercise.id, exercise.name, exercise.group.name, exercise.measure.name, 1L, now,
+                    exercise.description,
                 )
+                // Existing rows are not replaced, but a newer description should reach them.
+                q.updateBuiltinDescription(exercise.description, exercise.id)
             }
         }
     }
@@ -55,19 +59,35 @@ class CalisteniaRepository(
             group = MuscleGroup.fromStored(row.muscleGroup),
             measure = Measure.fromStored(row.measure),
             builtin = row.builtin != 0L,
+            description = row.description,
         )
     }
 
-    fun addExercise(name: String, group: MuscleGroup, measure: Measure): Exercise {
-        val exercise = Exercise(id = newId(), name = name.trim(), group = group, measure = measure, builtin = false)
+    fun addExercise(
+        name: String,
+        group: MuscleGroup,
+        measure: Measure,
+        description: String = "",
+    ): Exercise {
+        val exercise = Exercise(
+            id = newId(),
+            name = name.trim(),
+            group = group,
+            measure = measure,
+            builtin = false,
+            description = description.trim().take(MAX_EXERCISE_DESCRIPTION),
+        )
         q.insertExercise(
-            exercise.id, exercise.name, group.name, measure.name, 0L, clock(),
+            exercise.id, exercise.name, group.name, measure.name, 0L, clock(), exercise.description,
         )
         return exercise
     }
 
-    fun updateExercise(id: String, name: String, group: MuscleGroup, measure: Measure) {
-        q.updateExercise(name.trim(), group.name, measure.name, id)
+    fun updateExercise(id: String, name: String, group: MuscleGroup, measure: Measure, description: String) {
+        q.updateExercise(
+            name.trim(), group.name, measure.name,
+            description.trim().take(MAX_EXERCISE_DESCRIPTION), id,
+        )
     }
 
     /** Custom exercises only. Routines lose the line; history keeps its snapshot. */
@@ -322,7 +342,10 @@ class CalisteniaRepository(
     fun importBackup(merge: MergeResult) {
         db.transaction {
             merge.exercises.forEach {
-                q.insertExercise(it.id, it.name, it.group, it.measure, if (it.builtin) 1L else 0L, clock())
+                q.insertExercise(
+                    it.id, it.name, it.group, it.measure, if (it.builtin) 1L else 0L, clock(),
+                    it.description.take(MAX_EXERCISE_DESCRIPTION),
+                )
             }
             merge.routines.forEach { routine ->
                 q.insertRoutine(routine.id, routine.name, routine.notes, routine.createdAt, routine.updatedAt)

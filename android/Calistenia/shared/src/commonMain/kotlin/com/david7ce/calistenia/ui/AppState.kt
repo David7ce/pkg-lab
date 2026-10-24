@@ -561,9 +561,9 @@ class AppState(
     // ---------------------------------------------------------------------------------------------
     // Exercises
 
-    fun addExercise(name: String, group: MuscleGroup, measure: Measure) {
+    fun addExercise(name: String, group: MuscleGroup, measure: Measure, description: String = "") {
         persist({
-            repo.addExercise(name, group, measure)
+            repo.addExercise(name, group, measure, description)
             repo.exercises() to repo.routines()
         }) { (list, routinesList) ->
             exercises = list
@@ -571,9 +571,9 @@ class AppState(
         }
     }
 
-    fun updateExercise(id: String, name: String, group: MuscleGroup, measure: Measure) {
+    fun updateExercise(id: String, name: String, group: MuscleGroup, measure: Measure, description: String) {
         persist({
-            repo.updateExercise(id, name, group, measure)
+            repo.updateExercise(id, name, group, measure, description)
             repo.exercises() to repo.routines()
         }) { (list, routinesList) ->
             exercises = list

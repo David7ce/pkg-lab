@@ -28,6 +28,7 @@ class BuiltinExercisesTest {
             assertTrue(exercise.name.isNotBlank(), exercise.id)
             assertTrue(exercise.builtin, exercise.id)
             assertTrue(exercise.id.removePrefix("builtin:").isNotBlank(), exercise.id)
+            assertTrue(exercise.description.length >= 100, "${exercise.id} needs a detailed description")
         }
     }
 

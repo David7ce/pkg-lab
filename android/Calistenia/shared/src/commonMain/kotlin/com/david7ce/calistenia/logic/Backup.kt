@@ -1,6 +1,7 @@
 package com.david7ce.calistenia.logic
 
 import com.david7ce.calistenia.model.Exercise
+import com.david7ce.calistenia.model.MAX_EXERCISE_DESCRIPTION
 import com.david7ce.calistenia.model.Measure
 import com.david7ce.calistenia.model.MuscleGroup
 import com.david7ce.calistenia.model.Routine
@@ -32,6 +33,8 @@ data class ExerciseDto(
     val group: String,
     val measure: String,
     val builtin: Boolean = false,
+    /** v2; older backups have no field and decode to "". */
+    val description: String = "",
 )
 
 @Serializable
@@ -91,7 +94,7 @@ data class SetDto(
 )
 
 const val BACKUP_FORMAT = "calistenia"
-const val BACKUP_VERSION = 1
+const val BACKUP_VERSION = 2
 const val MAX_BACKUP_CHARS = 10 * 1024 * 1024
 const val MAX_EXERCISES = 2_000
 const val MAX_ROUTINES = 2_000
@@ -148,7 +151,11 @@ fun parseBackup(text: String): BackupResult {
     ) return BackupResult.Invalid(BackupProblem.DuplicateId)
 
     val exerciseIds = file.exercises.map { it.id }.toSet()
-    if (file.exercises.any { it.id.isBlank() || it.name.isBlank() || it.id.length > 200 || it.name.length > 200 }) {
+    if (file.exercises.any {
+            it.id.isBlank() || it.name.isBlank() || it.id.length > 200 || it.name.length > 200 ||
+                it.description.length > MAX_EXERCISE_DESCRIPTION
+        }
+    ) {
         return BackupResult.Invalid(BackupProblem.InvalidExercise)
     }
     if (file.exercises.any {
@@ -268,6 +275,7 @@ fun planMerge(file: BackupFile, existing: ExistingIds, existingSettings: Set<Str
 
 fun Exercise.toDto() = ExerciseDto(
     id = id, name = name, group = group.name, measure = measure.name, builtin = builtin,
+    description = description,
 )
 
 fun Routine.toDto(): RoutineDto = RoutineDto(
@@ -350,4 +358,5 @@ fun ExerciseDto.toModel() = Exercise(
     group = MuscleGroup.fromStored(group),
     measure = Measure.fromStored(measure),
     builtin = builtin,
+    description = description.take(MAX_EXERCISE_DESCRIPTION),
 )

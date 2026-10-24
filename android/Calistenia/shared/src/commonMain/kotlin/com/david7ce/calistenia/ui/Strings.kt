@@ -164,6 +164,8 @@ open class Strings {
     open val noProgressYet = "Finish a workout with this exercise to see progress here."
     open val lastSessions = "Last sessions"
     open val builtInNotice = "Built-in exercises cannot be edited or deleted."
+    open val exerciseHowTo = "How to do it"
+    open val descriptionLabel = "Description (optional)"
     open val filterGroup = "Group"
     open val filterMeasure = "Measure"
 
@@ -221,7 +223,7 @@ open class Strings {
         "**Everything is local.** No account, no network. The backup in Settings writes one JSON file with your routines, custom exercises and finished workouts; importing it merges by id and never overwrites what you already have.",
     )
     open val helpNote =
-        "Exercise names are in English, the common language of calisthenics training. Built-in exercises are a starting point: add your own variations whenever you need them."
+        "Exercise names and descriptions are in English, the common language of calisthenics training. Built-in exercises are a starting point: add your own variations whenever you need them."
 }
 
 val LocalStrings = staticCompositionLocalOf<Strings> { EnStrings }

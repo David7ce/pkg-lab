@@ -18,6 +18,9 @@ Per-app pending work lives in each app's own README, not here (Recetario: "Deskt
   debug + release APK, and the shared/desktop code compiled on the JVM), but the first `android.yml` and
   `desktop.yml` runs, `calistenia-latest`, and a real-phone check are still pending: set logging, rest
   timer notification, backup export/import, language switch, theme.
+- **Calistenia: exercise media (3D models, photos or video).** Deliberately text-only for now: a good
+  3D model and rig per exercise is a project of its own, and photos/video would need storage and a
+  licensing decision. The database can gain a media reference later with a normal migration.
 - **Compose-on-Robolectric smoke tests** pass locally; worth a real-device check too before
   relying on them as the only UI-level test.
 

@@ -23,9 +23,13 @@ enum class Measure {
     }
 }
 
+/** Longest how-to text a custom exercise may store; also the import validation cap. */
+const val MAX_EXERCISE_DESCRIPTION = 2000
+
 /**
  * One exercise. [id] is stable forever: "builtin:<slug>" for the catalog seeded by the app, a random
- * id for a custom exercise. Built-ins are never edited or deleted.
+ * id for a custom exercise. Built-ins are never edited or deleted. [description] is the detailed
+ * how-to text (English, like the built-in names); custom exercises may leave it empty.
  */
 data class Exercise(
     val id: String,
@@ -33,6 +37,7 @@ data class Exercise(
     val group: MuscleGroup,
     val measure: Measure,
     val builtin: Boolean,
+    val description: String = "",
 ) {
     val isCustom: Boolean get() = !builtin
 }

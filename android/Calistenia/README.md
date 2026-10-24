@@ -5,15 +5,17 @@ timer, history and per-exercise progress. Kotlin Multiplatform + Compose Multipl
 Windows, Linux and macOS. Spanish, English, French, German, Portuguese and Italian (device language by
 default, or chosen in Settings).
 
-- **Library:** 39 built-in bodyweight exercises (push, pull, legs, core, skill) with English names, plus
-  custom exercises you name yourself. Search by name (accents ignored), filter by group and by how the
-  exercise is measured (reps or seconds).
+- **Library:** 39 built-in bodyweight exercises (push, pull, legs, core, skill) with English names and a
+  detailed how-to text (setup, execution, a cue and a regression/progression), plus custom exercises you
+  name and describe yourself. Search by name (accents ignored), filter by group and by how the exercise
+  is measured (reps or seconds).
 - **Routines:** ordered exercises, planned sets, a target (reps or a hold in seconds) and the rest after
   each set. Create, edit, reorder, duplicate, delete. Starting a routine pre-fills every set.
 - **Workout:** start from a routine or empty; type reps/seconds and tick each set. Only ticked sets reach
   history. Add sets or exercises mid-workout, notes per exercise and for the session, elapsed time,
-  finish or discard with confirmation. The unfinished session is stored as you go, so closing the app
-  never loses it; the Train tab offers to continue.
+  finish or discard with confirmation. An info button on each exercise shows its how-to text without
+  leaving the workout. The unfinished session is stored as you go, so closing the app never loses it;
+  the Train tab offers to continue.
 - **Rest timer:** starts when a set is ticked, with that exercise's rest (or the default in Settings).
   Pause, +15 s, skip. On Android it also posts a notification when the app is in the background (sound
   and vibration follow Settings; the permission is asked the first time a rest timer starts, on
@@ -59,13 +61,14 @@ Dependency direction: `ui → data → logic → model`; `platform` interfaces a
 
 ## Data
 
-`calistenia.db`, schema version 1 (`Calistenia.sq`): `exercise`, `routine`, `routine_exercise`,
-`session`, `session_exercise`, `workout_set` and `setting` (theme, language, default rest, notification
-options, keep-screen-on). There are no foreign keys: sessions snapshot the routine name and each
-exercise's name, measure and targets, so deleting either never breaks history, and deletes remove
-children explicitly in one transaction. Children are replaced as a whole when a routine is saved, so
-positions stay dense. Built-ins are seeded with `INSERT OR IGNORE` from stable ids
-(`builtin:push-up`), so a later version can add exercises without touching user data.
+`calistenia.db`, schema version 2 (`Calistenia.sq`; `1.sqm` adds `exercise.description`):
+`exercise`, `routine`, `routine_exercise`, `session`, `session_exercise`, `workout_set` and `setting`
+(theme, language, default rest, notification options, keep-screen-on). There are no foreign keys:
+sessions snapshot the routine name and each exercise's name, measure and targets, so deleting either
+never breaks history, and deletes remove children explicitly in one transaction. Children are replaced
+as a whole when a routine is saved, so positions stay dense. Built-ins are seeded with
+`INSERT OR IGNORE` from stable ids (`builtin:push-up`), and their descriptions are refreshed on every
+start, so a later version can add exercises or improve their how-to text without touching user data.
 
 A workout is a normal `session` row with `finishedAt` null; sets are written as they are ticked. On
 finish, unticked sets and exercises left with no sets are dropped, then `finishedAt` is set.
@@ -75,8 +78,9 @@ finish, unticked sets and exercises left with no sets are dropped, then `finishe
 `calistenia-backup-YYYY-MM-DD.json`:
 
 ```json
-{ "format": "calistenia", "version": 1, "exportedAt": 1760000000000, "app": "Calistenia",
-  "exercises": [ { "id": "builtin:push-up", "name": "Push-up", "group": "Push", "measure": "Reps", "builtin": true } ],
+{ "format": "calistenia", "version": 2, "exportedAt": 1760000000000, "app": "Calistenia",
+  "exercises": [ { "id": "builtin:push-up", "name": "Push-up", "group": "Push", "measure": "Reps",
+                   "builtin": true, "description": "Start in a high plank…" } ],
   "routines": [ { "id": "…", "name": "Push day", "notes": "", "createdAt": 0, "updatedAt": 0,
                   "exercises": [ { "id": "…", "exerciseId": "builtin:push-up", "position": 0, "sets": 3,
                                    "targetReps": 8, "targetSeconds": null, "restSeconds": 90 } ] } ],
@@ -90,10 +94,10 @@ finish, unticked sets and exercises left with no sets are dropped, then `finishe
 ```
 
 Only finished sessions are exported. Newer `version`s are rejected (an older app would otherwise drop
-fields silently); unknown fields are ignored. Import checks the format, version, unique ids, every
-routine reference, measures, bounds and the size cap (10 MB), then merges in one transaction: existing
-top-level records are skipped with their children, and only settings keys not already stored are
-written.
+fields silently); unknown fields are ignored. Version 2 adds `exercise.description`; version 1 backups
+still import, with an empty description. Import checks the format, version, unique ids, every routine
+reference, measures, bounds and the size cap (10 MB), then merges in one transaction: existing top-level
+records are skipped with their children, and only settings keys not already stored are written.
 
 ## Build and test
 
@@ -110,22 +114,23 @@ Locally the same commands need JDK 17+ and an Android SDK with platform 36. Down
 *Releases → `calistenia-latest`* (APKs, `.msi`, `.tar.gz`, `.dmg`). Desktop data lives in
 `%APPDATA%\Calistenia` on Windows and `~/.calistenia` elsewhere.
 
-Tests cover the catalog and search, progress math, the rest timer state machine, routine validation,
-immutable set editing, backup parsing/validation/merge, date formats and all six string sets; the
-Android unit tests run the repository and the full export → fresh database → import path against real
-SQLite.
+Tests cover the catalog (ids, descriptions) and search, progress math, the rest timer state machine,
+routine validation, immutable set editing, backup parsing/validation/merge, date formats and all six
+string sets; the Android unit tests run the repository, the v1 → v2 migration and the full export →
+fresh database → import path against real SQLite.
 
 ## Known limitations
 
 - Not exercised on physical Android hardware or on macOS/Linux desktops yet. Verified by local debug
-  and release builds, the JVM desktop compile and 67 unit tests (including the repository against real
-  SQLite).
+  and release builds, the JVM desktop compile and 69 unit tests (including the repository, the v1 → v2
+  migration and real SQLite).
 - The background rest notification is a delayed job in the app process: it fires while the app is in the
   background, but not if Android kills the process. It is a training aid, not an alarm; no exact-alarm
   permissions are requested.
 - Two notification channels are used (alert and silent): turning off both sound and vibration posts the
   silent one; if only one is off, the alert channel may still do both.
-- Built-in exercise names stay in English (the common language of calisthenics training); groups, units
-  and the whole UI are translated.
+- Built-in exercise names and descriptions stay in English (the common language of calisthenics
+  training); groups, units and the whole UI are translated. Images, videos and 3D models are not
+  included yet.
 - No per-side tracking (left/right), no added weight, no body measurements, no charts beyond the last
   ten sessions. Deliberately out of this version.

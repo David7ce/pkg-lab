@@ -1,4 +1,4 @@
--- Schema version 1.
+-- Schema version 2 (1.sqm adds exercise.description).
 -- Exercises, routines and finished sessions are independent rows; sessions store a name snapshot of
 -- the routine and of each exercise, so deleting either never damages history. Children are replaced as
 -- a whole when a routine is saved, inside one transaction (see CalisteniaRepository), so positions stay
@@ -10,7 +10,8 @@ CREATE TABLE exercise (
     muscleGroup TEXT NOT NULL,             -- push | pull | legs | core | skill
     measure TEXT NOT NULL,                 -- reps | seconds
     builtin INTEGER NOT NULL DEFAULT 0,    -- 0/1; built-ins are seeded, never edited or deleted
-    createdAt INTEGER NOT NULL
+    createdAt INTEGER NOT NULL,
+    description TEXT NOT NULL DEFAULT ''   -- v2: detailed how-to text (English for built-ins)
 );
 
 CREATE TABLE routine (
@@ -76,15 +77,19 @@ selectExercise:
 SELECT * FROM exercise WHERE id = ?;
 
 insertExerciseIgnore:
-INSERT OR IGNORE INTO exercise(id, name, muscleGroup, measure, builtin, createdAt)
-VALUES (?, ?, ?, ?, ?, ?);
+INSERT OR IGNORE INTO exercise(id, name, muscleGroup, measure, builtin, createdAt, description)
+VALUES (?, ?, ?, ?, ?, ?, ?);
 
 insertExercise:
-INSERT INTO exercise(id, name, muscleGroup, measure, builtin, createdAt)
-VALUES (?, ?, ?, ?, ?, ?);
+INSERT INTO exercise(id, name, muscleGroup, measure, builtin, createdAt, description)
+VALUES (?, ?, ?, ?, ?, ?, ?);
 
 updateExercise:
-UPDATE exercise SET name = ?, muscleGroup = ?, measure = ? WHERE id = ?;
+UPDATE exercise SET name = ?, muscleGroup = ?, measure = ?, description = ? WHERE id = ?;
+
+-- Built-in descriptions are content: refresh them on update without touching names, measures or user rows.
+updateBuiltinDescription:
+UPDATE exercise SET description = ? WHERE id = ? AND builtin = 1;
 
 deleteExercise:
 DELETE FROM exercise WHERE id = ?;

@@ -17,21 +17,23 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.david7ce.calistenia.model.Exercise
+import com.david7ce.calistenia.model.MAX_EXERCISE_DESCRIPTION
 import com.david7ce.calistenia.model.Measure
 import com.david7ce.calistenia.model.MuscleGroup
 import com.david7ce.shared.ui.SegmentedChoice
 
-/** Create or rename a custom exercise. Built-ins never reach this dialog. */
+/** Create or edit a custom exercise. Built-ins never reach this dialog. */
 @Composable
 fun ExerciseEditDialog(
     initial: Exercise?,
     onDismiss: () -> Unit,
-    onSave: (name: String, group: MuscleGroup, measure: Measure) -> Unit,
+    onSave: (name: String, group: MuscleGroup, measure: Measure, description: String) -> Unit,
 ) {
     val strings = LocalStrings.current
     var name by remember(initial) { mutableStateOf(initial?.name.orEmpty()) }
     var group by remember(initial) { mutableStateOf(initial?.group ?: MuscleGroup.Push) }
     var measure by remember(initial) { mutableStateOf(initial?.measure ?: Measure.Reps) }
+    var description by remember(initial) { mutableStateOf(initial?.description.orEmpty()) }
 
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -65,11 +67,19 @@ fun ExerciseEditDialog(
                     selected = measure,
                     onSelect = { measure = it },
                 )
+                OutlinedTextField(
+                    value = description,
+                    onValueChange = { description = it.take(MAX_EXERCISE_DESCRIPTION) },
+                    label = { Text(strings.descriptionLabel) },
+                    minLines = 3,
+                    maxLines = 6,
+                    modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
+                )
             }
         },
         confirmButton = {
             TextButton(
-                onClick = { onSave(name.trim(), group, measure) },
+                onClick = { onSave(name.trim(), group, measure, description.trim()) },
                 enabled = name.isNotBlank(),
             ) { Text(strings.save) }
         },

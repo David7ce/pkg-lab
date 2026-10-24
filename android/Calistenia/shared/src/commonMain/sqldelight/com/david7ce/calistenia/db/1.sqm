@@ -1,0 +1,2 @@
+-- Version 1 -> 2: detailed how-to text for every exercise (empty for custom ones created before this).
+ALTER TABLE exercise ADD COLUMN description TEXT NOT NULL DEFAULT '';

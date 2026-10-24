@@ -78,17 +78,26 @@ class RepositoryTest {
         repo.seedBuiltins()
         assertEquals(count, repo.exercises().size)
         assertTrue(repo.exercises().all { it.builtin })
+        assertTrue(repo.exercises().all { it.description.length >= 100 })
     }
 
     @Test
     fun customExercisesCanBeAddedEditedAndDeleted() {
-        val custom = repo.addExercise("Front lever row", MuscleGroup.Pull, Measure.Reps)
+        val custom = repo.addExercise(
+            "Front lever row", MuscleGroup.Pull, Measure.Reps,
+            description = "Hang under a bar and pull your chest up while keeping the body straight.",
+        )
         assertTrue(custom.isCustom)
+        assertEquals("Hang under a bar and pull your chest up while keeping the body straight.", custom.description)
 
-        repo.updateExercise(custom.id, "Front lever row (feet)", MuscleGroup.Pull, Measure.Seconds)
+        repo.updateExercise(
+            custom.id, "Front lever row (feet)", MuscleGroup.Pull, Measure.Seconds,
+            description = "Keep the heels on the floor and pull slowly.",
+        )
         val updated = repo.exercises().first { it.id == custom.id }
         assertEquals("Front lever row (feet)", updated.name)
         assertEquals(Measure.Seconds, updated.measure)
+        assertEquals("Keep the heels on the floor and pull slowly.", updated.description)
 
         repo.deleteExercise(custom.id)
         assertNull(repo.exercises().firstOrNull { it.id == custom.id })
@@ -234,6 +243,10 @@ class RepositoryTest {
     fun backupRestoresIntoAFreshDatabaseAndImportingTwiceChangesNothing() {
         seedFinishedWorkout()
         val routineName = repo.routines().single().name
+        val custom = repo.addExercise(
+            "Front lever row", MuscleGroup.Pull, Measure.Reps,
+            description = "Hang under a bar and pull your chest up, keeping the body straight.",
+        )
         repo.saveSetting("theme", "Dark")
 
         val exported = repo.backup(settingsFrom(repo.loadSettings()))
@@ -251,10 +264,14 @@ class RepositoryTest {
             )
             restored.seedBuiltins()
             val merge = planMerge(parsed.file, restored.existingIds(), restored.loadSettings().keys)
-            assertEquals(2, merge.added, "one routine + one session; exercises already seeded")
+            assertEquals(3, merge.added, "one custom exercise + one routine + one session")
             restored.importBackup(merge)
 
             assertEquals(repo.exercises().map { it.id }.sorted(), restored.exercises().map { it.id }.sorted())
+            assertEquals(
+                "Hang under a bar and pull your chest up, keeping the body straight.",
+                restored.exercises().first { it.id == custom.id }.description,
+            )
             assertEquals(1, restored.routines().size)
             assertEquals(routineName, restored.routines().single().name)
             assertEquals(repo.finishedSessions(), restored.finishedSessions())

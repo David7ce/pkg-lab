@@ -61,6 +61,7 @@ class BackupTest {
         assertEquals(BACKUP_VERSION, decoded.version)
         assertEquals(999L, decoded.exportedAt)
         assertEquals(listOf(pushUp.id), decoded.exercises.map { it.id })
+        assertTrue(decoded.exercises.single().description.length >= 100)
         assertEquals("Push day", decoded.routines.single().name)
         assertEquals(3, decoded.routines.single().exercises.single().sets)
         assertEquals(listOf(8, 7), decoded.sessions.single().exercises.single().sets.map { it.reps })
@@ -84,6 +85,18 @@ class BackupTest {
     @Test
     fun rejectsPlainText() {
         assertIs<BackupResult.Invalid>(parseBackup("not json at all"))
+    }
+
+    @Test
+    fun version1BackupsStillImportWithoutDescriptions() {
+        val v1 = """
+            {"format":"calistenia","version":1,"exportedAt":0,"app":"Calistenia",
+             "exercises":[{"id":"custom:x","name":"Lever row","group":"Pull","measure":"Reps","builtin":true}],
+             "routines":[],"sessions":[],"settings":{}}
+        """.trimIndent()
+        val parsed = parseBackup(v1)
+        assertIs<BackupResult.Valid>(parsed)
+        assertEquals("", parsed.file.exercises.single().description)
     }
 
     @Test

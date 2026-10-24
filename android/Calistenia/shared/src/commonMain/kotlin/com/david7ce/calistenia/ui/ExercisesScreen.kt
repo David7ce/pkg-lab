@@ -115,8 +115,8 @@ fun ExercisesScreen(app: AppState) {
         ExerciseEditDialog(
             initial = null,
             onDismiss = { creating = false },
-            onSave = { name, group, measure ->
-                app.addExercise(name, group, measure)
+            onSave = { name, group, measure, description ->
+                app.addExercise(name, group, measure, description)
                 creating = false
             },
         )
@@ -212,6 +212,24 @@ fun ExerciseDetailScreen(app: AppState, exerciseId: String) {
                 if (exercise.isCustom) Pill(strings.custom)
             }
         }
+        if (exercise.description.isNotBlank()) {
+            item {
+                Card(modifier = Modifier.fillMaxWidth()) {
+                    Column(Modifier.padding(14.dp)) {
+                        Text(
+                            strings.exerciseHowTo,
+                            style = MaterialTheme.typography.titleSmall,
+                            color = MaterialTheme.colorScheme.primary,
+                        )
+                        Text(
+                            exercise.description,
+                            style = MaterialTheme.typography.bodyMedium,
+                            modifier = Modifier.padding(top = 6.dp),
+                        )
+                    }
+                }
+            }
+        }
         item {
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -302,8 +320,8 @@ fun ExerciseDetailScreen(app: AppState, exerciseId: String) {
         ExerciseEditDialog(
             initial = exercise,
             onDismiss = { editing = false },
-            onSave = { name, group, measure ->
-                app.updateExercise(exercise.id, name, group, measure)
+            onSave = { name, group, measure, description ->
+                app.updateExercise(exercise.id, name, group, measure, description)
                 editing = false
             },
         )
