@@ -106,6 +106,9 @@ compose.desktop {
             // Only what gets published: .msi (Windows) and .dmg (macOS). Linux uses createDistributable + tar.gz in CI.
             targetFormats(TargetFormat.Msi, TargetFormat.Dmg)
             packageName = "Calistenia"
+            // SQLDelight's JDBC driver needs java.sql; sqlite-jdbc also reaches into jdk.unsupported.
+            // Without these the packaged app starts and dies with NoClassDefFoundError: java/sql/DriverManager.
+            modules("java.sql", "java.naming", "jdk.unsupported")
             // Installers need MAJOR.MINOR.PATCH with a number in MAJOR; CI run number keeps each build newer.
             packageVersion = appVersion
             vendor = "david7ce"
