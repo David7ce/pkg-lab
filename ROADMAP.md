@@ -14,6 +14,10 @@ Per-app pending work lives in each app's own README, not here (Recetario: "Deskt
   see Reference below) instead of two separate ones, without ever deleting the other's assets.
   Reasoned through and syntax-checked (YAML + `bash -n`), the exact `gh` subcommands confirmed
   against `--help`, but not watched end-to-end against a real concurrent run of both workflows yet.
+- **Watch the first CI runs of Calistenia.** Built and unit-tested locally (temporary Android SDK,
+  debug + release APK, and the shared/desktop code compiled on the JVM), but the first `android.yml` and
+  `desktop.yml` runs, `calistenia-latest`, and a real-phone check are still pending: set logging, rest
+  timer notification, backup export/import, language switch, theme.
 - **Compose-on-Robolectric smoke tests** pass locally; worth a real-device check too before
   relying on them as the only UI-level test.
 
@@ -29,8 +33,9 @@ and path-filtered CI already handle this fine. Revisit only if a 5th app needs i
 ## Reference
 
 - **Releases** are rolling `latest` tags per app (`android-<App>-latest`; Recetario's is
-  `recetario-latest`, SleepCycles has `sleepcycles-latest`, each shared by Android and desktop), not a version history — intentional, not a
-  gap. Titles are `<App> <version>`, no platform suffix — the asset filenames already say that.
+  `recetario-latest`, SleepCycles has `sleepcycles-latest`, Calistenia has `calistenia-latest`, each
+  shared by Android and desktop), not a version history — intentional, not a gap. Titles are
+  `<App> <version>`, no platform suffix — the asset filenames already say that.
 - **Signing**: one key (alias `pkglab`), encrypted at `.github/signing/release.jks.enc`, password
   in the `ANDROID_KEYSTORE_PASSWORD` GitHub secret *and* a password manager (reset 2026-10-13 —
   the original was only ever in the secret, unrecoverable once set). Losing it again means every

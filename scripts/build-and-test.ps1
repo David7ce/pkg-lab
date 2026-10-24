@@ -48,7 +48,7 @@ foreach ($a in $apps) {
 }
 
 # Apps under android/ that have a desktop target (jvm("desktop") in their shared module).
-$desktopApps = @("Recetario", "SleepCycles")
+$desktopApps = @("Recetario", "SleepCycles", "Calistenia")
 
 if ($Desktop -or $Package) {
     $targets = if ($App) { $desktopApps | Where-Object { $_ -eq $App } } else { $desktopApps }

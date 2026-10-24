@@ -1,0 +1,7 @@
+<resources>
+    <string name="rest_channel_silent_name">Pause (lautlos)</string>
+    <string name="rest_channel_name">Pause</string>
+    <string name="rest_channel_description">Meldet, wenn die Pause zwischen den Sätzen vorbei ist.</string>
+    <string name="rest_notification_title">Pause vorbei</string>
+    <string name="rest_notification_text">Weiter mit dem nächsten Satz.</string>
+</resources>

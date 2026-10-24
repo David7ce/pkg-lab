@@ -1,7 +1,7 @@
-# Shared by every app under android/ (FuelLog, VozReves, Recetario) and android/shared, via
-# dependencyResolutionManagement.versionCatalogs in each app's settings.gradle.kts. Keeps the
-# versions that have to match for :pkgshared to compile (Kotlin, AGP, Compose Multiplatform,
-# Material3) in one place instead of 4. Checked 2026-10-12 (latest stable unless noted).
+# Shared by every app under android/ (FuelLog, VozReves, Recetario, SleepCycles, Calistenia) and
+# android/shared, via dependencyResolutionManagement.versionCatalogs in each app's settings.gradle.kts.
+# Keeps the versions that have to match for :pkgshared to compile (Kotlin, AGP, Compose Multiplatform,
+# Material3) in one place instead of 5. Checked 2026-10-12 (latest stable unless noted).
 [versions]
 agp = "8.13.2"                 # last 8.x; the KMP + com.android.library layout below needs AGP 8
 kotlin = "2.4.21"

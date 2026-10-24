@@ -13,6 +13,7 @@ on:
     paths:
       - "android/Recetario/**"
       - "android/SleepCycles/**"
+      - "android/Calistenia/**"
       - "android/shared/**"
       - ".github/workflows/desktop.yml"
   workflow_dispatch:
@@ -42,7 +43,7 @@ jobs:
           BEFORE: ${{ github.event.before }}
         run: |
           # Keep this list in sync with android.yml's MULTI.
-          ALL="Recetario SleepCycles"
+          ALL="Recetario SleepCycles Calistenia"
 
           if [ "$EVENT" = "workflow_dispatch" ]; then
             if [ -n "$INPUT_APP" ]; then apps="$INPUT_APP"; else apps="$ALL"; fi

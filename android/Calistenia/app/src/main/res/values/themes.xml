@@ -1,0 +1,4 @@
+<resources>
+    <!-- Window theme only; colours come from Compose (CalisteniaTheme). -->
+    <style name="Theme.Calistenia" parent="android:Theme.Material.Light.NoActionBar" />
+</resources>

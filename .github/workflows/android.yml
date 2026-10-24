@@ -192,7 +192,7 @@ jobs:
           # release, published by both this workflow and desktop.yml - never destructively, since either
           # can run first and neither should delete what the other already uploaded.
           # Keep this list in sync with desktop.yml's detect job.
-          MULTI=" Recetario SleepCycles "
+          MULTI=" Recetario SleepCycles Calistenia "
           IS_MULTI=false
           if [[ "$MULTI" == *" $APP "* ]]; then IS_MULTI=true; TAG="${APP,,}-latest"; else TAG="android-${APP}-latest"; fi
 

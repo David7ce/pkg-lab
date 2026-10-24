@@ -13,7 +13,8 @@ pkg-lab/
 │   ├── VozReves/          ← each app is its own independent Gradle project
 │   ├── FuelLog/           ← fuel refill and consumption tracker
 │   ├── Recetario/         ← personal recipe book (Kotlin Multiplatform: Android + Windows/Linux/macOS)
-│   └── SleepCycles/       ← sleep cycle calculator (Kotlin Multiplatform: Android + Windows/Linux/macOS)
+│   ├── SleepCycles/       ← sleep cycle calculator (Kotlin Multiplatform: Android + Windows/Linux/macOS)
+│   └── Calistenia/        ← calisthenics workout log (Kotlin Multiplatform: Android + Windows/Linux/macOS)
 ├── linux/                 ← (future) with its own linux.yml
 ├── windows/               ← (future)
 └── web/                   ← (future)
@@ -27,7 +28,7 @@ pkg-lab/
 - **Errors:** if a build or a test fails, Kotlin/Gradle errors show up as annotations on the
   run page, no need to open the full log.
 - **Multiplatform apps:** a Kotlin Multiplatform app lives the same way under `android/<App>/`, with its common code in a
-  `shared` module and `app` only for packaging (see Recetario, SleepCycles). CI doesn't change.
+  `shared` module and `app` only for packaging (see Recetario, SleepCycles, Calistenia). CI doesn't change.
 - **Shared module (`android/shared`, `:pkgshared`):** selectors, confirmation dialogs, multi-select,
   sub-screens and common text. Every app includes it and shares the same UX behavior; only
   colors, icon and app-specific features differ. Changes in that folder rebuild every app. Details and how to
@@ -38,14 +39,14 @@ pkg-lab/
   compileSdk 36, minSdk 26. Apps must use the same versions to be able to share the module.
 - **Building:** every push to `main` builds only the apps that changed. Also by hand from
   *Actions → Android → Run workflow* (type the folder name, or leave it empty for all of them).
-- **Downloading:** *Releases → `android-<AppName>-latest`* (Recetario: `recetario-latest`, SleepCycles: `sleepcycles-latest`, see
+- **Downloading:** *Releases → `android-<AppName>-latest`* (Recetario: `recetario-latest`, SleepCycles: `sleepcycles-latest`, Calistenia: `calistenia-latest`, see
   below). Each app builds in parallel for `arm64-v8a` (almost every phone), `armeabi-v7a` (old
   32-bit) and `universal`. For an app to produce per-architecture APKs, its `app/build.gradle.kts`
   must read `-Pabi` (see VozReves); otherwise all three come out identical.
 - **Release titles** are just `<App> <version>` — no platform suffix, since the asset filenames
   already say that (`.apk` vs `.msi`/`.dmg`/`.tar.gz`). An app with more than one platform (only
-  Recetario and SleepCycles) publishes all of them to *one* release instead of one per platform: `android.yml`
-  and `desktop.yml` both publish to the app own `<app>-latest` (`recetario-latest`, `sleepcycles-latest`), each only touching its own asset types
+  Recetario, SleepCycles and Calistenia) publishes all of them to *one* release instead of one per platform: `android.yml`
+  and `desktop.yml` both publish to the app own `<app>-latest` (`recetario-latest`, `sleepcycles-latest`, `calistenia-latest`), each only touching its own asset types
   (`*.apk` vs `*.msi`/`*.dmg`/`*.tar.gz`) so neither ever deletes what the other just uploaded —
   whichever runs first creates the release, the other adds to it.
 - **APK naming:** `<App>-android-<version>-<architecture>.apk` (the version is read from the APK itself).
@@ -71,7 +72,7 @@ iteration. With the Android SDK installed (Android Studio or standalone), everyt
 locally, no push needed:
 
 - **Build + unit test:** `.\scripts\build-and-test.ps1` (`-App <Name>` for just one,
-  `-Desktop`/`-Package` for the desktop apps (Recetario, SleepCycles; `-App` picks one), `-NoDaemon` to match CI exactly). Uses the
+  `-Desktop`/`-Package` for the desktop apps (Recetario, SleepCycles, Calistenia; `-App` picks one), `-NoDaemon` to match CI exactly). Uses the
   Gradle daemon by default — much faster on repeat runs than CI's `--no-daemon`.
 - **See it running (Android):** an emulator, since none comes preinstalled.
   One-time setup — SDK Manager → install "Android SDK Command-line Tools", then:
@@ -83,7 +84,7 @@ locally, no push needed:
   boots are fast), and `.\scripts\build-and-test.ps1 -App <Name> -Install` builds, installs, and
   launches on whatever's running.
 - **See it running (Recetario desktop):** `./gradlew.bat :shared:run` — a real window, no
-  emulator. (`:shared:hotRunDesktop`, Compose Hot Reload, exists but failed to launch standalone
+  emulator. (Calistenia and SleepCycles run the same way.) (`:shared:hotRunDesktop`, Compose Hot Reload, exists but failed to launch standalone
   from the CLI when tried — needs IDE integration, not a reliable fit for this loop yet.)
 
 ## Other platforms

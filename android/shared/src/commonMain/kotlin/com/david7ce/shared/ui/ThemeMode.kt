@@ -5,8 +5,8 @@ import androidx.compose.runtime.Composable
 
 /**
  * The light/dark choice every app offers in Settings. [code] is what FuelLog and VozReves already store
- * (0 system, 1 light, 2 dark), so adopting this type changes no saved setting; Recetario and SleepCycles
- * store [name], which is the same set of words they used before.
+ * (0 system, 1 light, 2 dark), so adopting this type changes no saved setting; Recetario, SleepCycles
+ * and Calistenia store [name], which is the same set of words they used before.
  */
 enum class ThemeMode(val code: Int) {
     System(0),

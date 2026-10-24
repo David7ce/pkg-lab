@@ -1,0 +1,7 @@
+<resources>
+    <string name="rest_channel_silent_name">Descanso (silencioso)</string>
+    <string name="rest_channel_name">Descanso</string>
+    <string name="rest_channel_description">Avisa quando o descanso entre as séries termina.</string>
+    <string name="rest_notification_title">Descanso terminado</string>
+    <string name="rest_notification_text">Hora da próxima série.</string>
+</resources>

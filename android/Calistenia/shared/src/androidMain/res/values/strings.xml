@@ -1,0 +1,7 @@
+<resources>
+    <string name="rest_channel_silent_name">Rest timer (silent)</string>
+    <string name="rest_channel_name">Rest timer</string>
+    <string name="rest_channel_description">Tells you when the rest between sets is over.</string>
+    <string name="rest_notification_title">Rest over</string>
+    <string name="rest_notification_text">Time for the next set.</string>
+</resources>

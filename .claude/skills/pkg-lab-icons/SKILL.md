@@ -1,6 +1,6 @@
 ---
 name: pkg-lab-icons
-description: Use when adding, changing or using an icon in any Kotlin app under android/ (FuelLog, VozReves, Recetario, SleepCycles, or a new one). Says where an icon lives (SharedIcons vs the app), how to name and define it, and what not to do (no material-icons library, no per-icon files, no duplicates).
+description: Use when adding, changing or using an icon in any Kotlin app under android/ (FuelLog, VozReves, Recetario, SleepCycles, Calistenia, or a new one). Says where an icon lives (SharedIcons vs the app), how to name and define it, and what not to do (no material-icons library, no per-icon files, no duplicates).
 ---
 
 # pkg-lab icons
@@ -21,6 +21,7 @@ doubt, share it: a shared icon costs a few lines, a duplicate costs a divergence
 Current domain icons (the only ones outside `SharedIcons`):
 FuelLog — Boat, Bus, Car, Drop, Fuel, Motorcycle, Payments, Plane, Plate, Speed, TrendingDown, TrendingUp,
 Truck, Van (+ `AppIcons.of(VehicleType)`). VozReves — Mic, PlayReverse, Quote. Recetario — Dish.
+Calistenia — Dumbbell, Medal.
 
 ## Steps to use or add one
 

@@ -1,0 +1,7 @@
+<resources>
+    <string name="rest_channel_silent_name">Recupero (silenzioso)</string>
+    <string name="rest_channel_name">Recupero</string>
+    <string name="rest_channel_description">Avvisa quando finisce il recupero tra le serie.</string>
+    <string name="rest_notification_title">Recupero finito</string>
+    <string name="rest_notification_text">Tocca la serie successiva.</string>
+</resources>

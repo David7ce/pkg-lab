@@ -1,0 +1,203 @@
+-- Schema version 1.
+-- Exercises, routines and finished sessions are independent rows; sessions store a name snapshot of
+-- the routine and of each exercise, so deleting either never damages history. Children are replaced as
+-- a whole when a routine is saved, inside one transaction (see CalisteniaRepository), so positions stay
+-- dense (0..n-1). Sets are written as the user ticks them, so closing the app mid-workout loses nothing.
+
+CREATE TABLE exercise (
+    id TEXT NOT NULL PRIMARY KEY,          -- "<random>" for custom, "builtin:push-up" for the catalog
+    name TEXT NOT NULL,
+    muscleGroup TEXT NOT NULL,             -- push | pull | legs | core | skill
+    measure TEXT NOT NULL,                 -- reps | seconds
+    builtin INTEGER NOT NULL DEFAULT 0,    -- 0/1; built-ins are seeded, never edited or deleted
+    createdAt INTEGER NOT NULL
+);
+
+CREATE TABLE routine (
+    id TEXT NOT NULL PRIMARY KEY,
+    name TEXT NOT NULL,
+    notes TEXT NOT NULL DEFAULT '',
+    createdAt INTEGER NOT NULL,
+    updatedAt INTEGER NOT NULL
+);
+
+CREATE TABLE routine_exercise (
+    id TEXT NOT NULL PRIMARY KEY,
+    routineId TEXT NOT NULL,
+    exerciseId TEXT NOT NULL,
+    position INTEGER NOT NULL,
+    sets INTEGER NOT NULL,                 -- 1..20 planned sets
+    targetReps INTEGER,                    -- exactly one of targetReps / targetSeconds is set
+    targetSeconds INTEGER,
+    restSeconds INTEGER NOT NULL           -- 0..600
+);
+
+CREATE TABLE session (
+    id TEXT NOT NULL PRIMARY KEY,
+    name TEXT NOT NULL,                    -- routine name snapshot, or the free-workout label
+    routineId TEXT,                        -- NULL for a free workout; may dangle after the routine is deleted
+    startedAt INTEGER NOT NULL,
+    finishedAt INTEGER,                    -- NULL = still in progress
+    notes TEXT NOT NULL DEFAULT ''
+);
+
+CREATE TABLE session_exercise (
+    id TEXT NOT NULL PRIMARY KEY,
+    sessionId TEXT NOT NULL,
+    exerciseId TEXT NOT NULL,              -- may dangle after a custom exercise is deleted
+    name TEXT NOT NULL,                    -- exercise name snapshot
+    measure TEXT NOT NULL,                 -- reps | seconds, snapshotted like the name
+    position INTEGER NOT NULL,
+    targetSets INTEGER NOT NULL,           -- planned sets (3 for a free workout)
+    targetReps INTEGER,                    -- snapshots of the routine target, may be NULL
+    targetSeconds INTEGER,
+    restSeconds INTEGER NOT NULL,          -- rest after a completed set
+    notes TEXT NOT NULL DEFAULT ''
+);
+
+CREATE TABLE workout_set (
+    id TEXT NOT NULL PRIMARY KEY,
+    sessionExerciseId TEXT NOT NULL,
+    position INTEGER NOT NULL,
+    reps INTEGER,                          -- exactly one of reps / seconds is set
+    seconds INTEGER,
+    completedAt INTEGER                    -- NULL = not done yet
+);
+
+CREATE TABLE setting (
+    name TEXT NOT NULL PRIMARY KEY,
+    content TEXT NOT NULL
+);
+
+selectExercises:
+SELECT * FROM exercise ORDER BY name COLLATE NOCASE;
+
+selectExercise:
+SELECT * FROM exercise WHERE id = ?;
+
+insertExerciseIgnore:
+INSERT OR IGNORE INTO exercise(id, name, muscleGroup, measure, builtin, createdAt)
+VALUES (?, ?, ?, ?, ?, ?);
+
+insertExercise:
+INSERT INTO exercise(id, name, muscleGroup, measure, builtin, createdAt)
+VALUES (?, ?, ?, ?, ?, ?);
+
+updateExercise:
+UPDATE exercise SET name = ?, muscleGroup = ?, measure = ? WHERE id = ?;
+
+deleteExercise:
+DELETE FROM exercise WHERE id = ?;
+
+selectRoutines:
+SELECT * FROM routine ORDER BY updatedAt DESC;
+
+selectRoutine:
+SELECT * FROM routine WHERE id = ?;
+
+insertRoutine:
+INSERT INTO routine(id, name, notes, createdAt, updatedAt) VALUES (?, ?, ?, ?, ?);
+
+updateRoutine:
+UPDATE routine SET name = ?, notes = ?, updatedAt = ? WHERE id = ?;
+
+deleteRoutine:
+DELETE FROM routine WHERE id = ?;
+
+selectAllRoutineExercises:
+SELECT * FROM routine_exercise ORDER BY routineId, position;
+
+selectRoutineExercises:
+SELECT * FROM routine_exercise WHERE routineId = ? ORDER BY position;
+
+insertRoutineExercise:
+INSERT INTO routine_exercise(id, routineId, exerciseId, position, sets, targetReps, targetSeconds, restSeconds)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?);
+
+deleteRoutineExercises:
+DELETE FROM routine_exercise WHERE routineId = ?;
+
+deleteRoutineExercisesByExercise:
+DELETE FROM routine_exercise WHERE exerciseId = ?;
+
+selectFinishedSessions:
+SELECT * FROM session WHERE finishedAt IS NOT NULL ORDER BY startedAt DESC;
+
+selectActiveSession:
+SELECT * FROM session WHERE finishedAt IS NULL ORDER BY startedAt DESC LIMIT 1;
+
+selectSession:
+SELECT * FROM session WHERE id = ?;
+
+insertSession:
+INSERT INTO session(id, name, routineId, startedAt, finishedAt, notes) VALUES (?, ?, ?, ?, ?, ?);
+
+finishSession:
+UPDATE session SET finishedAt = ?, notes = ? WHERE id = ?;
+
+updateSessionNotes:
+UPDATE session SET notes = ? WHERE id = ?;
+
+deleteSession:
+DELETE FROM session WHERE id = ?;
+
+selectSessionExercises:
+SELECT * FROM session_exercise WHERE sessionId = ? ORDER BY position;
+
+selectAllSessionExercises:
+SELECT * FROM session_exercise ORDER BY sessionId, position;
+
+insertSessionExercise:
+INSERT INTO session_exercise(id, sessionId, exerciseId, name, measure, position, targetSets, targetReps, targetSeconds, restSeconds, notes)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+
+updateSessionExerciseNotes:
+UPDATE session_exercise SET notes = ? WHERE id = ?;
+
+deleteSessionExercise:
+DELETE FROM session_exercise WHERE id = ?;
+
+deleteSessionExercises:
+DELETE FROM session_exercise WHERE sessionId = ?;
+
+selectSets:
+SELECT * FROM workout_set WHERE sessionExerciseId = ? ORDER BY position;
+
+selectAllSets:
+SELECT * FROM workout_set ORDER BY sessionExerciseId, position;
+
+insertSet:
+INSERT INTO workout_set(id, sessionExerciseId, position, reps, seconds, completedAt)
+VALUES (?, ?, ?, ?, ?, ?);
+
+updateSet:
+UPDATE workout_set SET reps = ?, seconds = ?, completedAt = ? WHERE id = ?;
+
+updateSetValue:
+UPDATE workout_set SET reps = ?, seconds = ? WHERE id = ?;
+
+setSetCompleted:
+UPDATE workout_set SET completedAt = ? WHERE id = ?;
+
+deleteSet:
+DELETE FROM workout_set WHERE id = ?;
+
+deleteUnfinishedSets:
+DELETE FROM workout_set WHERE completedAt IS NULL
+    AND sessionExerciseId IN (SELECT id FROM session_exercise WHERE sessionId = ?);
+
+deleteEmptySessionExercises:
+DELETE FROM session_exercise WHERE sessionId = ?
+    AND id NOT IN (SELECT sessionExerciseId FROM workout_set);
+
+deleteSetsBySessionExercise:
+DELETE FROM workout_set WHERE sessionExerciseId = ?;
+
+deleteSetsBySession:
+DELETE FROM workout_set WHERE sessionExerciseId IN (SELECT id FROM session_exercise WHERE sessionId = ?);
+
+selectSettings:
+SELECT * FROM setting;
+
+upsertSetting:
+INSERT OR REPLACE INTO setting(name, content) VALUES (?, ?);
