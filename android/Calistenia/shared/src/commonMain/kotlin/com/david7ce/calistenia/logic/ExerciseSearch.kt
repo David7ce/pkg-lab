@@ -34,3 +34,40 @@ fun filterExercises(
         (group == null || exercise.group == group) &&
         (measure == null || exercise.measure == measure)
 }
+
+/**
+ * One top-level exercise and the variants that belong to it. The parent is always the first variant
+ * (the standard version); the rest are sorted by name for a stable selector.
+ */
+data class ExerciseFamily(val parent: Exercise, val variants: List<Exercise>)
+
+fun familiesOf(exercises: List<Exercise>): List<ExerciseFamily> {
+    val childrenByParent = exercises
+        .filter { it.parentId != null }
+        .groupBy { it.parentId }
+    return exercises.filter { it.isTopLevel }.map { parent ->
+        val children = childrenByParent[parent.id].orEmpty()
+            .filter { it.id != parent.id }
+            .sortedBy { it.name }
+        ExerciseFamily(parent, listOf(parent) + children)
+    }
+}
+
+/** The top-level exercise that owns [exercise], or the exercise itself when it is already top-level. */
+fun parentOf(exercise: Exercise, exercises: List<Exercise>): Exercise =
+    exercise.parentId?.let { parentId -> exercises.firstOrNull { it.id == parentId } } ?: exercise
+
+/**
+ * The library filter, family-aware: a variant matches, and its family is shown. Group comes from the
+ * parent (all variants share it); measure matches when any variant uses it.
+ */
+fun filterFamilies(
+    exercises: List<Exercise>,
+    query: String = "",
+    group: MuscleGroup? = null,
+    measure: Measure? = null,
+): List<ExerciseFamily> = familiesOf(exercises).filter { family ->
+    (group == null || family.parent.group == group) &&
+        (measure == null || family.variants.any { it.measure == measure }) &&
+        (query.isBlank() || family.variants.any { it.matchesQuery(query) })
+}

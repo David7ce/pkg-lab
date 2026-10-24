@@ -6,14 +6,19 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -25,6 +30,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import com.david7ce.calistenia.logic.BuiltinRoutines
 import com.david7ce.calistenia.model.Routine
 import com.david7ce.shared.ui.ConfirmDialog
 import com.david7ce.shared.ui.SharedIcons
@@ -33,6 +39,7 @@ import com.david7ce.shared.ui.SharedIcons
 fun RoutinesScreen(app: AppState) {
     val strings = LocalStrings.current
     var toDelete by remember { mutableStateOf<Routine?>(null) }
+    var showStarters by remember { mutableStateOf(false) }
 
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
@@ -43,6 +50,12 @@ fun RoutinesScreen(app: AppState) {
             Button(onClick = app::openNewRoutine, modifier = Modifier.fillMaxWidth()) {
                 Icon(SharedIcons.Add, null)
                 Text(strings.newRoutine, modifier = Modifier.padding(start = 8.dp))
+            }
+        }
+        item {
+            OutlinedButton(onClick = { showStarters = true }, modifier = Modifier.fillMaxWidth()) {
+                Icon(SharedIcons.Checklist, null)
+                Text(strings.starterRoutines, modifier = Modifier.padding(start = 8.dp))
             }
         }
         if (app.routines.isEmpty()) {
@@ -79,6 +92,56 @@ fun RoutinesScreen(app: AppState) {
             destructive = true,
         )
     }
+
+    if (showStarters) {
+        StarterRoutinesDialog(app, onDismiss = { showStarters = false })
+    }
+}
+
+@Composable
+private fun StarterRoutinesDialog(app: AppState, onDismiss: () -> Unit) {
+    val strings = LocalStrings.current
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(strings.starterRoutines) },
+        text = {
+            LazyColumn(Modifier.heightIn(max = 440.dp)) {
+                items(BuiltinRoutines.all, key = { it.key }) { template ->
+                    val exerciseCount = template.exercises.count { line ->
+                        app.exercises.any { it.id == line.exerciseId }
+                    }
+                    Column(Modifier.fillMaxWidth().padding(vertical = 8.dp)) {
+                        Text(
+                            template.name(app.languageCode),
+                            style = MaterialTheme.typography.titleSmall,
+                        )
+                        Text(
+                            template.notes(app.languageCode),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.padding(top = 2.dp),
+                        )
+                        Row(
+                            modifier = Modifier.fillMaxWidth().padding(top = 4.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                        ) {
+                            Text(
+                                strings.exercisesCount(exerciseCount),
+                                style = MaterialTheme.typography.labelSmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                modifier = Modifier.weight(1f),
+                            )
+                            TextButton(
+                                onClick = { app.addStarterRoutine(template, onDone = onDismiss) },
+                            ) { Text(strings.add) }
+                        }
+                    }
+                    HorizontalDivider()
+                }
+            }
+        },
+        confirmButton = { TextButton(onClick = onDismiss) { Text(strings.close) } },
+    )
 }
 
 @Composable
@@ -127,10 +190,26 @@ private fun RoutineCard(
                 modifier = Modifier.padding(top = 8.dp),
             )
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
-                TextButton(onClick = onEdit) { Text(strings.edit) }
-                TextButton(onClick = { app.duplicateRoutine(routine.id) }) { Text(strings.duplicate) }
+                TextButton(onClick = onEdit) {
+                    Icon(SharedIcons.Edit, null, modifier = Modifier.size(16.dp))
+                    Text(strings.edit, modifier = Modifier.padding(start = 4.dp))
+                }
+                TextButton(onClick = { app.duplicateRoutine(routine.id) }) {
+                    Icon(SharedIcons.Copy, null, modifier = Modifier.size(16.dp))
+                    Text(strings.duplicate, modifier = Modifier.padding(start = 4.dp))
+                }
                 TextButton(onClick = onDelete) {
-                    Text(strings.delete, color = MaterialTheme.colorScheme.error)
+                    Icon(
+                        SharedIcons.Delete,
+                        null,
+                        modifier = Modifier.size(16.dp),
+                        tint = MaterialTheme.colorScheme.error,
+                    )
+                    Text(
+                        strings.delete,
+                        color = MaterialTheme.colorScheme.error,
+                        modifier = Modifier.padding(start = 4.dp),
+                    )
                 }
             }
         }

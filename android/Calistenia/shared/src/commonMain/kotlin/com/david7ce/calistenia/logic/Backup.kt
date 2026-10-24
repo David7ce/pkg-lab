@@ -35,6 +35,8 @@ data class ExerciseDto(
     val builtin: Boolean = false,
     /** v2; older backups have no field and decode to "". */
     val description: String = "",
+    /** v3; the family's standard exercise, or null for a top-level one. */
+    val parentId: String? = null,
 )
 
 @Serializable
@@ -94,7 +96,7 @@ data class SetDto(
 )
 
 const val BACKUP_FORMAT = "calistenia"
-const val BACKUP_VERSION = 2
+const val BACKUP_VERSION = 3
 const val MAX_BACKUP_CHARS = 10 * 1024 * 1024
 const val MAX_EXERCISES = 2_000
 const val MAX_ROUTINES = 2_000
@@ -153,7 +155,8 @@ fun parseBackup(text: String): BackupResult {
     val exerciseIds = file.exercises.map { it.id }.toSet()
     if (file.exercises.any {
             it.id.isBlank() || it.name.isBlank() || it.id.length > 200 || it.name.length > 200 ||
-                it.description.length > MAX_EXERCISE_DESCRIPTION
+                it.description.length > MAX_EXERCISE_DESCRIPTION ||
+                it.parentId != null && (it.parentId.isBlank() || it.parentId == it.id)
         }
     ) {
         return BackupResult.Invalid(BackupProblem.InvalidExercise)
@@ -161,6 +164,14 @@ fun parseBackup(text: String): BackupResult {
     if (file.exercises.any {
             !MuscleGroup.entries.any { group -> group.name.equals(it.group, true) } ||
                 !Measure.entries.any { measure -> measure.name.equals(it.measure, true) }
+        }
+    ) return BackupResult.Invalid(BackupProblem.InvalidExercise)
+
+    // A variant's parent must be in the file or in the built-in catalog (older backups have none).
+    if (file.exercises.any { exercise ->
+            exercise.parentId != null &&
+                exercise.parentId !in exerciseIds &&
+                BuiltinExercises.find(exercise.parentId) == null
         }
     ) return BackupResult.Invalid(BackupProblem.InvalidExercise)
 
@@ -275,7 +286,7 @@ fun planMerge(file: BackupFile, existing: ExistingIds, existingSettings: Set<Str
 
 fun Exercise.toDto() = ExerciseDto(
     id = id, name = name, group = group.name, measure = measure.name, builtin = builtin,
-    description = description,
+    description = description, parentId = parentId,
 )
 
 fun Routine.toDto(): RoutineDto = RoutineDto(
@@ -359,4 +370,5 @@ fun ExerciseDto.toModel() = Exercise(
     measure = Measure.fromStored(measure),
     builtin = builtin,
     description = description.take(MAX_EXERCISE_DESCRIPTION),
+    parentId = parentId,
 )

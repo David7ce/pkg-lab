@@ -38,6 +38,9 @@ class StringsTest {
                 s.noResults to en.noResults,
                 s.exerciseHowTo to en.exerciseHowTo,
                 s.descriptionLabel to en.descriptionLabel,
+                s.starterRoutines to en.starterRoutines,
+                s.routineAdded to en.routineAdded,
+                s.variant to en.variant,
             ).forEach { (translated, original) ->
                 assertNotEquals(original, translated, "${language.name}: $translated")
             }
@@ -54,6 +57,8 @@ class StringsTest {
             assertTrue(s.importConfirmText(3, 7).contains("3") && s.importConfirmText(3, 7).contains("7"), "$code import")
             assertTrue(s.deleteRoutineText("Push").contains("Push"), "$code routine text")
             assertTrue(s.workoutSummary("5:03", 12, 4).contains("5:03"), "$code summary")
+            assertTrue(s.variantsCount(3).contains("3"), "$code variantsCount")
+            assertTrue(s.variantsCount(1).contains("1"), "$code variantsCount singular")
         }
     }
 

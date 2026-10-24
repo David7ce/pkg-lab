@@ -36,14 +36,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import com.david7ce.calistenia.logic.ExerciseFamily
 import com.david7ce.calistenia.logic.ExerciseProgress
 import com.david7ce.calistenia.logic.descriptionFor
-import com.david7ce.calistenia.logic.filterExercises
+import com.david7ce.calistenia.logic.filterFamilies
 import com.david7ce.calistenia.logic.formatDuration
 import com.david7ce.calistenia.logic.ProgressPoint
 import com.david7ce.calistenia.model.Exercise
 import com.david7ce.calistenia.model.Measure
 import com.david7ce.calistenia.model.MuscleGroup
+import com.david7ce.shared.ui.ChoiceDropdown
 import com.david7ce.shared.ui.ConfirmDialog
 import com.david7ce.shared.ui.SharedIcons
 
@@ -56,7 +58,7 @@ fun ExercisesScreen(app: AppState) {
     var creating by remember { mutableStateOf(false) }
 
     val shown = remember(query, group, measure, app.exercises) {
-        filterExercises(app.exercises, query, group, measure)
+        filterFamilies(app.exercises, query, group, measure)
     }
 
     Box(Modifier.fillMaxSize()) {
@@ -98,8 +100,8 @@ fun ExercisesScreen(app: AppState) {
                         )
                     }
                 } else {
-                    items(shown, key = { it.id }) { exercise ->
-                        ExerciseRow(exercise, onClick = { app.openExercise(exercise.id) })
+                    items(shown, key = { it.parent.id }) { family ->
+                        ExerciseFamilyRow(family, onClick = { app.openExercise(family.parent.id) })
                     }
                 }
             }
@@ -163,8 +165,9 @@ private fun FilterRow(
 }
 
 @Composable
-private fun ExerciseRow(exercise: Exercise, onClick: () -> Unit) {
+private fun ExerciseFamilyRow(family: ExerciseFamily, onClick: () -> Unit) {
     val strings = LocalStrings.current
+    val parent = family.parent
     Card(onClick = onClick, modifier = Modifier.fillMaxWidth()) {
         Row(
             modifier = Modifier.fillMaxWidth().padding(14.dp),
@@ -172,18 +175,18 @@ private fun ExerciseRow(exercise: Exercise, onClick: () -> Unit) {
         ) {
             Column(Modifier.weight(1f)) {
                 Text(
-                    exercise.name,
+                    parent.name,
                     style = MaterialTheme.typography.titleMedium,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                 )
                 Text(
-                    "${strings.groupLabel(exercise.group)} · ${strings.measureLabel(exercise.measure)}",
+                    "${strings.variantsCount(family.variants.size)} · ${strings.groupLabel(parent.group)}",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }
-            if (exercise.isCustom) Pill(strings.custom)
+            if (parent.isCustom) Pill(strings.custom)
         }
     }
 }
@@ -191,13 +194,17 @@ private fun ExerciseRow(exercise: Exercise, onClick: () -> Unit) {
 @Composable
 fun ExerciseDetailScreen(app: AppState, exerciseId: String) {
     val strings = LocalStrings.current
-    val exercise = app.exerciseById(exerciseId)
-    if (exercise == null) {
+    val opened = app.exerciseById(exerciseId)
+    if (opened == null) {
         EmptyState(strings.noExercisesYet)
         return
     }
-    val progress = app.progressFor(exerciseId)
-    val lastSets = app.lastSetsFor(exerciseId)
+    val parent = app.parentExercise(exerciseId) ?: opened
+    val family = app.familyOf(parent.id)
+    var selectedId by remember(parent.id) { mutableStateOf(exerciseId) }
+    val exercise = app.exerciseById(selectedId) ?: parent
+    val progress = app.progressFor(exercise.id)
+    val lastSets = app.lastSetsFor(exercise.id)
     val description = exercise.descriptionFor(app.languageCode)
     var editing by remember { mutableStateOf(false) }
     var deleting by remember { mutableStateOf(false) }
@@ -207,6 +214,17 @@ fun ExerciseDetailScreen(app: AppState, exerciseId: String) {
         contentPadding = PaddingValues(16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
+        if (family.size > 1) {
+            item {
+                ChoiceDropdown(
+                    options = family.map { it.id to it.name },
+                    selected = exercise.id,
+                    label = strings.variant,
+                    leadingIcon = SharedIcons.Tune,
+                    onSelect = { selectedId = it },
+                )
+            }
+        }
         item {
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 Pill(strings.groupLabel(exercise.group))

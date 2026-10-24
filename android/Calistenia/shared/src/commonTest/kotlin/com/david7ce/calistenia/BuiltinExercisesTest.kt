@@ -39,4 +39,29 @@ class BuiltinExercisesTest {
         assertEquals("Push-up", pushUp.name)
         assertNull(BuiltinExercises.find("builtin:not-there"))
     }
+
+    @Test
+    fun variantsPointAtAnExistingTopLevelExerciseInTheSameGroup() {
+        val byId = BuiltinExercises.all.associateBy { it.id }
+        val topLevel = BuiltinExercises.all.filter { it.isTopLevel }
+        assertEquals(15, topLevel.size, "expected fifteen families/singles")
+        assertEquals(39, BuiltinExercises.all.size)
+
+        BuiltinExercises.all.filterNot { it.isTopLevel }.forEach { variant ->
+            val parentId = assertNotNull(variant.parentId, "${variant.id} has no parent")
+            val parent = assertNotNull(byId[parentId], "${variant.id} points at a missing parent")
+            assertTrue(parent.isTopLevel, "${variant.id} points at another variant")
+            assertEquals(parent.group, variant.group, "${variant.id} changes group inside its family")
+        }
+    }
+
+    @Test
+    fun familiesCoverEveryVariantOnce() {
+        val ids = mutableSetOf<String>()
+        BuiltinExercises.all.filter { it.isTopLevel }.forEach { parent ->
+            ids += parent.id
+            BuiltinExercises.all.filter { it.parentId == parent.id }.forEach { ids += it.id }
+        }
+        assertEquals(BuiltinExercises.all.map { it.id }.toSet(), ids)
+    }
 }

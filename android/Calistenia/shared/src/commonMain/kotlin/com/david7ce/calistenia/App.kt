@@ -201,7 +201,7 @@ private fun AppTopBar(app: AppState) {
         is Screen.RoutineEditor -> screen.state.draft.name.ifBlank {
             if (screen.state.isNew) strings.newRoutine else strings.routines
         }
-        is Screen.ExerciseDetail -> app.exerciseById(screen.exerciseId)?.name ?: strings.exercises
+        is Screen.ExerciseDetail -> app.parentExercise(screen.exerciseId)?.name ?: strings.exercises
         is Screen.SessionDetail -> app.sessionById(screen.sessionId)?.name ?: strings.workout
     }
     TopAppBar(

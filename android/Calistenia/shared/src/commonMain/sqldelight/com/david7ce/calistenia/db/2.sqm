@@ -1,0 +1,2 @@
+-- Version 2 -> 3: group variants under their standard exercise.
+ALTER TABLE exercise ADD COLUMN parentId TEXT;

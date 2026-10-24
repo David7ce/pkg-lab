@@ -30,6 +30,10 @@ const val MAX_EXERCISE_DESCRIPTION = 2000
  * One exercise. [id] is stable forever: "builtin:<slug>" for the catalog seeded by the app, a random
  * id for a custom exercise. Built-ins are never edited or deleted. [description] is the detailed
  * how-to text (English, like the built-in names); custom exercises may leave it empty.
+ *
+ * [parentId] groups variants under the standard exercise: the parent is a normal exercise with a null
+ * parent, and its variants point at it. Every exercise (parent included) is a variant that can be
+ * logged, with its own progress; the parent only decides what the library shows as one family.
  */
 data class Exercise(
     val id: String,
@@ -38,6 +42,8 @@ data class Exercise(
     val measure: Measure,
     val builtin: Boolean,
     val description: String = "",
+    val parentId: String? = null,
 ) {
     val isCustom: Boolean get() = !builtin
+    val isTopLevel: Boolean get() = parentId == null
 }

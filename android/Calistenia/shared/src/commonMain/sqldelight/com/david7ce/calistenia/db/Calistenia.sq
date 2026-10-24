@@ -1,4 +1,4 @@
--- Schema version 2 (1.sqm adds exercise.description).
+-- Schema version 3 (1.sqm adds exercise.description; 2.sqm adds exercise.parentId).
 -- Exercises, routines and finished sessions are independent rows; sessions store a name snapshot of
 -- the routine and of each exercise, so deleting either never damages history. Children are replaced as
 -- a whole when a routine is saved, inside one transaction (see CalisteniaRepository), so positions stay
@@ -11,7 +11,8 @@ CREATE TABLE exercise (
     measure TEXT NOT NULL,                 -- reps | seconds
     builtin INTEGER NOT NULL DEFAULT 0,    -- 0/1; built-ins are seeded, never edited or deleted
     createdAt INTEGER NOT NULL,
-    description TEXT NOT NULL DEFAULT ''   -- v2: detailed how-to text (English for built-ins)
+    description TEXT NOT NULL DEFAULT '',  -- v2: detailed how-to text (English base)
+    parentId TEXT                          -- v3: NULL for the family's standard exercise, else its id
 );
 
 CREATE TABLE routine (
@@ -77,19 +78,22 @@ selectExercise:
 SELECT * FROM exercise WHERE id = ?;
 
 insertExerciseIgnore:
-INSERT OR IGNORE INTO exercise(id, name, muscleGroup, measure, builtin, createdAt, description)
-VALUES (?, ?, ?, ?, ?, ?, ?);
+INSERT OR IGNORE INTO exercise(id, name, muscleGroup, measure, builtin, createdAt, description, parentId)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?);
 
 insertExercise:
-INSERT INTO exercise(id, name, muscleGroup, measure, builtin, createdAt, description)
-VALUES (?, ?, ?, ?, ?, ?, ?);
+INSERT INTO exercise(id, name, muscleGroup, measure, builtin, createdAt, description, parentId)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?);
 
 updateExercise:
 UPDATE exercise SET name = ?, muscleGroup = ?, measure = ?, description = ? WHERE id = ?;
 
--- Built-in descriptions are content: refresh them on update without touching names, measures or user rows.
+-- Built-in descriptions and family links are content: refresh them on update without touching user rows.
 updateBuiltinDescription:
 UPDATE exercise SET description = ? WHERE id = ? AND builtin = 1;
+
+updateBuiltinParent:
+UPDATE exercise SET parentId = ? WHERE id = ? AND builtin = 1;
 
 deleteExercise:
 DELETE FROM exercise WHERE id = ?;

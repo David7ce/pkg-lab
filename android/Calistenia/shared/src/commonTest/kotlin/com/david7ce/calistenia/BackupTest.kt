@@ -21,6 +21,7 @@ import com.david7ce.calistenia.model.RoutineExercise
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertIs
+import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
 class BackupTest {
@@ -97,6 +98,7 @@ class BackupTest {
         val parsed = parseBackup(v1)
         assertIs<BackupResult.Valid>(parsed)
         assertEquals("", parsed.file.exercises.single().description)
+        assertNull(parsed.file.exercises.single().parentId)
     }
 
     @Test
@@ -164,5 +166,20 @@ class BackupTest {
     fun dtosMapBackToModels() {
         val back = pushUp.toDto().toModel()
         assertEquals(pushUp, back)
+    }
+
+    @Test
+    fun roundTripKeepsTheFamilyLink() {
+        val knee = BuiltinExercises.find("builtin:knee-push-up")!!
+        val decoded = parseOrFail(buildBackup(listOf(knee), emptyList(), emptyList(), settings, now = 0))
+        assertEquals("builtin:push-up", decoded.exercises.single().parentId)
+        assertEquals(knee.description, decoded.exercises.single().description)
+    }
+
+    @Test
+    fun rejectsAVariantWithAnUnknownParent() {
+        val knee = BuiltinExercises.find("builtin:knee-push-up")!!.copy(parentId = "custom:not-there")
+        val bad = buildBackup(listOf(knee), emptyList(), emptyList(), settings, now = 0)
+        assertEquals(BackupProblem.InvalidExercise, problemOf(bad))
     }
 }

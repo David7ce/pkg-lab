@@ -13,6 +13,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
@@ -30,6 +31,8 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import com.david7ce.calistenia.logic.filterFamilies
+import com.david7ce.calistenia.logic.matchesQuery
 import com.david7ce.calistenia.model.Exercise
 import com.david7ce.shared.ui.SharedIcons
 
@@ -110,8 +113,8 @@ fun ExercisePickerDialog(
 ) {
     val strings = LocalStrings.current
     var query by remember { mutableStateOf("") }
-    val shown = remember(query, exercises) {
-        com.david7ce.calistenia.logic.filterExercises(exercises, query)
+    val families = remember(query, exercises) {
+        filterFamilies(exercises, query = query)
     }
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -126,7 +129,7 @@ fun ExercisePickerDialog(
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth(),
                 )
-                if (shown.isEmpty()) {
+                if (families.isEmpty()) {
                     Text(
                         strings.noResults,
                         modifier = Modifier.padding(16.dp),
@@ -134,24 +137,45 @@ fun ExercisePickerDialog(
                     )
                 } else {
                     LazyColumn(modifier = Modifier.fillMaxWidth().heightIn(max = 380.dp).padding(top = 8.dp)) {
-                        items(shown, key = { it.id }) { exercise ->
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(vertical = 4.dp),
-                                horizontalArrangement = Arrangement.SpaceBetween,
-                                verticalAlignment = Alignment.CenterVertically,
-                            ) {
-                                Column(Modifier.weight(1f)) {
-                                    Text(exercise.name, style = MaterialTheme.typography.bodyLarge)
-                                    Text(
-                                        "${strings.groupLabel(exercise.group)} · ${strings.measureLabel(exercise.measure)}",
-                                        style = MaterialTheme.typography.bodySmall,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                    )
+                        families.forEach { family ->
+                            val parent = family.parent
+                            item(key = "family-${parent.id}") {
+                                Row(
+                                    modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+                                    verticalAlignment = Alignment.CenterVertically,
+                                ) {
+                                    Column(Modifier.weight(1f)) {
+                                        Text(parent.name, style = MaterialTheme.typography.titleSmall)
+                                        Text(
+                                            "${strings.groupLabel(parent.group)} · ${strings.measureLabel(parent.measure)}",
+                                            style = MaterialTheme.typography.bodySmall,
+                                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                        )
+                                    }
+                                    if (query.isBlank() || parent.matchesQuery(query)) {
+                                        TextButton(onClick = { onPick(parent) }) { Text(strings.add) }
+                                    }
                                 }
-                                TextButton(onClick = { onPick(exercise) }) { Text(strings.add) }
                             }
+                            val children = family.variants.drop(1)
+                                .filter { query.isBlank() || it.matchesQuery(query) }
+                            items(children, key = { it.id }) { variant ->
+                                Row(
+                                    modifier = Modifier.fillMaxWidth().padding(start = 16.dp, top = 2.dp, bottom = 2.dp),
+                                    verticalAlignment = Alignment.CenterVertically,
+                                ) {
+                                    Column(Modifier.weight(1f)) {
+                                        Text(variant.name, style = MaterialTheme.typography.bodyLarge)
+                                        Text(
+                                            strings.measureLabel(variant.measure),
+                                            style = MaterialTheme.typography.bodySmall,
+                                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                        )
+                                    }
+                                    TextButton(onClick = { onPick(variant) }) { Text(strings.add) }
+                                }
+                            }
+                            item(key = "divider-${parent.id}") { HorizontalDivider() }
                         }
                     }
                 }

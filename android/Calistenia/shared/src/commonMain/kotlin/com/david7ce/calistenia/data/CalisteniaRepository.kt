@@ -37,17 +37,18 @@ class CalisteniaRepository(
     // ---------------------------------------------------------------------------------------------
     // Exercises
 
-    /** Inserts any built-in missing from an older install and refreshes its how-to text. */
+    /** Inserts any built-in missing from an older install and refreshes its content and family link. */
     fun seedBuiltins() {
         val now = clock()
         db.transaction {
             BuiltinExercises.all.forEach { exercise ->
                 q.insertExerciseIgnore(
                     exercise.id, exercise.name, exercise.group.name, exercise.measure.name, 1L, now,
-                    exercise.description,
+                    exercise.description, exercise.parentId,
                 )
-                // Existing rows are not replaced, but a newer description should reach them.
+                // Existing rows are not replaced, but newer content should reach them.
                 q.updateBuiltinDescription(exercise.description, exercise.id)
+                q.updateBuiltinParent(exercise.parentId, exercise.id)
             }
         }
     }
@@ -60,6 +61,7 @@ class CalisteniaRepository(
             measure = Measure.fromStored(row.measure),
             builtin = row.builtin != 0L,
             description = row.description,
+            parentId = row.parentId,
         )
     }
 
@@ -78,7 +80,7 @@ class CalisteniaRepository(
             description = description.trim().take(MAX_EXERCISE_DESCRIPTION),
         )
         q.insertExercise(
-            exercise.id, exercise.name, group.name, measure.name, 0L, clock(), exercise.description,
+            exercise.id, exercise.name, group.name, measure.name, 0L, clock(), exercise.description, null,
         )
         return exercise
     }
@@ -344,7 +346,7 @@ class CalisteniaRepository(
             merge.exercises.forEach {
                 q.insertExercise(
                     it.id, it.name, it.group, it.measure, if (it.builtin) 1L else 0L, clock(),
-                    it.description.take(MAX_EXERCISE_DESCRIPTION),
+                    it.description.take(MAX_EXERCISE_DESCRIPTION), it.parentId,
                 )
             }
             merge.routines.forEach { routine ->

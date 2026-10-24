@@ -5,12 +5,15 @@ timer, history and per-exercise progress. Kotlin Multiplatform + Compose Multipl
 Windows, Linux and macOS. Spanish, English, French, German, Portuguese and Italian (device language by
 default, or chosen in Settings).
 
-- **Library:** 39 built-in bodyweight exercises (push, pull, legs, core, skill) with English names and a
-  detailed how-to text available in all six app languages, plus custom exercises you name and describe
-  yourself. Search by name (accents ignored), filter by group and by how the exercise is measured (reps
-  or seconds).
+- **Library:** 15 top-level exercises covering 39 bodyweight variants (push, pull, legs, core, skill).
+  Opening one shows a variant selector (e.g. Push-up → knee, incline, diamond, archer, pike, handstand)
+  and its description, progress and history. Names stay in English; the how-to text is available in all
+  six app languages. Custom exercises are top-level and you write their description yourself.
 - **Routines:** ordered exercises, planned sets, a target (reps or a hold in seconds) and the rest after
-  each set. Create, edit, reorder, duplicate, delete. Starting a routine pre-fills every set.
+  each set. Create, edit, reorder, duplicate, delete. Starting a routine pre-fills every set. **Five
+  starter routines** (morning, full body, strength, push day, pull and core) can be added with one tap
+  and then edited like any other; they are templates, not locked content. They are copied with their
+  name and notes in the app language at the moment you add them.
 - **Workout:** start from a routine or empty; type reps/seconds and tick each set. Only ticked sets reach
   history. Add sets or exercises mid-workout, notes per exercise and for the session, elapsed time,
   finish or discard with confirmation. An info button on each exercise shows its how-to text without
@@ -62,14 +65,16 @@ Dependency direction: `ui → data → logic → model`; `platform` interfaces a
 
 ## Data
 
-`calistenia.db`, schema version 2 (`Calistenia.sq`; `1.sqm` adds `exercise.description`):
-`exercise`, `routine`, `routine_exercise`, `session`, `session_exercise`, `workout_set` and `setting`
-(theme, language, default rest, notification options, keep-screen-on). There are no foreign keys:
-sessions snapshot the routine name and each exercise's name, measure and targets, so deleting either
-never breaks history, and deletes remove children explicitly in one transaction. Children are replaced
-as a whole when a routine is saved, so positions stay dense. Built-ins are seeded with
-`INSERT OR IGNORE` from stable ids (`builtin:push-up`), and their descriptions are refreshed on every
-start, so a later version can add exercises or improve their how-to text without touching user data.
+`calistenia.db`, schema version 3 (`Calistenia.sq`; `1.sqm` adds `exercise.description`, `2.sqm` adds
+`exercise.parentId`): `exercise`, `routine`, `routine_exercise`, `session`, `session_exercise`,
+`workout_set` and `setting` (theme, language, default rest, notification options, keep-screen-on). There
+are no foreign keys: sessions snapshot the routine name and each exercise's name, measure and targets, so
+deleting either never breaks history, and deletes remove children explicitly in one transaction. Children
+are replaced as a whole when a routine is saved, so positions stay dense. Built-ins are seeded with
+`INSERT OR IGNORE` from stable ids (`builtin:push-up`), and their descriptions and family links are
+refreshed on every start, so a later version can add exercises or improve their content without touching
+user data. A variant points at its top-level family through `parentId`; every exercise, parent included,
+is a loggable variant with its own progress.
 
 A workout is a normal `session` row with `finishedAt` null; sets are written as they are ticked. On
 finish, unticked sets and exercises left with no sets are dropped, then `finishedAt` is set.
@@ -79,9 +84,9 @@ finish, unticked sets and exercises left with no sets are dropped, then `finishe
 `calistenia-backup-YYYY-MM-DD.json`:
 
 ```json
-{ "format": "calistenia", "version": 2, "exportedAt": 1760000000000, "app": "Calistenia",
-  "exercises": [ { "id": "builtin:push-up", "name": "Push-up", "group": "Push", "measure": "Reps",
-                   "builtin": true, "description": "Start in a high plank…" } ],
+{ "format": "calistenia", "version": 3, "exportedAt": 1760000000000, "app": "Calistenia",
+  "exercises": [ { "id": "builtin:knee-push-up", "name": "Knee Push-up", "group": "Push", "measure": "Reps",
+                   "builtin": true, "description": "Kneel with the hands…", "parentId": "builtin:push-up" } ],
   "routines": [ { "id": "…", "name": "Push day", "notes": "", "createdAt": 0, "updatedAt": 0,
                   "exercises": [ { "id": "…", "exerciseId": "builtin:push-up", "position": 0, "sets": 3,
                                    "targetReps": 8, "targetSeconds": null, "restSeconds": 90 } ] } ],
@@ -95,12 +100,12 @@ finish, unticked sets and exercises left with no sets are dropped, then `finishe
 ```
 
 Only finished sessions are exported. Newer `version`s are rejected (an older app would otherwise drop
-fields silently); unknown fields are ignored. Version 2 adds `exercise.description`; version 1 backups
-still import, with an empty description. Built-in descriptions are exported in English (their base
-text); the app shows the translation for its current language. Import checks the format, version,
-unique ids, every routine reference, measures, bounds and the size cap (10 MB), then merges in one
-transaction: existing top-level records are skipped with their children, and only settings keys not
-already stored are written.
+fields silently); unknown fields are ignored. Version 2 added `exercise.description`; version 3 adds
+`exercise.parentId` (the family link). Versions 1 and 2 still import, with an empty description or no
+family. Built-in descriptions are exported in English (their base text); the app shows the translation
+for its current language. Import checks the format, version, unique ids, every routine reference,
+measures, bounds and the size cap (10 MB), then merges in one transaction: existing top-level records
+are skipped with their children, and only settings keys not already stored are written.
 
 ## Build and test
 
@@ -125,15 +130,16 @@ fresh database → import path against real SQLite.
 ## Known limitations
 
 - Not exercised on physical Android hardware or on macOS/Linux desktops yet. Verified by local debug
-  and release builds, the JVM desktop compile and 72 unit tests (including the repository, the v1 → v2
-  migration and real SQLite).
+  and release builds, the JVM desktop compile and 83 unit tests (including the repository, the v1 → v3
+  migrations and real SQLite).
 - The background rest notification is a delayed job in the app process: it fires while the app is in the
   background, but not if Android kills the process. It is a training aid, not an alarm; no exact-alarm
   permissions are requested.
 - Two notification channels are used (alert and silent): turning off both sound and vibration posts the
   silent one; if only one is off, the alert channel may still do both.
 - Built-in exercise names stay in English (the common language of calisthenics training); their how-to
-  descriptions follow the app language. Custom exercise descriptions are shown exactly as written.
+  descriptions follow the app language. Variants are grouped under their standard exercise but progress
+  is kept per variant, not per family. Custom exercises are always top-level (no custom variants yet).
   Images, videos and 3D models are not included yet.
 - No per-side tracking (left/right), no added weight, no body measurements, no charts beyond the last
   ten sessions. Deliberately out of this version.

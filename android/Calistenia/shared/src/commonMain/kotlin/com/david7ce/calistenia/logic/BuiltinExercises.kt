@@ -19,6 +19,37 @@ import com.david7ce.calistenia.model.MuscleGroup.Skill
  */
 object BuiltinExercises {
 
+    /**
+     * Variants grouped under the standard exercise. Ids are stable; the parent is always a built-in
+     * that appears in the catalog too. Everything not listed here is a top-level family of one.
+     */
+    private val parentBySlug: Map<String, String> = mapOf(
+        "knee-push-up" to "builtin:push-up",
+        "incline-push-up" to "builtin:push-up",
+        "diamond-push-up" to "builtin:push-up",
+        "archer-push-up" to "builtin:push-up",
+        "pseudo-planche-push-up" to "builtin:push-up",
+        "pike-push-up" to "builtin:push-up",
+        "handstand-push-up" to "builtin:push-up",
+        "bench-dip" to "builtin:parallel-bar-dip",
+        "dead-hang" to "builtin:pull-up",
+        "scapular-pull-up" to "builtin:pull-up",
+        "inverted-row" to "builtin:pull-up",
+        "negative-pull-up" to "builtin:pull-up",
+        "chin-up" to "builtin:pull-up",
+        "commando-pull-up" to "builtin:pull-up",
+        "muscle-up" to "builtin:pull-up",
+        "split-squat" to "builtin:squat",
+        "bulgarian-split-squat" to "builtin:squat",
+        "reverse-lunge" to "builtin:squat",
+        "single-leg-glute-bridge" to "builtin:glute-bridge",
+        "side-plank" to "builtin:plank",
+        "hanging-knee-raise" to "builtin:leg-raise",
+        "hanging-leg-raise" to "builtin:leg-raise",
+        "dragon-flag" to "builtin:leg-raise",
+        "wall-handstand" to "builtin:handstand-hold",
+    )
+
     private fun exercise(
         slug: String,
         name: String,
@@ -32,6 +63,7 @@ object BuiltinExercises {
         measure = measure,
         builtin = true,
         description = description,
+        parentId = parentBySlug[slug],
     )
 
     val all: List<Exercise> = listOf(

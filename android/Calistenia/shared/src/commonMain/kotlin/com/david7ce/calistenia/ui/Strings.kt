@@ -85,6 +85,10 @@ open class Strings {
     open val startRoutine = "Start a routine"
     open val noRoutinesYet = "No routines yet. Create one in the Routines tab and it will be one tap away."
     open val newRoutine = "New routine"
+    open val starterRoutines = "Starter routines"
+    open val routineAdded = "Routine added"
+    open val variant = "Variant"
+    open fun variantsCount(n: Int) = if (n == 1) "1 variant" else "$n variants"
     open val freeWorkout = "Free workout"
 
     // Routines

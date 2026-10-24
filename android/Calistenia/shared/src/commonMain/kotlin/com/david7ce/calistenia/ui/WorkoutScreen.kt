@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -224,7 +225,10 @@ private fun WorkoutExerciseCard(
                 TextButton(
                     onClick = { app.removeSet(exercise.id, exercise.sets.last().id) },
                     enabled = exercise.sets.size > 1,
-                ) { Text(strings.removeSet) }
+                ) {
+                    Icon(SharedIcons.Minus, null, modifier = Modifier.size(16.dp))
+                    Text(strings.removeSet, modifier = Modifier.padding(start = 4.dp))
+                }
             }
             OutlinedTextField(
                 value = exercise.notes,

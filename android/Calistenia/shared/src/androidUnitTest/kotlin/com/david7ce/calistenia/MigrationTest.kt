@@ -5,6 +5,7 @@ import com.david7ce.calistenia.data.CalisteniaRepository
 import com.david7ce.calistenia.db.CalisteniaDatabase
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
 /** A database created before descriptions existed is upgraded and gets the built-in how-to text. */
@@ -27,7 +28,7 @@ class MigrationTest {
             0,
         )
 
-        assertEquals(2L, CalisteniaDatabase.Schema.version)
+        assertEquals(3L, CalisteniaDatabase.Schema.version)
         CalisteniaDatabase.Schema.migrate(driver, 1, CalisteniaDatabase.Schema.version)
 
         val repo = CalisteniaRepository(
@@ -42,5 +43,10 @@ class MigrationTest {
         assertTrue(pushUp.description.length >= 100, "the migrated row should receive the how-to text")
         assertEquals(39, repo.exercises().size)
         assertTrue(repo.exercises().all { it.description.isNotBlank() })
+        assertNull(pushUp.parentId)
+        assertEquals(
+            "builtin:push-up",
+            repo.exercises().first { it.id == "builtin:knee-push-up" }.parentId,
+        )
     }
 }

@@ -13,6 +13,7 @@ import com.david7ce.calistenia.logic.ExerciseProgress
 import com.david7ce.calistenia.logic.MergeResult
 import com.david7ce.calistenia.logic.RestState
 import com.david7ce.calistenia.logic.RoutineDraft
+import com.david7ce.calistenia.logic.StarterRoutine
 import com.david7ce.calistenia.logic.addExercise
 import com.david7ce.calistenia.logic.backupFileName
 import com.david7ce.calistenia.logic.canFinish
@@ -20,6 +21,7 @@ import com.david7ce.calistenia.logic.encodeBackup
 import com.david7ce.calistenia.logic.isValid
 import com.david7ce.calistenia.logic.lastSetsFor
 import com.david7ce.calistenia.logic.numberText
+import com.david7ce.calistenia.logic.parentOf
 import com.david7ce.calistenia.logic.parseBackup
 import com.david7ce.calistenia.logic.pause
 import com.david7ce.calistenia.logic.planMerge
@@ -280,6 +282,19 @@ class AppState(
     fun routineById(id: String): Routine? = routines.firstOrNull { it.id == id }
     fun sessionById(id: String): WorkoutSession? =
         history.firstOrNull { it.id == id } ?: active?.takeIf { it.id == id }
+
+    /** The family's standard exercise, even when [exerciseId] is one of its variants. */
+    fun parentExercise(exerciseId: String): Exercise? =
+        exerciseById(exerciseId)?.let { parentOf(it, exercises) }
+
+    /** The standard exercise first, then its variants by name (one element when it has no variants). */
+    fun familyOf(exerciseId: String): List<Exercise> {
+        val exercise = exerciseById(exerciseId) ?: return emptyList()
+        val parent = parentOf(exercise, exercises)
+        return listOf(parent) + exercises
+            .filter { it.parentId == parent.id && it.id != parent.id }
+            .sortedBy { it.name }
+    }
 
     fun progressFor(exerciseId: String): ExerciseProgress = progressFor(exerciseId, history)
     fun lastSetsFor(exerciseId: String): List<WorkoutSet> = lastSetsFor(exerciseId, history)
@@ -547,6 +562,19 @@ class AppState(
             routines = list
             message = strings.routineSaved
             screen = null
+        }
+    }
+
+    /** Copies a starter template with a new id; its name and notes are in the current app language. */
+    fun addStarterRoutine(template: StarterRoutine, onDone: () -> Unit = {}) {
+        val draft = template.toDraft(exercises, languageCode, ::newKey) ?: return
+        persist({
+            repo.saveRoutine(draft)
+            repo.routines()
+        }) { list ->
+            routines = list
+            message = strings.routineAdded
+            onDone()
         }
     }
 
