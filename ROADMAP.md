@@ -18,9 +18,13 @@ Per-app pending work lives in each app's own README, not here (Recetario: "Deskt
   debug + release APK, and the shared/desktop code compiled on the JVM), but the first `android.yml` and
   `desktop.yml` runs, `calistenia-latest`, and a real-phone check are still pending: set logging, rest
   timer notification, backup export/import, language switch, theme.
-- **Calistenia: exercise media (3D models, photos or video).** Deliberately text-only for now: a good
-  3D model and rig per exercise is a project of its own, and photos/video would need storage and a
-  licensing decision. The database can gain a media reference later with a normal migration.
+- **Calistenia: exercise animation, in progress.** Direction changed from "text-only": instead of 3D
+  models, photos or video (storage, licensing, a rig per exercise), exercises get a code-drawn 2D
+  profile stick figure (`ui/figure/`: `Rig` orientation + `Pose` angles + `FigureAnimation` keyframes,
+  drawn by `Figure`), so there are no assets to ship. Push-up and squat are done; `figureFor(parentId)`
+  is the registry, every other family is still text-only. Remaining: pull-up/dip (hanging/bar rig), plank
+  and other holds (`FigureAnimation.hold`), the rest of the families, and a real-device look at how the
+  figure reads (never checked visually, only geometry-tested). Photos/video stay out of scope.
 - **Compose-on-Robolectric smoke tests** pass locally; worth a real-device check too before
   relying on them as the only UI-level test.
 
