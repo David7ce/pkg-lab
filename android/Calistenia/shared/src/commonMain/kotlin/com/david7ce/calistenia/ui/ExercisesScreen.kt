@@ -46,7 +46,7 @@ import com.david7ce.calistenia.model.Exercise
 import com.david7ce.calistenia.model.Measure
 import com.david7ce.calistenia.model.MuscleGroup
 import com.david7ce.calistenia.ui.figure.Figure
-import com.david7ce.calistenia.ui.figure.PushUp
+import com.david7ce.calistenia.ui.figure.figureFor
 import com.david7ce.shared.ui.ChoiceDropdown
 import com.david7ce.shared.ui.ConfirmDialog
 import com.david7ce.shared.ui.SharedIcons
@@ -234,12 +234,15 @@ fun ExerciseDetailScreen(app: AppState, exerciseId: String) {
                 if (exercise.isCustom) Pill(strings.custom)
             }
         }
-        // Spike: only the push-up family gets the animated figure for now, to judge on a real
-        // device whether a 2D stick figure reads well before building the other ~8 families.
-        if (parent.id == "builtin:push-up") {
+        // Families without a registered figure stay text-only.
+        val figure = figureFor(parent.id)
+        if (figure != null) {
             item {
                 Card(modifier = Modifier.fillMaxWidth()) {
-                    Figure(poses = PushUp, modifier = Modifier.fillMaxWidth().padding(14.dp))
+                    Figure(
+                        animation = figure,
+                        modifier = Modifier.fillMaxWidth().height(180.dp).padding(14.dp),
+                    )
                 }
             }
         }
