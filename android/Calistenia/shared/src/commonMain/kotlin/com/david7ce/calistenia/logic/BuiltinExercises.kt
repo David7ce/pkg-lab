@@ -288,6 +288,14 @@ object BuiltinExercises {
 
         // Skill
         exercise(
+            "jumping-jack", "Jumping Jack", Skill, Reps,
+            "Stand tall with the arms at the sides and the feet together. Jump the feet out wider than the " +
+                "shoulders while sweeping the arms overhead, then jump back to the start in one rhythm. Stay on " +
+                "the balls of the feet, keep the knees soft and the core braced. Use it as a warm-up: the point is " +
+                "the heart rate and the shoulders, not speed. Step the feet out instead of jumping if the impact " +
+                "bothers the knees.",
+        ),
+        exercise(
             "wall-handstand", "Wall Handstand", Skill, Seconds,
             "Place the hands about 15 to 20 cm from a wall, kick or walk up until the chest faces the wall and the " +
                 "body is straight. Push through the shoulders, keep the ribs down and hold. Come down under " +

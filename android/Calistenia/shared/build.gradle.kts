@@ -59,6 +59,7 @@ kotlin {
             implementation(libs.compose.foundation)
             implementation(libs.compose.ui)
             implementation(libs.compose.material3)
+            implementation(compose.components.resources)
             implementation(libs.kotlinx.coroutines.core)
             implementation(libs.kotlinx.serialization.json)
             implementation(libs.sqldelight.runtime)
@@ -99,6 +100,11 @@ sqldelight {
 }
 
 // Desktop app: packageMsi (Windows), packageDmg (macOS), createDistributable (Linux). See .github/workflows/desktop.yml.
+compose.resources {
+    // Explicit, so the generated accessor package is predictable from any module.
+    packageOfResClass = "com.david7ce.calistenia.resources"
+}
+
 compose.desktop {
     application {
         mainClass = "com.david7ce.calistenia.platform.DesktopMainKt"

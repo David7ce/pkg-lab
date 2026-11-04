@@ -44,8 +44,8 @@ class BuiltinExercisesTest {
     fun variantsPointAtAnExistingTopLevelExerciseInTheSameGroup() {
         val byId = BuiltinExercises.all.associateBy { it.id }
         val topLevel = BuiltinExercises.all.filter { it.isTopLevel }
-        assertEquals(15, topLevel.size, "expected fifteen families/singles")
-        assertEquals(39, BuiltinExercises.all.size)
+        assertEquals(16, topLevel.size, "expected sixteen families/singles")
+        assertEquals(40, BuiltinExercises.all.size)
 
         BuiltinExercises.all.filterNot { it.isTopLevel }.forEach { variant ->
             val parentId = assertNotNull(variant.parentId, "${variant.id} has no parent")

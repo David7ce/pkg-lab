@@ -158,6 +158,12 @@ object BuiltinDescriptions {
             "Túmbate en un banco y agárrate detrás de la cabeza; sube el cuerpo hasta los hombros y bájalo como una " +
             "línea recta con control. Mantén las costillas abajo y los glúteos apretados. Es un movimiento " +
             "avanzado. Empieza con versiones encogidas o negativas y nunca dejes que la zona lumbar se arquee.",
+        "builtin:jumping-jack" to
+            "De pie, erguido, con los brazos a los lados y los pies juntos. Salta abriendo los pies más que los " +
+            "hombros mientras subes los brazos por encima de la cabeza, y vuelve al inicio en un solo ritmo. " +
+            "Apoya en la punta de los pies, mantén las rodillas blandas y el core activo. Úsalo como " +
+            "calentamiento: importan la frecuencia cardíaca y los hombros, no la velocidad. Si el impacto molesta " +
+            "a las rodillas, abre los pies sin saltar.",
         "builtin:wall-handstand" to
             "Pon las manos a unos 15 o 20 cm de la pared, sube de una patada o caminando hasta que el pecho mire a " +
             "la pared y el cuerpo quede recto. Empuja con los hombros, mantén las costillas abajo y aguanta. Baja " +
@@ -342,6 +348,12 @@ object BuiltinDescriptions {
             "redescends-le comme une ligne droite avec contrôle. Garde les côtes basses et les fessiers serrés. " +
             "C'est un mouvement avancé. Commence par des versions groupées ou négatives et ne laisse jamais le bas " +
             "du dos se creuser.",
+        "builtin:jumping-jack" to
+            "Debout, bras le long du corps et pieds joints. Saute en écartant les pieds au-delà de la largeur " +
+            "des épaules pendant que les bras montent au-dessus de la tête, puis reviens au départ dans le même " +
+            "rythme. Reste sur l'avant des pieds, genoux souples et gaine active. Sers-t'en comme échauffement : " +
+            "ce qui compte est le rythme cardiaque et les épaules, pas la vitesse. Si l'impact gêne les genoux, " +
+            "écarte les pieds sans sauter.",
         "builtin:wall-handstand" to
             "Place les mains à 15 ou 20 cm du mur, monte d'un coup de pied ou en marchant jusqu'à ce que la " +
             "poitrine fasse face au mur et le corps soit droit. Pousse dans les épaules, garde les côtes basses " +
@@ -532,6 +544,12 @@ object BuiltinDescriptions {
             "senke ihn als eine gerade Linie kontrolliert. Halte die Rippen unten und das Gesäß fest. Es ist eine " +
             "fortgeschrittene Übung. Beginne mit eingerollten oder negativen Versionen und lass das Kreuz nie ins " +
             "Hohlkreuz gehen.",
+        "builtin:jumping-jack" to
+            "Aufrecht stehen, Arme seitlich am Körper, Füße zusammen. Springe mit den Füßen weiter als " +
+            "schulterbreit auseinander, während die Arme über den Kopf schwingen, und komm im gleichen Rhythmus " +
+            "zurück. Bleib auf dem Fußballen, halte die Knie weich und die Körpermitte aktiv. Als Aufwärmen " +
+            "gedacht: Es geht um Herzfrequenz und Schultern, nicht um Tempo. Wenn der Aufprall den Knien weh tut, " +
+            "stell die Füße ohne Sprung auseinander.",
         "builtin:wall-handstand" to
             "Setze die Hände etwa 15 bis 20 cm von der Wand entfernt, kicke oder laufe hoch, bis die Brust zur " +
             "Wand zeigt und der Körper gerade ist. Drücke in den Schultern, halte die Rippen unten und halte. " +
@@ -706,6 +724,11 @@ object BuiltinDescriptions {
             "Deita-te num banco e agarra atrás da cabeça; sobe o corpo até aos ombros e desce-o como uma linha " +
             "reta com controlo. Mantém as costelas em baixo e os glúteos apertados. É um movimento avançado. " +
             "Começa com versões encolhidas ou negativas e nunca deixes a zona lombar arquear.",
+        "builtin:jumping-jack" to
+            "De pé, ereto, com os braços ao lado do corpo e os pés juntos. Salta abrindo os pés além da largura " +
+            "dos ombros enquanto os braços sobem acima da cabeça, e volta ao início no mesmo ritmo. Fica na ponta " +
+            "dos pés, mantém os joelhos soltos e o core ativo. Usa como aquecimento: o que importa é a frequência " +
+            "cardíaca e os ombros, não a velocidade. Se o impacto incomodar os joelhos, abre os pés sem saltar.",
         "builtin:wall-handstand" to
             "Põe as mãos a cerca de 15 a 20 cm da parede, sobe com um pontapé ou caminhando até o peito ficar " +
             "virado para a parede e o corpo direito. Empurra nos ombros, mantém as costelas em baixo e aguenta. " +
@@ -884,6 +907,12 @@ object BuiltinDescriptions {
             "Sdraiati su una panchina e afferra dietro la testa, poi solleva il corpo fino alle spalle e abbassalo " +
             "come una linea retta con controllo. Tieni le costole basse e i glutei stretti. È un movimento " +
             "avanzato. Inizia con versioni raccolte o negative e non lasciare mai che la zona lombare si inarchi.",
+        "builtin:jumping-jack" to
+            "In piedi, braccia lungo i fianchi e piedi uniti. Salta aprendo i piedi oltre la larghezza delle " +
+            "spalle mentre le braccia salgono sopra la testa, poi torna al via con lo stesso ritmo. Resta " +
+            "sull'avampiede, ginocchia morbide e core attivo. Usalo come riscaldamento: contano frequenza " +
+            "cardiaca e spalle, non la velocità. Se l'impatto dà fastidio alle ginocchia, apri i piedi senza " +
+            "saltare.",
         "builtin:wall-handstand" to
             "Metti le mani a 15-20 cm dal muro, sali con un calcio o camminando finché il petto è rivolto al muro " +
             "e il corpo è dritto. Spingi nelle spalle, tieni le costole basse e resisti. Scendi con controllo. " +
