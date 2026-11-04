@@ -31,3 +31,6 @@ fun Exercise.effectiveMuscles(): Set<Muscle> =
 /** True when the exercise trains at least one of the selected muscles (OR semantics). */
 fun Exercise.trainsAny(selection: Set<Muscle>): Boolean =
     selection.isEmpty() || effectiveMuscles().any { it in selection }
+
+/** The selection after tapping [muscle]: added when absent, removed when present. */
+fun Set<Muscle>.toggled(muscle: Muscle): Set<Muscle> = if (muscle in this) this - muscle else this + muscle

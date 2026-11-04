@@ -42,6 +42,7 @@ fun TrainScreen(app: AppState) {
         item {
             if (active != null) ContinueCard(app, active) else StartCard(app)
         }
+        item { WhatTodayCard(app) }
         item { WeekCard(app) }
         if (active == null) {
             item { SectionTitle(strings.startRoutine) }
@@ -199,4 +200,22 @@ private fun Hint(text: String) {
         color = MaterialTheme.colorScheme.onSurfaceVariant,
         modifier = Modifier.padding(vertical = 4.dp),
     )
+}
+
+/** Entry to the body map: say what you train before choosing exercises. */
+@Composable
+private fun WhatTodayCard(app: AppState) {
+    val strings = LocalStrings.current
+    Card(onClick = app::openWhatToday, modifier = Modifier.fillMaxWidth()) {
+        Column(Modifier.fillMaxWidth().padding(16.dp)) {
+            Text(strings.whatTrainToday, style = MaterialTheme.typography.titleMedium)
+            if (app.muscleFilter.isNotEmpty()) {
+                Text(
+                    app.muscleFilter.sortedBy { it.ordinal }.joinToString(" · ") { strings.muscleLabel(it) },
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.primary,
+                )
+            }
+        }
+    }
 }

@@ -1,6 +1,7 @@
 package com.david7ce.calistenia
 
 import com.david7ce.calistenia.logic.AppLanguage
+import com.david7ce.calistenia.model.Muscle
 import com.david7ce.calistenia.ui.EnStrings
 import com.david7ce.calistenia.ui.stringsFor
 import kotlin.test.Test
@@ -92,5 +93,24 @@ class StringsTest {
         assertSame(EnStrings, stringsFor(""))
         assertSame(stringsFor("pt"), stringsFor("pt-BR"))
         assertSame(stringsFor("es"), stringsFor("ES"))
+    }
+
+    @Test
+    fun everyMuscleHasAUniqueNameInEveryLanguage() {
+        AppLanguage.entries.mapNotNull { it.code }.forEach { code ->
+            val s = stringsFor(code)
+            val names = Muscle.entries.map { s.muscleLabel(it) }
+            assertTrue(names.all { it.isNotBlank() }, "$code has a blank muscle name")
+            assertEquals(names.size, names.toSet().size, "$code repeats a muscle name: $names")
+            if (code != "en") {
+                assertNotEquals(EnStrings.whatTrainToday, s.whatTrainToday, "$code whatTrainToday")
+                assertNotEquals(EnStrings.muscleMapHint, s.muscleMapHint, "$code muscleMapHint")
+                assertNotEquals(EnStrings.showExercises, s.showExercises, "$code showExercises")
+                assertNotEquals(EnStrings.bodyBack, s.bodyBack, "$code bodyBack")
+                // Biceps/Triceps are international; the rest must really be translated.
+                val translated = Muscle.entries.count { s.muscleLabel(it) != EnStrings.muscleLabel(it) }
+                assertTrue(translated >= 9, "$code translated only $translated of ${Muscle.entries.size} muscles")
+            }
+        }
     }
 }

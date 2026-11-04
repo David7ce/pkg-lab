@@ -47,6 +47,7 @@ import com.david7ce.calistenia.ui.SessionDetailScreen
 import com.david7ce.calistenia.ui.SettingsScreen
 import com.david7ce.calistenia.ui.Tab
 import com.david7ce.calistenia.ui.TrainScreen
+import com.david7ce.calistenia.ui.WhatTodayScreen
 import com.david7ce.calistenia.ui.WorkoutScreen
 import com.david7ce.shared.ui.ConfirmDialog
 import com.david7ce.shared.ui.LocalSharedStrings
@@ -120,6 +121,7 @@ private fun Root(app: AppState) {
 
                     Screen.Settings -> SettingsScreen(app)
                     Screen.Workout -> WorkoutScreen(app)
+                    Screen.WhatToday -> WhatTodayScreen(app)
                     is Screen.RoutineEditor -> RoutineEditorScreen(app, screen.state)
                     is Screen.ExerciseDetail -> ExerciseDetailScreen(app, screen.exerciseId)
                     is Screen.SessionDetail -> SessionDetailScreen(app, screen.sessionId)
@@ -198,6 +200,7 @@ private fun AppTopBar(app: AppState) {
 
         Screen.Settings -> strings.settings
         Screen.Workout -> app.active?.name ?: strings.workout
+        Screen.WhatToday -> strings.whatTrainToday
         is Screen.RoutineEditor -> screen.state.draft.name.ifBlank {
             if (screen.state.isNew) strings.newRoutine else strings.routines
         }

@@ -59,8 +59,8 @@ fun ExercisesScreen(app: AppState) {
     var measure by remember { mutableStateOf<Measure?>(null) }
     var creating by remember { mutableStateOf(false) }
 
-    val shown = remember(query, group, measure, app.exercises) {
-        filterFamilies(app.exercises, query, group, measure)
+    val shown = remember(query, group, measure, app.exercises, app.muscleFilter) {
+        filterFamilies(app.exercises, query, group, measure, app.muscleFilter)
     }
 
     Box(Modifier.fillMaxSize()) {
@@ -78,6 +78,7 @@ fun ExercisesScreen(app: AppState) {
                 singleLine = true,
                 modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp),
             )
+            if (app.muscleFilter.isNotEmpty()) MuscleFilterRow(app)
             FilterRow(
                 groups = listOf(null) + MuscleGroup.entries,
                 selectedGroup = group,
@@ -415,4 +416,25 @@ private fun androidx.compose.foundation.layout.RowScope.Bar(point: ProgressPoint
             .fillMaxHeight(fraction)
             .background(MaterialTheme.colorScheme.primary, RoundedCornerShape(topStart = 3.dp, topEnd = 3.dp)),
     )
+}
+
+/** The active body-map selection: tap a chip to drop that muscle, "x" to clear, the label to reopen the map. */
+@Composable
+private fun MuscleFilterRow(app: AppState) {
+    val strings = LocalStrings.current
+    Row(
+        modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()).padding(horizontal = 12.dp),
+        horizontalArrangement = Arrangement.spacedBy(6.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        TextButton(onClick = app::openWhatToday) { Text(strings.musclesLabel) }
+        app.muscleFilter.sortedBy { it.ordinal }.forEach { muscle ->
+            FilterChip(
+                selected = true,
+                onClick = { app.toggleMuscle(muscle) },
+                label = { Text(strings.muscleLabel(muscle)) },
+            )
+        }
+        TextButton(onClick = app::clearMuscles) { Text(strings.clear) }
+    }
 }

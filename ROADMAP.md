@@ -14,8 +14,12 @@ Per-app pending work lives in each app's own README, not here (Recetario: "Deskt
   leyendo las sesiones que ya existen, sin duplicarlas. Cinco fases; **M1 hecha**
   (2026-11-04): enum `Muscle` de 12 regiones, `musclesFor`, `Exercise.muscles`
   con 32 ejercicios etiquetados a mano, columna `muscles` + migración `3.sqm`,
-  backup tolerante a nombres desconocidos, 7 tests nuevos. Siguiente: **M2**, el
-  mapa corporal y el filtro.
+  backup tolerante a nombres desconocidos, 7 tests nuevos. **M2 hecha**
+  (2026-11-04): `ui/MuscleMap.kt` (frente + espalda con `Path`s, una selección
+  compartida), pantalla "¿Qué entrenas hoy?" con chips y "Todos" desde Entrenar,
+  selección efímera en `AppState`, `filterFamilies(muscles=)` en Ejercicios, 13
+  nombres en seis idiomas, 14 tests nuevos. Siguiente: **M3**, filtrar rutinas y
+  resaltar dentro de la rutina.
 
 - **Watch the first CI runs of SleepCycles.** Written without a local Android build at the time, so
   the first `android.yml` and `desktop.yml` runs were its first compile. A durable Android SDK now

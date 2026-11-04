@@ -2,6 +2,7 @@ package com.david7ce.calistenia.ui
 
 import androidx.compose.runtime.staticCompositionLocalOf
 import com.david7ce.calistenia.model.Measure
+import com.david7ce.calistenia.model.Muscle
 import com.david7ce.calistenia.model.MuscleGroup
 import com.david7ce.calistenia.logic.targetLabel
 
@@ -40,6 +41,25 @@ open class Strings {
     open val groupLegs = "Legs"
     open val groupCore = "Core"
     open val groupSkill = "Skill"
+    open val muscleChest = "Chest"
+    open val muscleLats = "Lats"
+    open val muscleShoulders = "Shoulders"
+    open val muscleBiceps = "Biceps"
+    open val muscleTriceps = "Triceps"
+    open val muscleForearms = "Forearms"
+    open val muscleAbs = "Abs"
+    open val muscleObliques = "Obliques"
+    open val muscleLowerBack = "Lower back"
+    open val muscleGlutes = "Glutes"
+    open val muscleQuads = "Quads"
+    open val muscleHamstrings = "Hamstrings"
+    open val muscleCalves = "Calves"
+    open val whatTrainToday = "What are you training today?"
+    open val muscleMapHint = "Tap the body or pick from the list. Nothing selected shows everything."
+    open val showExercises = "Show exercises"
+    open val bodyFront = "Front"
+    open val bodyBack = "Back"
+    open val musclesLabel = "Muscles"
     open val reps = "reps"
     open val secondsUnit = "s"
     open val hold = "Hold"
@@ -52,6 +72,22 @@ open class Strings {
         MuscleGroup.Legs -> groupLegs
         MuscleGroup.Core -> groupCore
         MuscleGroup.Skill -> groupSkill
+    }
+
+    fun muscleLabel(muscle: Muscle): String = when (muscle) {
+        Muscle.Chest -> muscleChest
+        Muscle.Lats -> muscleLats
+        Muscle.Shoulders -> muscleShoulders
+        Muscle.Biceps -> muscleBiceps
+        Muscle.Triceps -> muscleTriceps
+        Muscle.Forearms -> muscleForearms
+        Muscle.Abs -> muscleAbs
+        Muscle.Obliques -> muscleObliques
+        Muscle.LowerBack -> muscleLowerBack
+        Muscle.Glutes -> muscleGlutes
+        Muscle.Quads -> muscleQuads
+        Muscle.Hamstrings -> muscleHamstrings
+        Muscle.Calves -> muscleCalves
     }
 
     fun measureLabel(measure: Measure): String = when (measure) {

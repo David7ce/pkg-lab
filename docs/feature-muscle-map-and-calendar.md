@@ -1,6 +1,6 @@
 # Muscles and calendar — design before code
 
-STATUS: active — designed 2026-11-04; **M1 done** (muscle data + tags + storage + backup), UI not started.
+STATUS: active — designed 2026-11-04; **M1 done** (muscle data + tags + storage + backup), **M2 done** (map + "what today" surface + exercise filter); routines and calendar not started.
 
 Two features the owner asked for after seeing the figure work:
 
@@ -101,11 +101,11 @@ Hoy  ──▶  ¿Qué entrenas hoy?  (body map + chips + "todo")
 
 ### Acceptance
 
-- [ ] `musclesFor` and the filter predicate are pure functions with unit tests.
-- [ ] Every built-in exercise has tags (test: no built-in has an empty set).
-- [ ] Backup round-trip survives unknown muscle names and older files.
-- [ ] Selecting a muscle changes the visible exercise list; deselecting restores it.
-- [ ] All 12 names exist in the six languages.
+- [x] `musclesFor` and the filter predicate are pure functions with unit tests.
+- [x] Every built-in exercise has tags (test: no built-in has an empty set).
+- [x] Backup round-trip survives unknown muscle names and older files.
+- [x] Selecting a muscle changes the visible exercise list; deselecting restores it.
+- [x] All 13 names exist in the six languages (the enum has 13 entries; the doc's "12" is a miscount).
 
 ---
 
@@ -175,7 +175,7 @@ replacement. Both read the same session store; only the plan store is new.
 | Phase | Deliverable | Why this order |
 |---|---|---|
 | **M1** ✅ | `Muscle` enum, `musclesFor`, `Exercise.muscles`, built-in tags, backup handling, unit tests — **done 2026-11-04** (`MusclesTest`, 7 tests; storage v4 + `3.sqm`) | Data first: the map is useless without tags, and this phase has no UI risk |
-| **M2** | `MuscleMap` component + "¿qué entrenas hoy?" surface + exercise filter | Visible, testable, and independent of routines |
+| **M2** ✅ | `MuscleMap` component + "¿qué entrenas hoy?" surface + exercise filter | Visible, testable, and independent of routines — **done 2026-11-04** (`MuscleMapTest`, 8 tests; `StringsTest` muscle names) |
 | **M3** | Routine filtering + highlight inside the routine | Small once M2 exists |
 | **M4** | `PlannedWorkout` store + calendar grid (read-only: plans + finished) | Read-only grid proves the day logic before editing exists |
 | **M5** | Plan / move / remove from the day sheet, start from a plan | The write side, on top of a grid that already renders correctly |

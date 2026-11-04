@@ -37,12 +37,14 @@ import com.david7ce.calistenia.logic.startRest as newRestState
 import com.david7ce.calistenia.logic.tick
 import com.david7ce.calistenia.logic.toDraft
 import com.david7ce.calistenia.logic.toStored
+import com.david7ce.calistenia.logic.toggled
 import com.david7ce.calistenia.logic.toggleSet
 import com.david7ce.calistenia.logic.updateExerciseNotes
 import com.david7ce.calistenia.logic.updateNotes
 import com.david7ce.calistenia.logic.updateSetValue
 import com.david7ce.calistenia.model.Exercise
 import com.david7ce.calistenia.model.Measure
+import com.david7ce.calistenia.model.Muscle
 import com.david7ce.calistenia.model.MuscleGroup
 import com.david7ce.calistenia.model.Routine
 import com.david7ce.calistenia.model.WorkoutSession
@@ -90,6 +92,7 @@ class RoutineEditorState(initial: RoutineDraft) {
 sealed interface Screen {
     data object Settings : Screen
     data object Workout : Screen
+    data object WhatToday : Screen
     class RoutineEditor(val state: RoutineEditorState) : Screen
     data class ExerciseDetail(val exerciseId: String) : Screen
     data class SessionDetail(val sessionId: String) : Screen
@@ -128,6 +131,12 @@ class AppState(
     var tab by mutableStateOf<Tab>(Tab.Train)
         private set
     var screen by mutableStateOf<Screen?>(null)
+        private set
+    /**
+     * "What are you training today": the body-map selection. Deliberately not stored - it is a filter for
+     * this browsing session. Empty means no filter.
+     */
+    var muscleFilter by mutableStateOf<Set<Muscle>>(emptySet())
         private set
     var showHelp by mutableStateOf(false)
         private set
@@ -236,6 +245,21 @@ class AppState(
         tab = value
         screen = null
     }
+
+    fun openWhatToday() {
+        screen = Screen.WhatToday
+    }
+
+    fun toggleMuscle(muscle: Muscle) {
+        muscleFilter = muscleFilter.toggled(muscle)
+    }
+
+    fun clearMuscles() {
+        muscleFilter = emptySet()
+    }
+
+    /** Leaves the picker for the filtered exercise library. */
+    fun showFilteredExercises() = selectTab(Tab.Exercises)
 
     fun openSettings() {
         screen = Screen.Settings

@@ -2,6 +2,7 @@ package com.david7ce.calistenia.logic
 
 import com.david7ce.calistenia.model.Exercise
 import com.david7ce.calistenia.model.Measure
+import com.david7ce.calistenia.model.Muscle
 import com.david7ce.calistenia.model.MuscleGroup
 
 /** Accent folding, so "dominada" finds "Domináda" and "traction" is not blocked by casing. */
@@ -59,15 +60,18 @@ fun parentOf(exercise: Exercise, exercises: List<Exercise>): Exercise =
 
 /**
  * The library filter, family-aware: a variant matches, and its family is shown. Group comes from the
- * parent (all variants share it); measure matches when any variant uses it.
+ * parent (all variants share it); measure matches when any variant uses it. [muscles] is the body-map
+ * selection: a family passes when any variant trains any selected muscle (OR); empty keeps everything.
  */
 fun filterFamilies(
     exercises: List<Exercise>,
     query: String = "",
     group: MuscleGroup? = null,
     measure: Measure? = null,
+    muscles: Set<Muscle> = emptySet(),
 ): List<ExerciseFamily> = familiesOf(exercises).filter { family ->
-    (group == null || family.parent.group == group) &&
+    (muscles.isEmpty() || family.variants.any { it.trainsAny(muscles) }) &&
+        (group == null || family.parent.group == group) &&
         (measure == null || family.variants.any { it.measure == measure }) &&
         (query.isBlank() || family.variants.any { it.matchesQuery(query) })
 }
