@@ -6,6 +6,7 @@ import com.david7ce.calistenia.db.Workout_set as DbWorkoutSet
 import com.david7ce.calistenia.logic.AppSettings
 import com.david7ce.calistenia.logic.BackupFile
 import com.david7ce.calistenia.logic.BuiltinExercises
+import com.david7ce.calistenia.logic.effectiveMuscles
 import com.david7ce.calistenia.logic.ExistingIds
 import com.david7ce.calistenia.logic.MergeResult
 import com.david7ce.calistenia.logic.RoutineDraft
@@ -15,6 +16,7 @@ import com.david7ce.calistenia.logic.normalized
 import com.david7ce.calistenia.model.Exercise
 import com.david7ce.calistenia.model.MAX_EXERCISE_DESCRIPTION
 import com.david7ce.calistenia.model.Measure
+import com.david7ce.calistenia.model.Muscle
 import com.david7ce.calistenia.model.MuscleGroup
 import com.david7ce.calistenia.model.Routine
 import com.david7ce.calistenia.model.RoutineExercise
@@ -44,11 +46,12 @@ class CalisteniaRepository(
             BuiltinExercises.all.forEach { exercise ->
                 q.insertExerciseIgnore(
                     exercise.id, exercise.name, exercise.group.name, exercise.measure.name, 1L, now,
-                    exercise.description, exercise.parentId,
+                    exercise.description, exercise.parentId, Muscle.toCsv(exercise.muscles),
                 )
                 // Existing rows are not replaced, but newer content should reach them.
                 q.updateBuiltinDescription(exercise.description, exercise.id)
                 q.updateBuiltinParent(exercise.parentId, exercise.id)
+                q.updateBuiltinMuscles(Muscle.toCsv(exercise.effectiveMuscles()), exercise.id)
             }
         }
     }
@@ -62,6 +65,7 @@ class CalisteniaRepository(
             builtin = row.builtin != 0L,
             description = row.description,
             parentId = row.parentId,
+            muscles = Muscle.parseCsv(row.muscles),
         )
     }
 
@@ -81,6 +85,7 @@ class CalisteniaRepository(
         )
         q.insertExercise(
             exercise.id, exercise.name, group.name, measure.name, 0L, clock(), exercise.description, null,
+            Muscle.toCsv(exercise.muscles),
         )
         return exercise
     }
@@ -346,7 +351,7 @@ class CalisteniaRepository(
             merge.exercises.forEach {
                 q.insertExercise(
                     it.id, it.name, it.group, it.measure, if (it.builtin) 1L else 0L, clock(),
-                    it.description.take(MAX_EXERCISE_DESCRIPTION), it.parentId,
+                    it.description.take(MAX_EXERCISE_DESCRIPTION), it.parentId, Muscle.toCsv(Muscle.fromNames(it.muscles)),
                 )
             }
             merge.routines.forEach { routine ->

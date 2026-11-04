@@ -1,0 +1,3 @@
+-- Version 3 -> 4: the fine muscles the map and the filter work with.
+-- Empty means "derive from the group", so every existing row stays valid.
+ALTER TABLE exercise ADD COLUMN muscles TEXT NOT NULL DEFAULT '';

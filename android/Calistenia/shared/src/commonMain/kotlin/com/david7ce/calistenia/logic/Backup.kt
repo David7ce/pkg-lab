@@ -3,6 +3,7 @@ package com.david7ce.calistenia.logic
 import com.david7ce.calistenia.model.Exercise
 import com.david7ce.calistenia.model.MAX_EXERCISE_DESCRIPTION
 import com.david7ce.calistenia.model.Measure
+import com.david7ce.calistenia.model.Muscle
 import com.david7ce.calistenia.model.MuscleGroup
 import com.david7ce.calistenia.model.Routine
 import com.david7ce.calistenia.model.WorkoutSession
@@ -37,6 +38,8 @@ data class ExerciseDto(
     val description: String = "",
     /** v3; the family's standard exercise, or null for a top-level one. */
     val parentId: String? = null,
+    /** v4; curated Muscle names. Unknown ones are dropped on import, not rejected. */
+    val muscles: List<String> = emptyList(),
 )
 
 @Serializable
@@ -287,6 +290,7 @@ fun planMerge(file: BackupFile, existing: ExistingIds, existingSettings: Set<Str
 fun Exercise.toDto() = ExerciseDto(
     id = id, name = name, group = group.name, measure = measure.name, builtin = builtin,
     description = description, parentId = parentId,
+    muscles = Muscle.entries.filter { it in muscles }.map { it.name },
 )
 
 fun Routine.toDto(): RoutineDto = RoutineDto(
@@ -371,4 +375,5 @@ fun ExerciseDto.toModel() = Exercise(
     builtin = builtin,
     description = description.take(MAX_EXERCISE_DESCRIPTION),
     parentId = parentId,
+    muscles = Muscle.fromNames(muscles),
 )

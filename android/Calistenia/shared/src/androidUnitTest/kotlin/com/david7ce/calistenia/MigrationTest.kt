@@ -28,7 +28,7 @@ class MigrationTest {
             0,
         )
 
-        assertEquals(3L, CalisteniaDatabase.Schema.version)
+        assertEquals(4L, CalisteniaDatabase.Schema.version)
         CalisteniaDatabase.Schema.migrate(driver, 1, CalisteniaDatabase.Schema.version)
 
         val repo = CalisteniaRepository(
@@ -41,7 +41,7 @@ class MigrationTest {
 
         val pushUp = repo.exercises().first { it.id == "builtin:push-up" }
         assertTrue(pushUp.description.length >= 100, "the migrated row should receive the how-to text")
-        assertEquals(39, repo.exercises().size)
+        assertEquals(40, repo.exercises().size)
         assertTrue(repo.exercises().all { it.description.isNotBlank() })
         assertNull(pushUp.parentId)
         assertEquals(

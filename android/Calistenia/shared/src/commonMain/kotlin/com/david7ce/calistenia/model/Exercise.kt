@@ -43,6 +43,8 @@ data class Exercise(
     val builtin: Boolean,
     val description: String = "",
     val parentId: String? = null,
+    /** Curated muscles for the map and the filter; empty means "ask the group". */
+    val muscles: Set<Muscle> = emptySet(),
 ) {
     val isCustom: Boolean get() = !builtin
     val isTopLevel: Boolean get() = parentId == null
