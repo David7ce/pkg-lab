@@ -173,6 +173,47 @@ class ExerciseFiguresTest {
     }
 
     @Test
+    fun lSitIsAStaticHoldOnTheBars() {
+        assertTrue(LSit.isStatic)
+        assertEquals(0, LSit.periodMs)
+        assertEquals(Contact.Bar, LSit.rig.contact)
+    }
+
+    @Test
+    fun lSitSupportsOnStraightArmsWithAVerticalTorso() {
+        val s = anchoredSkeleton(LSit.poseAt(0), LSit.rig)
+        assertEquals(0f, s.hand.y, "the anchored hand is on the bar line")
+        assertTrue(abs(s.shoulder.x - s.hand.x) < 0.01f, "arms are not vertical: $s")
+        assertTrue(-s.shoulder.y in 0.8f..0.9f, "arms are not straight: shoulder height ${-s.shoulder.y}")
+        assertTrue(abs(s.hip.x - s.shoulder.x) < 0.01f, "torso is not vertical: $s")
+        assertTrue(s.headCenter.y < s.shoulder.y, "head should be above the shoulder: $s")
+    }
+
+    @Test
+    fun lSitLegsAreStraightAndPointForwardLevelWithTheBars() {
+        val s = anchoredSkeleton(LSit.poseAt(0), LSit.rig)
+        // Hip, knee and ankle are collinear (straight legs)...
+        val cross = (s.knee.x - s.hip.x) * (s.ankle.y - s.hip.y) -
+            (s.knee.y - s.hip.y) * (s.ankle.x - s.hip.x)
+        assertTrue(abs(cross) < 0.01f, "knee is off the hip-ankle line by $cross")
+        // ...forward of the hips, almost horizontal, with the feet on the bar line.
+        assertTrue(s.ankle.x > s.hip.x + 1.5f, "legs should extend forward: $s")
+        assertTrue(abs(s.ankle.y - s.hip.y) < 0.2f, "legs are not near horizontal: $s")
+        assertTrue(abs(s.ankle.y) < 0.05f, "the feet are ${s.ankle.y} off the bar line")
+    }
+
+    @Test
+    fun lSitBoundsContainTheWholeL() {
+        val bounds = boundsFor(LSit)
+        val s = anchoredSkeleton(LSit.poseAt(0), LSit.rig)
+        for (point in s.points) {
+            assertTrue(point.x >= bounds.minX && point.x <= bounds.maxX, "x $point outside $bounds")
+            assertTrue(point.y >= bounds.minY && point.y <= bounds.maxY, "y $point outside $bounds")
+        }
+        assertTrue(bounds.width > 2f && bounds.height > 1.4f, "an L is both wide and tall: $bounds")
+    }
+
+    @Test
     fun onlyRegisteredFamiliesHaveAFigure() {
         assertEquals(PushUp, figureFor("builtin:push-up"))
         assertEquals(Squat, figureFor("builtin:squat"))
@@ -181,6 +222,8 @@ class ExerciseFiguresTest {
         assertEquals(Dip, figureFor("builtin:parallel-bar-dip"))
         assertEquals(Contact.Bar, Dip.rig.contact)
         assertEquals(Plank, figureFor("builtin:plank"))
+        assertEquals(LSit, figureFor("builtin:l-sit"))
+        assertEquals(Contact.Bar, LSit.rig.contact)
         assertEquals(null, figureFor("builtin:glute-bridge"))
         assertEquals(null, figureFor("custom-1"))
     }

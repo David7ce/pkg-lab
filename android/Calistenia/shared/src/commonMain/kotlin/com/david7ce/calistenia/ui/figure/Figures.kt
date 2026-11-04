@@ -145,6 +145,31 @@ private val PlankHold = Pose(torsoLean = 0f, hip = 0f, knee = 0f, shoulder = 0f,
 val Plank = FigureAnimation.hold(ProneForearmPlankRig, PlankHold)
 
 /**
+ * L-sit: a static hold, so a single [Keyframe] through [FigureAnimation.hold]. It is the dip's
+ * support rig (standing orientation, anchored at the hand, [Contact.Bar]) with straight arms, a
+ * vertical torso and both legs swung up to horizontal in front: the "L" is the vertical
+ * arm-and-torso line against the horizontal legs.
+ *
+ * Parallel bars (or parallettes) rather than the floor: with an arm of 0.87 and a torso of 1.0 the
+ * hip necessarily ends up 0.13 *below* the hand line, which would put it under the floor on the
+ * ground variant but simply hangs it between the bars here. The hip is `-95°` (not `-90°`), so the
+ * straight legs rise 5° above horizontal and the ankle lands on the hand line (`0.13 - 1.75 ×
+ * sin 5° ≈ 0`), the feet level with the bars like in a real L-sit. Variants (floor, tuck) share
+ * the parent's figure, as with the other families.
+ */
+private val SupportLSitRig = Rig(
+    bodyAxisDeg = -90f,
+    armRestDeg = 180f,
+    anchor = Joint.Hand,
+    contact = Contact.Bar,
+)
+
+/** Straight arms and torso, legs straight and raised to (just above) horizontal. */
+private val LSitHold = Pose(torsoLean = 0f, hip = -95f, knee = 0f, shoulder = 0f, elbow = 0f)
+
+val LSit = FigureAnimation.hold(SupportLSitRig, LSitHold)
+
+/**
  * The animation for an exercise family, by its parent exercise id, or null when that family is
  * still text-only. This is the one place a new figure gets registered.
  */
@@ -154,5 +179,6 @@ fun figureFor(parentId: String): FigureAnimation? = when (parentId) {
     "builtin:pull-up" -> PullUp
     "builtin:parallel-bar-dip" -> Dip
     "builtin:plank" -> Plank
+    "builtin:l-sit" -> LSit
     else -> null
 }

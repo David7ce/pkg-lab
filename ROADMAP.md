@@ -21,13 +21,14 @@ Per-app pending work lives in each app's own README, not here (Recetario: "Deskt
 - **Calistenia: exercise animation, in progress.** Direction changed from "text-only": instead of 3D
   models, photos or video (storage, licensing, a rig per exercise), exercises get a code-drawn 2D
   profile stick figure (`ui/figure/`: `Rig` orientation + `Pose` angles + `FigureAnimation` keyframes,
-  drawn by `Figure`), so there are no assets to ship. Push-up, squat, pull-up, dip and plank are done (pull-up is the
+  drawn by `Figure`), so there are no assets to ship. Push-up, squat, pull-up, dip, plank and L-sit are done (pull-up is the
   first bar exercise: hanging rig, and `Contact.Bar` now draws a thick bar with end caps via
   `contactStrokes`, distinct from the floor line); `figureFor(parentId)` is the registry, every other
   family is still text-only (dip is a `Contact.Bar` support rig registered for `builtin:parallel-bar-dip`;
   bench dip stays text-only; plank is the first static hold: a forearm plank via
-  `FigureAnimation.hold` on a prone rig anchored at the elbow). Remaining: other holds (L-sit, etc.),
-  the rest of the families, and a real-device look at how the
+  `FigureAnimation.hold` on a prone rig anchored at the elbow; L-sit is a hold on the dip's
+  support rig, straight arms and legs raised to horizontal, registered for `builtin:l-sit`).
+  Remaining: other holds, the rest of the families, and a real-device look at how the
   figure reads (never checked visually, only geometry-tested). Photos/video stay out of scope.
 - **Compose-on-Robolectric smoke tests** pass locally; worth a real-device check too before
   relying on them as the only UI-level test.
