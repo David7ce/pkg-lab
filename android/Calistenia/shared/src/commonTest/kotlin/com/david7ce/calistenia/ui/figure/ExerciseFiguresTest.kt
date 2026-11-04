@@ -133,6 +133,46 @@ class ExerciseFiguresTest {
     }
 
     @Test
+    fun plankIsAStaticHold() {
+        assertTrue(Plank.isStatic)
+        assertEquals(0, Plank.periodMs)
+        assertEquals(Contact.Ground, Plank.rig.contact)
+    }
+
+    @Test
+    fun plankRestsOnTheForearmsAndToesOnTheFloor() {
+        val s = anchoredSkeleton(Plank.poseAt(0), Plank.rig)
+        assertEquals(0f, s.elbow.y, "the anchored elbow is on the floor line")
+        assertTrue(abs(s.hand.y) < 0.01f, "the forearm is not flat: hand ${s.hand.y}")
+        assertTrue(s.hand.x > s.elbow.x + 0.3f, "the forearm should point forward: $s")
+        assertTrue(abs(s.ankle.y) < 0.01f, "the toes are ${s.ankle.y} off the floor")
+        assertTrue(s.points.maxOf { it.y } <= 0.01f, "a joint is below the floor: $s")
+    }
+
+    @Test
+    fun plankKeepsTheBodyInAStraightNearHorizontalLine() {
+        val s = anchoredSkeleton(Plank.poseAt(0), Plank.rig)
+        // Ankle, hip and shoulder are collinear (straight body)...
+        val cross = (s.hip.x - s.ankle.x) * (s.shoulder.y - s.ankle.y) -
+            (s.hip.y - s.ankle.y) * (s.shoulder.x - s.ankle.x)
+        assertTrue(abs(cross) < 0.01f, "hip is off the shoulder-ankle line by $cross")
+        // ...and almost horizontal: the shoulder is one upper arm above the floor, not a push-up's 0.87.
+        assertTrue(-s.shoulder.y in 0.4f..0.5f, "shoulder height ${-s.shoulder.y}")
+        assertTrue(s.headCenter.x > s.shoulder.x && s.shoulder.x > s.hip.x && s.hip.x > s.ankle.x, "not head-forward: $s")
+    }
+
+    @Test
+    fun plankBoundsAreWideAndFlat() {
+        val bounds = boundsFor(Plank)
+        val s = anchoredSkeleton(Plank.poseAt(0), Plank.rig)
+        for (point in s.points) {
+            assertTrue(point.x >= bounds.minX && point.x <= bounds.maxX, "x $point outside $bounds")
+            assertTrue(point.y >= bounds.minY && point.y <= bounds.maxY, "y $point outside $bounds")
+        }
+        assertTrue(bounds.width > bounds.height * 3f, "plank should be much wider than tall: $bounds")
+    }
+
+    @Test
     fun onlyRegisteredFamiliesHaveAFigure() {
         assertEquals(PushUp, figureFor("builtin:push-up"))
         assertEquals(Squat, figureFor("builtin:squat"))
@@ -140,7 +180,8 @@ class ExerciseFiguresTest {
         assertEquals(Contact.Bar, PullUp.rig.contact)
         assertEquals(Dip, figureFor("builtin:parallel-bar-dip"))
         assertEquals(Contact.Bar, Dip.rig.contact)
-        assertEquals(null, figureFor("builtin:plank"))
+        assertEquals(Plank, figureFor("builtin:plank"))
+        assertEquals(null, figureFor("builtin:glute-bridge"))
         assertEquals(null, figureFor("custom-1"))
     }
 }

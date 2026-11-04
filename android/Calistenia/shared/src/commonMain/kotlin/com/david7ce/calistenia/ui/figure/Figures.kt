@@ -120,6 +120,31 @@ val Dip = FigureAnimation(
 )
 
 /**
+ * Forearm plank: a static hold, so a single [Keyframe] through [FigureAnimation.hold]. It is the
+ * push-up's prone rig with the support moved from the hands to the forearms, which fits the current
+ * [Rig] with no new concepts: the upper arm hangs straight down from the shoulder, the forearm lies
+ * flat along the floor pointing forward, and the anchor is the elbow (it stays on the floor line,
+ * and the forearm and toes land on the same line).
+ *
+ * The body axis is tilted `asin(0.45 / 2.75) = 9.42°` above horizontal for the same reason as the
+ * push-up: the shoulder sits one upper-arm length (0.45) above the elbow, and the straight body adds
+ * `2.75 × sin(9.42°)` of drop from shoulder to toe, so the feet reach the floor. A forearm plank
+ * was chosen over a straight-arm one because that is just the push-up's top pose, whereas this
+ * reads as a different exercise.
+ */
+private val ProneForearmPlankRig = Rig(
+    bodyAxisDeg = -9.42f,
+    armRestDeg = 99.42f, // 90° on screen: straight down from the shoulder
+    anchor = Joint.Elbow,
+    contact = Contact.Ground,
+)
+
+/** Straight body, upper arm vertical, forearm folded 90° to lie flat along the floor. */
+private val PlankHold = Pose(torsoLean = 0f, hip = 0f, knee = 0f, shoulder = 0f, elbow = -90f)
+
+val Plank = FigureAnimation.hold(ProneForearmPlankRig, PlankHold)
+
+/**
  * The animation for an exercise family, by its parent exercise id, or null when that family is
  * still text-only. This is the one place a new figure gets registered.
  */
@@ -128,5 +153,6 @@ fun figureFor(parentId: String): FigureAnimation? = when (parentId) {
     "builtin:squat" -> Squat
     "builtin:pull-up" -> PullUp
     "builtin:parallel-bar-dip" -> Dip
+    "builtin:plank" -> Plank
     else -> null
 }
