@@ -28,9 +28,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import com.david7ce.calistenia.logic.BuiltinRoutines
+import com.david7ce.calistenia.logic.trainsAny
 import com.david7ce.calistenia.model.Routine
 import com.david7ce.shared.ui.ConfirmDialog
 import com.david7ce.shared.ui.SharedIcons
@@ -40,6 +45,9 @@ fun RoutinesScreen(app: AppState) {
     val strings = LocalStrings.current
     var toDelete by remember { mutableStateOf<Routine?>(null) }
     var showStarters by remember { mutableStateOf(false) }
+    val shown = remember(app.routines, app.muscleFilter) {
+        app.routines.filter { it.trainsAny(app.muscleFilter) }
+    }
 
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
@@ -58,17 +66,20 @@ fun RoutinesScreen(app: AppState) {
                 Text(strings.starterRoutines, modifier = Modifier.padding(start = 8.dp))
             }
         }
-        if (app.routines.isEmpty()) {
+        if (app.muscleFilter.isNotEmpty()) {
+            item { MuscleFilterRow(app) }
+        }
+        if (app.routines.isEmpty() || shown.isEmpty()) {
             item {
                 Text(
-                    strings.emptyRoutines,
+                    if (app.routines.isEmpty()) strings.emptyRoutines else strings.noResults,
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.padding(vertical = 12.dp),
                 )
             }
         } else {
-            items(app.routines, key = { it.id }) { routine ->
+            items(shown, key = { it.id }) { routine ->
                 RoutineCard(
                     app = app,
                     routine = routine,
@@ -179,9 +190,23 @@ private fun RoutineCard(
                     Icon(SharedIcons.Play, strings.startRoutine, tint = MaterialTheme.colorScheme.primary)
                 }
             }
+            // With a muscle selection the matching exercises come first (so a match is never
+            // hidden behind the 3-name cut) and are drawn in the primary colour, bold.
+            val selection = app.muscleFilter
+            val preview = routine.exercises
+                .sortedBy { selection.isNotEmpty() && !it.exercise.trainsAny(selection) }
+                .take(3)
+            val highlight = SpanStyle(color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold)
             Text(
-                routine.exercises.take(3).joinToString(" · ") {
-                    it.exercise.name
+                buildAnnotatedString {
+                    preview.forEachIndexed { i, line ->
+                        if (i > 0) append(" · ")
+                        if (selection.isNotEmpty() && line.exercise.trainsAny(selection)) {
+                            withStyle(highlight) { append(line.exercise.name) }
+                        } else {
+                            append(line.exercise.name)
+                        }
+                    }
                 },
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,

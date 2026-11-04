@@ -13,6 +13,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -33,6 +34,7 @@ import com.david7ce.calistenia.logic.MAX_ROUTINE_NAME
 import com.david7ce.calistenia.logic.RoutineDraft
 import com.david7ce.calistenia.logic.RoutineDraftExercise
 import com.david7ce.calistenia.logic.RoutineProblem
+import com.david7ce.calistenia.logic.trainsAny
 import com.david7ce.calistenia.model.Measure
 import com.david7ce.shared.ui.SectionTitle
 import com.david7ce.shared.ui.SharedIcons
@@ -72,6 +74,7 @@ fun RoutineEditorScreen(app: AppState, state: RoutineEditorState) {
             LineCard(
                 line = line,
                 strings = strings,
+                highlighted = app.muscleFilter.isNotEmpty() && line.exercise.trainsAny(app.muscleFilter),
                 canMoveUp = index > 0,
                 canMoveDown = index < draft.exercises.lastIndex,
                 onMoveUp = { state.update { it.swap(index, -1) } },
@@ -128,6 +131,7 @@ fun RoutineEditorScreen(app: AppState, state: RoutineEditorState) {
 private fun LineCard(
     line: RoutineDraftExercise,
     strings: Strings,
+    highlighted: Boolean,
     canMoveUp: Boolean,
     canMoveDown: Boolean,
     onMoveUp: () -> Unit,
@@ -135,7 +139,15 @@ private fun LineCard(
     onRemove: () -> Unit,
     onChange: (RoutineDraftExercise) -> Unit,
 ) {
-    Card(modifier = Modifier.fillMaxWidth()) {
+    // Highlighted = trains a muscle picked on the body map; same primary tint as the map's selection.
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        colors = if (highlighted) {
+            CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer)
+        } else {
+            CardDefaults.cardColors()
+        },
+    ) {
         Column(Modifier.padding(12.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Column(Modifier.weight(1f)) {

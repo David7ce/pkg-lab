@@ -420,7 +420,7 @@ private fun androidx.compose.foundation.layout.RowScope.Bar(point: ProgressPoint
 
 /** The active body-map selection: tap a chip to drop that muscle, "x" to clear, the label to reopen the map. */
 @Composable
-private fun MuscleFilterRow(app: AppState) {
+internal fun MuscleFilterRow(app: AppState) {
     val strings = LocalStrings.current
     Row(
         modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()).padding(horizontal = 12.dp),

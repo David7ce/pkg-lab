@@ -18,8 +18,10 @@ Per-app pending work lives in each app's own README, not here (Recetario: "Deskt
   (2026-11-04): `ui/MuscleMap.kt` (frente + espalda con `Path`s, una selección
   compartida), pantalla "¿Qué entrenas hoy?" con chips y "Todos" desde Entrenar,
   selección efímera en `AppState`, `filterFamilies(muscles=)` en Ejercicios, 13
-  nombres en seis idiomas, 14 tests nuevos. Siguiente: **M3**, filtrar rutinas y
-  resaltar dentro de la rutina.
+  nombres en seis idiomas, 14 tests nuevos. **M3 hecha** (2026-11-04): Rutinas
+  se filtra con la misma selección (pasa si algún ejercicio pasa,
+  `Routine.trainsAny`), y los ejercicios que coinciden se resaltan sin ocultar
+  el resto, 5 tests nuevos. Siguiente: **M4**, `PlannedWorkout` y calendario de solo lectura.
 
 - **Watch the first CI runs of SleepCycles.** Written without a local Android build at the time, so
   the first `android.yml` and `desktop.yml` runs were its first compile. A durable Android SDK now

@@ -3,6 +3,7 @@ package com.david7ce.calistenia.logic
 import com.david7ce.calistenia.model.Exercise
 import com.david7ce.calistenia.model.Muscle
 import com.david7ce.calistenia.model.MuscleGroup
+import com.david7ce.calistenia.model.Routine
 
 /**
  * Which muscles an exercise trains, for the body map and the pre-workout filter.
@@ -31,6 +32,13 @@ fun Exercise.effectiveMuscles(): Set<Muscle> =
 /** True when the exercise trains at least one of the selected muscles (OR semantics). */
 fun Exercise.trainsAny(selection: Set<Muscle>): Boolean =
     selection.isEmpty() || effectiveMuscles().any { it in selection }
+
+/**
+ * True when at least one exercise of the routine trains a selected muscle: a legs routine is
+ * relevant when you tap quads. An empty selection passes everything.
+ */
+fun Routine.trainsAny(selection: Set<Muscle>): Boolean =
+    selection.isEmpty() || exercises.any { it.exercise.trainsAny(selection) }
 
 /** The selection after tapping [muscle]: added when absent, removed when present. */
 fun Set<Muscle>.toggled(muscle: Muscle): Set<Muscle> = if (muscle in this) this - muscle else this + muscle
