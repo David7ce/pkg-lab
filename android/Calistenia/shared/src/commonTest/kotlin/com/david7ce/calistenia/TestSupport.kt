@@ -11,6 +11,7 @@ class TestTimeFormat : TimeFormat {
     override fun shortDate(epochMillis: Long) = "2026-10-24"
     override fun time(epochMillis: Long) = "18:30"
     override fun isoDate(epochMillis: Long) = "2026-10-24"
+    override fun utcOffsetMillis(epochMillis: Long) = 0L
 }
 
 /** A finished session with one exercise; [sets] is reps (or seconds, when [measure] says so). */

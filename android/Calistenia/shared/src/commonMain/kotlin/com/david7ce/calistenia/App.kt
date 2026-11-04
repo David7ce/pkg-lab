@@ -32,6 +32,7 @@ import androidx.compose.ui.unit.dp
 import com.david7ce.calistenia.logic.formatDuration
 import com.david7ce.calistenia.ui.AppIcons
 import com.david7ce.calistenia.ui.AppState
+import com.david7ce.calistenia.ui.CalendarScreen
 import com.david7ce.calistenia.ui.CalisteniaTheme
 import com.david7ce.calistenia.ui.HistoryScreen
 import com.david7ce.calistenia.ui.ExerciseDetailScreen
@@ -117,6 +118,7 @@ private fun Root(app: AppState) {
                         Tab.Routines -> RoutinesScreen(app)
                         Tab.Exercises -> ExercisesScreen(app)
                         Tab.History -> HistoryScreen(app)
+                        Tab.Calendar -> CalendarScreen(app)
                     }
 
                     Screen.Settings -> SettingsScreen(app)
@@ -196,6 +198,7 @@ private fun AppTopBar(app: AppState) {
             Tab.Routines -> strings.routines
             Tab.Exercises -> strings.exercises
             Tab.History -> strings.history
+            Tab.Calendar -> strings.calendar
         }
 
         Screen.Settings -> strings.settings
@@ -254,6 +257,12 @@ private fun AppBottomBar(app: AppState) {
             onClick = { app.selectTab(Tab.History) },
             icon = { Icon(SharedIcons.History, null) },
             label = { Text(strings.history, maxLines = 1) },
+        )
+        NavigationBarItem(
+            selected = app.tab == Tab.Calendar,
+            onClick = { app.selectTab(Tab.Calendar) },
+            icon = { Icon(SharedIcons.CalendarToday, null) },
+            label = { Text(strings.calendar, maxLines = 1) },
         )
     }
 }

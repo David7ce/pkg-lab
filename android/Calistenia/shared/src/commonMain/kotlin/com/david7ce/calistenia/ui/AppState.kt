@@ -6,6 +6,9 @@ import androidx.compose.runtime.setValue
 import com.david7ce.calistenia.data.CalisteniaRepository
 import com.david7ce.calistenia.logic.AppLanguage
 import com.david7ce.calistenia.logic.AppSettings
+import com.david7ce.calistenia.logic.CalendarData
+import com.david7ce.calistenia.logic.MonthRef
+import com.david7ce.calistenia.logic.dayOf
 import com.david7ce.calistenia.logic.BackupFile
 import com.david7ce.calistenia.logic.BackupProblem
 import com.david7ce.calistenia.logic.BackupResult
@@ -46,6 +49,7 @@ import com.david7ce.calistenia.model.Exercise
 import com.david7ce.calistenia.model.Measure
 import com.david7ce.calistenia.model.Muscle
 import com.david7ce.calistenia.model.MuscleGroup
+import com.david7ce.calistenia.model.PlannedWorkout
 import com.david7ce.calistenia.model.Routine
 import com.david7ce.calistenia.model.WorkoutSession
 import com.david7ce.calistenia.model.WorkoutSet
@@ -59,12 +63,13 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-/** The four bottom tabs. Sub-screens open on top of them. */
+/** The five bottom tabs. Sub-screens open on top of them. */
 sealed interface Tab {
     data object Train : Tab
     data object Routines : Tab
     data object Exercises : Tab
     data object History : Tab
+    data object Calendar : Tab
 }
 
 /** State of the routine editor, kept outside composition so rotation keeps the typing. */
@@ -151,6 +156,14 @@ class AppState(
         private set
     var active by mutableStateOf<WorkoutSession?>(null)
         private set
+    var plans by mutableStateOf<List<PlannedWorkout>>(emptyList())
+        private set
+
+    /** Calendar browsing state: ephemeral, like the muscle filter. Null month means the month of today. */
+    var calendarMonth by mutableStateOf<MonthRef?>(null)
+        private set
+    var calendarDay by mutableStateOf<String?>(null)
+        private set
 
     var rest by mutableStateOf<RestState?>(null)
         private set
@@ -192,6 +205,7 @@ class AppState(
         val routines: List<Routine>,
         val history: List<WorkoutSession>,
         val active: WorkoutSession?,
+        val plans: List<PlannedWorkout>,
     )
 
     private fun loadSnapshot(seed: Boolean): Snapshot {
@@ -202,6 +216,7 @@ class AppState(
             routines = repo.routines(),
             history = repo.finishedSessions(),
             active = repo.activeSession(),
+            plans = repo.plannedWorkouts(),
         )
     }
 
@@ -211,6 +226,7 @@ class AppState(
         routines = snapshot.routines
         history = snapshot.history
         active = snapshot.active
+        plans = snapshot.plans
         if (snapshot.active == null && rest?.finished != true) stopRest()
     }
 
@@ -260,6 +276,34 @@ class AppState(
 
     /** Leaves the picker for the filtered exercise library. */
     fun showFilteredExercises() = selectTab(Tab.Exercises)
+
+    // Calendar: a second view of the same sessions. Read-only for now; plans are edited in a later phase.
+
+    /** Today's local date, "2026-11-04". */
+    fun today(): String = dayOf(services.clock(), services.timeFormat::utcOffsetMillis)
+
+    /** Plans plus every session (finished from history, and the running one), grouped by local day. */
+    val calendar: CalendarData
+        get() = CalendarData(plans, history + listOfNotNull(active), services.timeFormat::utcOffsetMillis)
+
+    fun shownMonth(): MonthRef = calendarMonth ?: MonthRef.of(today())!!
+
+    fun showMonth(delta: Int) {
+        calendarMonth = shownMonth().plusMonths(delta)
+    }
+
+    fun showToday() {
+        calendarMonth = null
+        calendarDay = today()
+    }
+
+    fun openCalendarDay(day: String) {
+        calendarDay = day
+    }
+
+    fun closeCalendarDay() {
+        calendarDay = null
+    }
 
     fun openSettings() {
         screen = Screen.Settings

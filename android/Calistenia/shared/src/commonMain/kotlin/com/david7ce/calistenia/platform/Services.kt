@@ -11,8 +11,11 @@ interface TimeFormat {
     /** "18:30" in the device locale (24 h or AM/PM as the device prefers). */
     fun time(epochMillis: Long): String
 
-    /** "2026-10-24", for file names and exports (not localized). */
+    /** "2026-10-24", for file names and exports (not localized). Same local day as the calendar's `dayOf`. */
     fun isoDate(epochMillis: Long): String
+
+    /** The zone's offset from UTC at [epochMillis], DST included; what `dayOf` needs to find the local day. */
+    fun utcOffsetMillis(epochMillis: Long): Long
 }
 
 /**

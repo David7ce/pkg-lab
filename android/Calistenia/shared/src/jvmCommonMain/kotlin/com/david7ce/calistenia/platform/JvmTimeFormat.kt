@@ -1,5 +1,6 @@
 package com.david7ce.calistenia.platform
 
+import com.david7ce.calistenia.logic.dayOf
 import java.time.Instant
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
@@ -29,5 +30,8 @@ class JvmTimeFormat(
 
     override fun time(epochMillis: Long): String = time.format(local(epochMillis))
 
-    override fun isoDate(epochMillis: Long): String = local(epochMillis).toLocalDate().toString()
+    override fun isoDate(epochMillis: Long): String = dayOf(epochMillis, ::utcOffsetMillis)
+
+    override fun utcOffsetMillis(epochMillis: Long): Long =
+        zone.rules.getOffset(Instant.ofEpochMilli(epochMillis)).totalSeconds * 1000L
 }

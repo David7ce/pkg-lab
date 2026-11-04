@@ -28,7 +28,7 @@ class MigrationTest {
             0,
         )
 
-        assertEquals(4L, CalisteniaDatabase.Schema.version)
+        assertEquals(5L, CalisteniaDatabase.Schema.version)
         CalisteniaDatabase.Schema.migrate(driver, 1, CalisteniaDatabase.Schema.version)
 
         val repo = CalisteniaRepository(

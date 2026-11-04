@@ -1,6 +1,6 @@
 # Muscles and calendar — design before code
 
-STATUS: active — designed 2026-11-04; **M1 done** (muscle data + tags + storage + backup), **M2 done** (map + "what today" surface + exercise filter), **M3 done** (routine filter + highlight); calendar not started.
+STATUS: active — designed 2026-11-04; **M1 done** (muscle data + tags + storage + backup), **M2 done** (map + "what today" surface + exercise filter), **M3 done** (routine filter + highlight), **M4 done** (plan store + read-only calendar grid); plan editing (M5) not started.
 
 Two features the owner asked for after seeing the figure work:
 
@@ -162,10 +162,10 @@ replacement. Both read the same session store; only the plan store is new.
 
 ### Acceptance
 
-- [ ] `dayOf` is one function, unit-tested around midnight and DST.
-- [ ] Today shows planned + done independently.
-- [ ] Deleting a routine leaves the plan readable.
-- [ ] History and calendar never disagree about a session (asserted in a test
+- [x] `dayOf` is one function, unit-tested around midnight and DST.
+- [x] Today shows planned + done independently.
+- [x] Deleting a routine leaves the plan readable.
+- [x] History and calendar never disagree about a session (asserted in a test
       that builds a session and reads both views).
 
 ---
@@ -177,7 +177,7 @@ replacement. Both read the same session store; only the plan store is new.
 | **M1** ✅ | `Muscle` enum, `musclesFor`, `Exercise.muscles`, built-in tags, backup handling, unit tests — **done 2026-11-04** (`MusclesTest`, 7 tests; storage v4 + `3.sqm`) | Data first: the map is useless without tags, and this phase has no UI risk |
 | **M2** ✅ | `MuscleMap` component + "¿qué entrenas hoy?" surface + exercise filter | Visible, testable, and independent of routines — **done 2026-11-04** (`MuscleMapTest`, 8 tests; `StringsTest` muscle names) |
 | **M3** ✅ | Routine filtering + highlight inside the routine | Small once M2 exists — **done 2026-11-04** (`Routine.trainsAny`, `RoutineMuscleFilterTest`, 5 tests). Highlight: primary-container card in the editor; bold primary names in the list preview, matches listed first |
-| **M4** | `PlannedWorkout` store + calendar grid (read-only: plans + finished) | Read-only grid proves the day logic before editing exists |
+| **M4** ✅ | `PlannedWorkout` store + calendar grid (read-only: plans + finished) | Read-only grid proves the day logic before editing exists — **done 2026-11-04**: schema v5 (`4.sqm`, `planned_workout`), `logic/Days.kt` (`dayOf` takes the zone's UTC offset from `TimeFormat.utcOffsetMillis`, so DST is the platform's), `ui/CalendarScreen.kt`, `CalendarTest` (11, common) + `CalendarStoreTest` (3, desktop: real SQLite and real DST). Repository has `savePlannedWorkout`/`removePlannedWorkout` for M5; no UI uses them yet. Plans are not in the backup file yet |
 | **M5** | Plan / move / remove from the day sheet, start from a plan | The write side, on top of a grid that already renders correctly |
 
 Each phase compiles and passes the existing suite on its own; none of them

@@ -17,6 +17,7 @@ import com.david7ce.calistenia.model.Exercise
 import com.david7ce.calistenia.model.MAX_EXERCISE_DESCRIPTION
 import com.david7ce.calistenia.model.Measure
 import com.david7ce.calistenia.model.Muscle
+import com.david7ce.calistenia.model.PlannedWorkout
 import com.david7ce.calistenia.model.MuscleGroup
 import com.david7ce.calistenia.model.Routine
 import com.david7ce.calistenia.model.RoutineExercise
@@ -164,8 +165,25 @@ class CalisteniaRepository(
     fun deleteRoutine(id: String) {
         db.transaction {
             q.deleteRoutineExercises(id)
+            q.detachPlannedWorkouts(id)
             q.deleteRoutine(id)
         }
+    }
+
+    // ---------------------------------------------------------------------------------------------
+    // Planned workouts (the calendar's only own data)
+
+    fun plannedWorkouts(): List<PlannedWorkout> = q.selectPlannedWorkouts().executeAsList().map {
+        PlannedWorkout(it.id, it.day, it.routineId, it.routineName, it.note)
+    }
+
+    /** One plan per day: a plan for a day that already has one replaces it. */
+    fun savePlannedWorkout(plan: PlannedWorkout) {
+        q.insertPlannedWorkout(plan.id, plan.day, plan.routineId, plan.routineName, plan.note)
+    }
+
+    fun removePlannedWorkout(day: String) {
+        q.deletePlannedWorkoutByDay(day)
     }
 
     // ---------------------------------------------------------------------------------------------

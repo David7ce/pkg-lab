@@ -1,5 +1,5 @@
--- Schema version 4 (1.sqm adds exercise.description; 2.sqm adds exercise.parentId;
--- 3.sqm adds exercise.muscles).
+-- Schema version 5 (1.sqm adds exercise.description; 2.sqm adds exercise.parentId;
+-- 3.sqm adds exercise.muscles; 4.sqm adds planned_workout).
 -- Exercises, routines and finished sessions are independent rows; sessions store a name snapshot of
 -- the routine and of each exercise, so deleting either never damages history. Children are replaced as
 -- a whole when a routine is saved, inside one transaction (see CalisteniaRepository), so positions stay
@@ -66,6 +66,15 @@ CREATE TABLE workout_set (
     reps INTEGER,                          -- exactly one of reps / seconds is set
     seconds INTEGER,
     completedAt INTEGER                    -- NULL = not done yet
+);
+
+-- v5: the future, the one thing history cannot know. Past days come from `session`, never copied here.
+CREATE TABLE planned_workout (
+    id TEXT NOT NULL PRIMARY KEY,
+    day TEXT NOT NULL UNIQUE,              -- local ISO date "2026-11-04": no time, no timezone; one plan per day
+    routineId TEXT,                        -- NULL = "something, I'll decide", or the routine was deleted
+    routineName TEXT NOT NULL,             -- snapshot, so a deleted routine does not erase the plan
+    note TEXT NOT NULL DEFAULT ''
 );
 
 CREATE TABLE setting (
@@ -210,6 +219,19 @@ DELETE FROM workout_set WHERE sessionExerciseId = ?;
 
 deleteSetsBySession:
 DELETE FROM workout_set WHERE sessionExerciseId IN (SELECT id FROM session_exercise WHERE sessionId = ?);
+
+selectPlannedWorkouts:
+SELECT * FROM planned_workout ORDER BY day;
+
+insertPlannedWorkout:
+INSERT OR REPLACE INTO planned_workout(id, day, routineId, routineName, note) VALUES (?, ?, ?, ?, ?);
+
+deletePlannedWorkoutByDay:
+DELETE FROM planned_workout WHERE day = ?;
+
+-- A deleted routine keeps its plans readable: the name stays, the link goes.
+detachPlannedWorkouts:
+UPDATE planned_workout SET routineId = NULL WHERE routineId = ?;
 
 selectSettings:
 SELECT * FROM setting;

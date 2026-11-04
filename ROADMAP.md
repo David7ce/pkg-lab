@@ -21,7 +21,11 @@ Per-app pending work lives in each app's own README, not here (Recetario: "Deskt
   nombres en seis idiomas, 14 tests nuevos. **M3 hecha** (2026-11-04): Rutinas
   se filtra con la misma selección (pasa si algún ejercicio pasa,
   `Routine.trainsAny`), y los ejercicios que coinciden se resaltan sin ocultar
-  el resto, 5 tests nuevos. Siguiente: **M4**, `PlannedWorkout` y calendario de solo lectura.
+  el resto, 5 tests nuevos. **M4 hecha** (2026-11-04): `PlannedWorkout` (tabla
+  `planned_workout`, esquema v5 + `4.sqm`), `dayOf` única en `logic/Days.kt`,
+  pestaña "Calendario" hermana de Historial con rejilla mensual de solo lectura
+  y hoja del día, 16 tests nuevos (incl. DST real). Siguiente: **M5**, planear / mover /
+  quitar desde la hoja y empezar desde un plan.
 
 - **Watch the first CI runs of SleepCycles.** Written without a local Android build at the time, so
   the first `android.yml` and `desktop.yml` runs were its first compile. A durable Android SDK now

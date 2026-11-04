@@ -43,6 +43,13 @@ object SharedIcons {
                 "c-2.98,0 -5.4,-2.42 -5.4,-5.4c0,-1.81 0.89,-3.42 2.26,-4.4C12.92,3.04 12.46,3 12,3L12,3z",
         )
     }
+    val CalendarToday by lazy {
+        icon(
+            "CalendarToday",
+            "M20,3h-1V1h-2v2H7V1H5v2H4C2.9,3 2,3.9 2,5v16c0,1.1 0.9,2 2,2h16c1.1,0 2,-0.9 2,-2V5C22,3.9 21.1,3 20,3z" +
+                "M20,21H4V8h16V21z",
+        )
+    }
     val Check by lazy {
         icon(
             "Check",

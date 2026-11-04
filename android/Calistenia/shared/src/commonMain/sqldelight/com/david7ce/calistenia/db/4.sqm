@@ -1,0 +1,8 @@
+-- Version 4 -> 5: planned workouts for the calendar. Sessions are not copied; only the future is stored.
+CREATE TABLE planned_workout (
+    id TEXT NOT NULL PRIMARY KEY,
+    day TEXT NOT NULL UNIQUE,
+    routineId TEXT,
+    routineName TEXT NOT NULL,
+    note TEXT NOT NULL DEFAULT ''
+);
