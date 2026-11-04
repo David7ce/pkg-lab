@@ -57,6 +57,12 @@ Per-app pending work lives in each app's own README, not here (Recetario: "Deskt
   support rig, straight arms and legs raised to horizontal, registered for `builtin:l-sit`).
   Remaining: other holds, the rest of the families, and a real-device look at how the
   figure reads (never checked visually, only geometry-tested). Photos/video stay out of scope.
+  **Decision (owner, 2026-11-04): Calistenia does not use charstudio-rendered frames; it stays 100%
+  on the Compose Canvas skeleton.** The jumping-jack flipbook (`Flipbook`/`FlipbookFigure`, eight
+  `jack_*.png`, the Compose Resources dependency and the flipbook branch of the detail screen, added
+  in `e34d396`) was reverted by hand. "Jumping Jack" stays as a normal text exercise, with its
+  descriptions in the six languages, and falls back to text-only like any family without a figure.
+  A figure for it, if wanted, is a drawn `Rig`/`Pose` one.
 - **Compose-on-Robolectric smoke tests** pass locally; worth a real-device check too before
   relying on them as the only UI-level test.
 

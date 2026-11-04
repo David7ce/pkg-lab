@@ -46,9 +46,7 @@ import com.david7ce.calistenia.model.Exercise
 import com.david7ce.calistenia.model.Measure
 import com.david7ce.calistenia.model.MuscleGroup
 import com.david7ce.calistenia.ui.figure.Figure
-import com.david7ce.calistenia.ui.figure.FlipbookFigure
 import com.david7ce.calistenia.ui.figure.figureFor
-import com.david7ce.calistenia.ui.figure.flipbookFor
 import com.david7ce.shared.ui.ChoiceDropdown
 import com.david7ce.shared.ui.ConfirmDialog
 import com.david7ce.shared.ui.SharedIcons
@@ -236,20 +234,9 @@ fun ExerciseDetailScreen(app: AppState, exerciseId: String) {
                 if (exercise.isCustom) Pill(strings.custom)
             }
         }
-        // A rendered flipbook wins when a family has one (it looks like a body,
-        // not a diagram); otherwise the drawn figure; otherwise text-only.
-        val flipbook = flipbookFor(parent.id)
+        // Families without a registered figure stay text-only.
         val figure = figureFor(parent.id)
-        if (flipbook != null) {
-            item {
-                Card(modifier = Modifier.fillMaxWidth()) {
-                    FlipbookFigure(
-                        flipbook = flipbook,
-                        modifier = Modifier.fillMaxWidth().height(180.dp).padding(14.dp),
-                    )
-                }
-            }
-        } else if (figure != null) {
+        if (figure != null) {
             item {
                 Card(modifier = Modifier.fillMaxWidth()) {
                     Figure(
