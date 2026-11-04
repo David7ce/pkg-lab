@@ -90,6 +90,36 @@ val PullUp = FigureAnimation(
 )
 
 /**
+ * Parallel-bar dip: a support on straight arms (head up, torso almost vertical) anchored at the
+ * hand, so the bar stays put while the body sinks. Unlike the pull-up the body is *above* the bar
+ * line and the legs hang through it. The rig is the standing one (`armRestDeg = 180`: the arm
+ * hangs straight down from the shoulder when the torso is vertical).
+ *
+ * Top: torso leaning 8° forward with the shoulder 0.87 above the hand and the knees bent 30°.
+ * Bottom: torso 20° forward, the upper arm folded back and down and the forearm forward again so
+ * the elbow ends ~0.12 below the shoulder (upper arm near horizontal) while the hand stays within
+ * 0.2 of the shoulder, which drops from 0.87 to 0.46 above the bar. The angles were solved
+ * numerically with the hand pinned on the bar.
+ */
+private val SupportDipRig = Rig(
+    bodyAxisDeg = -90f,
+    armRestDeg = 180f,
+    anchor = Joint.Hand,
+    contact = Contact.Bar,
+)
+
+private val DipTop = Pose(torsoLean = 8f, hip = -8f, knee = 30f, shoulder = -8f, elbow = 0f)
+private val DipBottom = Pose(torsoLean = 20f, hip = -15f, knee = 40f, shoulder = 55f, elbow = -110f)
+
+val Dip = FigureAnimation(
+    rig = SupportDipRig,
+    frames = listOf(
+        Keyframe(DipTop, holdMs = 300, moveMs = 1100),
+        Keyframe(DipBottom, holdMs = 250, moveMs = 1000),
+    ),
+)
+
+/**
  * The animation for an exercise family, by its parent exercise id, or null when that family is
  * still text-only. This is the one place a new figure gets registered.
  */
@@ -97,5 +127,6 @@ fun figureFor(parentId: String): FigureAnimation? = when (parentId) {
     "builtin:push-up" -> PushUp
     "builtin:squat" -> Squat
     "builtin:pull-up" -> PullUp
+    "builtin:parallel-bar-dip" -> Dip
     else -> null
 }

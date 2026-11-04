@@ -101,11 +101,45 @@ class ExerciseFiguresTest {
     }
 
     @Test
+    fun dipKeepsItsHandsOnTheBarAndTheBodyAboveIt() {
+        for (skeleton in samples(Dip)) {
+            assertEquals(0f, skeleton.hand.x, "the anchored hand does not slide")
+            assertEquals(0f, skeleton.hand.y, "the anchored hand stays on the bar line")
+            assertTrue(skeleton.shoulder.y < -0.3f, "the shoulder sank to the bar: $skeleton")
+            assertTrue(skeleton.headCenter.y < skeleton.shoulder.y, "the head is below the shoulder: $skeleton")
+        }
+    }
+
+    @Test
+    fun dipLowersTheShoulderUntilTheUpperArmIsNearlyHorizontal() {
+        val all = samples(Dip)
+        val topHeight = -all.minOf { it.shoulder.y }
+        val bottom = all.maxByOrNull { it.shoulder.y }!!
+        assertTrue(topHeight > 0.8f, "support height $topHeight")
+        assertTrue(-bottom.shoulder.y < topHeight * 0.6f, "the shoulder only drops to ${-bottom.shoulder.y} of $topHeight")
+        assertTrue(abs(bottom.elbow.y - bottom.shoulder.y) < 0.2f, "the upper arm is not near horizontal: $bottom")
+        assertTrue(abs(bottom.hand.x - bottom.shoulder.x) < 0.3f, "the hand drifted from under the shoulder: $bottom")
+    }
+
+    @Test
+    fun dipBoundsCoverEveryPoseInTheCycle() {
+        val bounds = boundsFor(Dip)
+        for (skeleton in samples(Dip)) {
+            for (point in skeleton.points) {
+                assertTrue(point.x >= bounds.minX && point.x <= bounds.maxX, "x $point outside $bounds")
+                assertTrue(point.y >= bounds.minY && point.y <= bounds.maxY, "y $point outside $bounds")
+            }
+        }
+    }
+
+    @Test
     fun onlyRegisteredFamiliesHaveAFigure() {
         assertEquals(PushUp, figureFor("builtin:push-up"))
         assertEquals(Squat, figureFor("builtin:squat"))
         assertEquals(PullUp, figureFor("builtin:pull-up"))
         assertEquals(Contact.Bar, PullUp.rig.contact)
+        assertEquals(Dip, figureFor("builtin:parallel-bar-dip"))
+        assertEquals(Contact.Bar, Dip.rig.contact)
         assertEquals(null, figureFor("builtin:plank"))
         assertEquals(null, figureFor("custom-1"))
     }

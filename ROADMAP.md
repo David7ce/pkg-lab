@@ -21,10 +21,11 @@ Per-app pending work lives in each app's own README, not here (Recetario: "Deskt
 - **Calistenia: exercise animation, in progress.** Direction changed from "text-only": instead of 3D
   models, photos or video (storage, licensing, a rig per exercise), exercises get a code-drawn 2D
   profile stick figure (`ui/figure/`: `Rig` orientation + `Pose` angles + `FigureAnimation` keyframes,
-  drawn by `Figure`), so there are no assets to ship. Push-up, squat and pull-up are done (pull-up is the
+  drawn by `Figure`), so there are no assets to ship. Push-up, squat, pull-up and dip are done (pull-up is the
   first bar exercise: hanging rig, and `Contact.Bar` now draws a thick bar with end caps via
   `contactStrokes`, distinct from the floor line); `figureFor(parentId)` is the registry, every other
-  family is still text-only. Remaining: dip (bar/parallel-bars rig), plank
+  family is still text-only (dip is a `Contact.Bar` support rig registered for `builtin:parallel-bar-dip`;
+  bench dip stays text-only). Remaining: plank
   and other holds (`FigureAnimation.hold`), the rest of the families, and a real-device look at how the
   figure reads (never checked visually, only geometry-tested). Photos/video stay out of scope.
 - **Compose-on-Robolectric smoke tests** pass locally; worth a real-device check too before
