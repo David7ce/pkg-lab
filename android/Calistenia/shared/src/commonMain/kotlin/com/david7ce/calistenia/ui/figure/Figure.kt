@@ -17,7 +17,7 @@ import androidx.compose.ui.graphics.drawscope.DrawScope
 
 /**
  * A 2D profile-view stick figure that moves through [animation]'s keyframes. Colours come from the
- * Material theme; the rig's contact joint gets a floor or bar line, so the figure reads as anchored
+ * Material theme; the rig's contact joint gets a thin floor line or a thick bar with end caps (see [contactStrokes]), so the figure reads as anchored
  * rather than floating. Purely a form illustration: it needs no image assets, storage or network.
  *
  * The caller controls the box (pass a height): the figure is scaled to fit inside it, preserving
@@ -44,7 +44,7 @@ fun Figure(
     // A fixed box over the whole cycle: computing it per frame would resize and jump the figure.
     val bounds = remember(animation) { boundsFor(animation) }
     val bodyColor = MaterialTheme.colorScheme.onSurface
-    val contactColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f)
+    val contactColor = MaterialTheme.colorScheme.onSurfaceVariant
 
     Canvas(modifier = modifier) {
         val skeleton = anchoredSkeleton(animation.poseAt(clock.value.toLong()), animation.rig)
@@ -54,14 +54,12 @@ fun Figure(
         val offsetY = size.height / 2f - bounds.centerY * scale
         fun at(point: FigurePoint) = Offset(point.x * scale + offsetX, point.y * scale + offsetY)
 
-        if (animation.rig.contact != Contact.None) {
-            val overhang = bounds.width * 0.08f
-            val y = at(FigurePoint(0f, 0f)).y
-            drawContactLine(
-                from = Offset((bounds.minX - overhang) * scale + offsetX, y),
-                to = Offset((bounds.maxX + overhang) * scale + offsetX, y),
-                color = contactColor,
-                strokeWidth = (scale * 0.02f).coerceAtLeast(1f),
+        for (line in contactStrokes(animation.rig.contact, bounds.minX, bounds.maxX)) {
+            drawLimb(
+                at(line.from),
+                at(line.to),
+                contactColor.copy(alpha = line.alpha),
+                (line.width * scale).coerceAtLeast(1f),
             )
         }
 
@@ -76,9 +74,5 @@ fun Figure(
 }
 
 private fun DrawScope.drawLimb(from: Offset, to: Offset, color: Color, strokeWidth: Float) {
-    drawLine(color, from, to, strokeWidth = strokeWidth, cap = StrokeCap.Round)
-}
-
-private fun DrawScope.drawContactLine(from: Offset, to: Offset, color: Color, strokeWidth: Float) {
     drawLine(color, from, to, strokeWidth = strokeWidth, cap = StrokeCap.Round)
 }

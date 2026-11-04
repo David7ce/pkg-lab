@@ -68,9 +68,44 @@ class ExerciseFiguresTest {
     }
 
     @Test
+    fun pullUpKeepsItsHandsOnTheBarAndTheBodyBelowIt() {
+        for (skeleton in samples(PullUp)) {
+            assertEquals(0f, skeleton.hand.x, "the anchored hand does not slide")
+            assertEquals(0f, skeleton.hand.y, "the anchored hand stays on the bar line")
+            assertTrue(skeleton.points.minOf { it.y } >= -0.3f, "a joint is above the bar: $skeleton")
+            assertTrue(skeleton.elbow.y >= -0.02f, "the elbow went over the bar: $skeleton")
+        }
+    }
+
+    @Test
+    fun pullUpRaisesTheBodyUntilTheHeadReachesTheBar() {
+        val all = samples(PullUp)
+        val hangingHead = all.maxOf { it.headCenter.y }
+        val topHead = all.minOf { it.headCenter.y }
+        // Hanging: shoulder 0.87 below the bar, the head centre ~0.29 above the shoulder.
+        assertTrue(hangingHead > 0.5f, "hanging head depth $hangingHead")
+        // The head circle (radius 0.22) must overlap the bar line at the top.
+        assertTrue(topHead - all.first().headRadius < 0.05f, "head only reaches $topHead below the bar")
+        assertTrue(topHead < hangingHead * 0.5f, "the head only rises from $hangingHead to $topHead")
+    }
+
+    @Test
+    fun pullUpBoundsCoverEveryPoseInTheCycle() {
+        val bounds = boundsFor(PullUp)
+        for (skeleton in samples(PullUp)) {
+            for (point in skeleton.points) {
+                assertTrue(point.x >= bounds.minX && point.x <= bounds.maxX, "x $point outside $bounds")
+                assertTrue(point.y >= bounds.minY && point.y <= bounds.maxY, "y $point outside $bounds")
+            }
+        }
+    }
+
+    @Test
     fun onlyRegisteredFamiliesHaveAFigure() {
         assertEquals(PushUp, figureFor("builtin:push-up"))
         assertEquals(Squat, figureFor("builtin:squat"))
+        assertEquals(PullUp, figureFor("builtin:pull-up"))
+        assertEquals(Contact.Bar, PullUp.rig.contact)
         assertEquals(null, figureFor("builtin:plank"))
         assertEquals(null, figureFor("custom-1"))
     }

@@ -60,11 +60,42 @@ val Squat = FigureAnimation(
 )
 
 /**
+ * Pull-up: a dead hang from the bar (head up, arms straight overhead) anchored at the hand, so the
+ * bar stays put while the body rises. The hang is `armRestDeg = 0` (arm along the torso toward the
+ * head) with the hands on the bar line, hence everything else is below `y = 0`.
+ *
+ * Top: the torso leans back 30° (the bar ends up in front of the chest), the upper arm is folded
+ * to horizontal-forward and the forearm back up to the bar, so the shoulder rises from 0.87 to 0.41
+ * below the bar and the head reaches the bar line. The knees bend 30° so the legs do not trail
+ * stiffly. These angles were solved numerically so the hand stays on the bar with the elbow at
+ * shoulder height: the closest the 0.87 arm length allows to "elbows down" without the shoulder
+ * passing the bar.
+ */
+private val HangingPullUpRig = Rig(
+    bodyAxisDeg = -90f,
+    armRestDeg = 0f,
+    anchor = Joint.Hand,
+    contact = Contact.Bar,
+)
+
+private val PullUpHang = Pose(torsoLean = 0f, hip = 0f, knee = 0f, shoulder = 0f, elbow = 0f)
+private val PullUpTop = Pose(torsoLean = -30f, hip = 0f, knee = 30f, shoulder = 120f, elbow = -105f)
+
+val PullUp = FigureAnimation(
+    rig = HangingPullUpRig,
+    frames = listOf(
+        Keyframe(PullUpHang, holdMs = 350, moveMs = 1300),
+        Keyframe(PullUpTop, holdMs = 250, moveMs = 1100),
+    ),
+)
+
+/**
  * The animation for an exercise family, by its parent exercise id, or null when that family is
  * still text-only. This is the one place a new figure gets registered.
  */
 fun figureFor(parentId: String): FigureAnimation? = when (parentId) {
     "builtin:push-up" -> PushUp
     "builtin:squat" -> Squat
+    "builtin:pull-up" -> PullUp
     else -> null
 }

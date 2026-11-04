@@ -72,6 +72,26 @@ class FigureSkeletonTest {
     }
 
     @Test
+    fun aBarIsDrawnDifferentlyFromTheFloor() {
+        assertTrue(contactStrokes(Contact.None, -1f, 1f).isEmpty())
+
+        val ground = contactStrokes(Contact.Ground, -1f, 1f)
+        val bar = contactStrokes(Contact.Bar, -1f, 1f)
+        assertEquals(1, ground.size)
+        assertTrue(bar.size > ground.size, "the bar has end caps the floor does not")
+
+        val barLine = bar.first()
+        assertTrue(barLine.width > ground.single().width, "the bar is thicker than the floor line")
+        assertTrue(barLine.alpha > ground.single().alpha, "the bar is more opaque than the floor line")
+        // Both lines pass through the anchor's height, the bar's caps cross it.
+        assertEquals(0f, barLine.from.y)
+        assertEquals(0f, barLine.to.y)
+        assertTrue(bar.drop(1).all { it.from.y < 0f && it.to.y > 0f })
+        // Both overhang the body's box.
+        assertTrue(barLine.from.x < -1f && barLine.to.x > 1f)
+    }
+
+    @Test
     fun lerpAtTheEndpointsReturnsTheOriginalPoses() {
         val (up, down) = PushUp.frames.map { it.pose }
         assertEquals(up, lerp(up, down, 0f))
