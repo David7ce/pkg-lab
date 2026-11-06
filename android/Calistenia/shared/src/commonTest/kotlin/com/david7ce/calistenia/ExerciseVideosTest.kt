@@ -12,11 +12,14 @@ class ExerciseVideosTest {
         assertEquals("files/exercise_videos/pull-up.mp4", videoPathFor("builtin:pull-up"))
         assertEquals("files/exercise_videos/push-up.mp4", videoPathFor("builtin:push-up"))
         assertEquals("files/exercise_videos/squat.mp4", videoPathFor("builtin:squat"))
+        assertEquals("files/exercise_videos/mountain-climber.mp4",
+            videoPathFor("builtin:mountain-climber"))
+        assertEquals("files/exercise_videos/l-sit.mp4", videoPathFor("builtin:l-sit"))
     }
 
     @Test
-    fun unregisteredBuiltinHasNoVideo() {
-        assertNull(videoPathFor("builtin:jumping-jack"))
+    fun unknownBuiltinHasNoVideo() {
+        assertNull(videoPathFor("builtin:not-an-exercise"))
     }
 
     @Test

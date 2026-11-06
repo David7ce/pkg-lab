@@ -7,9 +7,18 @@ package com.david7ce.calistenia.logic
  * neither and stay text-only.
  */
 private val exerciseVideoSlugs: Set<String> = setOf(
-    "pull-up",
-    "push-up",
-    "squat",
+    "archer-push-up", "back-lever", "bear-crawl", "bench-dip",
+    "bulgarian-split-squat", "burpee", "calf-raise", "chin-up",
+    "commando-pull-up", "dead-hang", "diamond-push-up", "dragon-flag",
+    "glute-bridge", "handstand-hold", "handstand-push-up", "hanging-knee-raise",
+    "hanging-leg-raise", "high-knees", "hollow-body-hold", "incline-push-up",
+    "inverted-row", "jump-squat", "jumping-jack", "knee-push-up",
+    "l-sit", "leg-raise", "mountain-climber", "muscle-up",
+    "negative-pull-up", "nordic-curl", "parallel-bar-dip", "pike-push-up",
+    "plank", "plank-jack", "pseudo-planche-push-up", "pull-up",
+    "push-up", "reverse-lunge", "scapular-pull-up", "side-plank",
+    "single-leg-glute-bridge", "skater-jump", "split-squat", "squat",
+    "tuck-front-lever", "tuck-planche", "wall-handstand",
 )
 
 /**

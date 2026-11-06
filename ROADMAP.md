@@ -81,8 +81,8 @@ Per-app pending work lives in each app's own README, not here (Recetario: "Deskt
   figure reads (never checked visually, only geometry-tested). **Update 2026-11-06: short
   Magnific demonstration clips are now in scope alongside the skeleton.** The path
   convention is `videoPathFor` (`builtin:<slug>` → `files/exercise_videos/<slug>.mp4`), and
-  the first three clips (`pull-up`, `push-up`, `squat`) ship in `composeResources`; the
-  skeleton remains the fallback for every exercise without a clip.
+  all 47 built-in exercises now have a clip in `composeResources`; the skeleton
+  remains the fallback for any exercise without one.
   **Decision (owner, 2026-11-04): Calistenia does not use charstudio-rendered frames; it stays 100%
   on the Compose Canvas skeleton.** The jumping-jack flipbook (`Flipbook`/`FlipbookFigure`, eight
   `jack_*.png`, the Compose Resources dependency and the flipbook branch of the detail screen, added
