@@ -149,7 +149,6 @@ open class Strings {
     open val targetSets = "Sets"
     open val targetReps = "Reps"
     open val targetSeconds = "Seconds"
-    open val restBetweenSets = "Rest"
     open val moveUp = "Move up"
     open val moveDown = "Move down"
     open val removeExercise = "Remove exercise"

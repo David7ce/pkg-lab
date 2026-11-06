@@ -44,6 +44,12 @@ import com.david7ce.calistenia.logic.DEFAULT_REPS
 import com.david7ce.calistenia.logic.DEFAULT_SET_COUNT
 import com.david7ce.calistenia.logic.ExerciseFamily
 import com.david7ce.calistenia.logic.ExerciseProgress
+import com.david7ce.calistenia.logic.MAX_HOLD_SECONDS
+import com.david7ce.calistenia.logic.MAX_REPS
+import com.david7ce.calistenia.logic.MAX_SETS
+import com.david7ce.calistenia.logic.MIN_HOLD_SECONDS
+import com.david7ce.calistenia.logic.MIN_REPS
+import com.david7ce.calistenia.logic.MIN_SETS
 import com.david7ce.calistenia.logic.descriptionFor
 import com.david7ce.calistenia.logic.effectiveMuscles
 import com.david7ce.calistenia.logic.filterFamilies
@@ -327,28 +333,28 @@ fun ExerciseDetailScreen(app: AppState, exerciseId: String) {
                 }
             }
         }
-        item {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceEvenly,
-            ) {
-                StatTile(
-                    strings.bestSet,
-                    if (exercise.measure == Measure.Reps) progress.bestValue.toString()
-                    else strings.secondsValue(progress.bestValue.toInt()),
-                    Modifier.weight(1f),
-                )
-                StatTile(strings.doneSets, progress.totalSets.toString(), Modifier.weight(1f))
-                StatTile(
-                    if (exercise.measure == Measure.Reps) strings.totalReps else strings.totalHoldTime,
-                    if (exercise.measure == Measure.Reps) progress.totalValue.toString()
-                    else formatDuration(progress.totalValue * 1000),
-                    Modifier.weight(1f),
-                )
-                StatTile(strings.timesDone, progress.sessions.toString(), Modifier.weight(1f))
-            }
-        }
         if (progress.hasData) {
+            item {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceEvenly,
+                ) {
+                    StatTile(
+                        strings.bestSet,
+                        if (exercise.measure == Measure.Reps) progress.bestValue.toString()
+                        else strings.secondsValue(progress.bestValue.toInt()),
+                        Modifier.weight(1f),
+                    )
+                    StatTile(strings.doneSets, progress.totalSets.toString(), Modifier.weight(1f))
+                    StatTile(
+                        if (exercise.measure == Measure.Reps) strings.totalReps else strings.totalHoldTime,
+                        if (exercise.measure == Measure.Reps) progress.totalValue.toString()
+                        else formatDuration(progress.totalValue * 1000),
+                        Modifier.weight(1f),
+                    )
+                    StatTile(strings.timesDone, progress.sessions.toString(), Modifier.weight(1f))
+                }
+            }
             item {
                 Column {
                     Text(
@@ -459,39 +465,50 @@ private fun QuickStartDialog(
 ) {
     val strings = LocalStrings.current
     var sets by remember { mutableStateOf(DEFAULT_SET_COUNT) }
-    var reps by remember { mutableStateOf(if (exercise.measure == Measure.Reps) DEFAULT_REPS else null) }
-    var seconds by remember { mutableStateOf(if (exercise.measure == Measure.Seconds) DEFAULT_HOLD_SECONDS else null) }
+    var reps by remember { mutableStateOf(DEFAULT_REPS) }
+    var seconds by remember { mutableStateOf(DEFAULT_HOLD_SECONDS) }
     AlertDialog(
         onDismissRequest = onDismiss,
         title = { Text(if (joiningWorkout) strings.addExerciseToWorkout else strings.startExercise) },
         text = {
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                NumberBox(
-                    value = sets.takeIf { it > 0 },
+                Stepper(
+                    value = sets,
                     label = strings.targetSets,
-                    onValueChange = { raw -> sets = raw.toIntOrNull()?.coerceIn(0, 99) ?: 0 },
+                    onValueChange = { sets = it },
                     modifier = Modifier.weight(1f),
-                    maxDigits = 2,
+                    step = 1,
+                    min = MIN_SETS,
+                    max = MAX_SETS,
                 )
                 if (exercise.measure == Measure.Reps) {
-                    NumberBox(
-                        value = reps?.takeIf { it > 0 },
+                    Stepper(
+                        value = reps,
                         label = strings.targetReps,
-                        onValueChange = { raw -> reps = raw.toIntOrNull() },
+                        onValueChange = { reps = it },
                         modifier = Modifier.weight(1f),
+                        step = 5,
+                        min = MIN_REPS,
+                        max = MAX_REPS,
                     )
                 } else {
-                    NumberBox(
-                        value = seconds?.takeIf { it > 0 },
+                    Stepper(
+                        value = seconds,
                         label = strings.targetSeconds,
-                        onValueChange = { raw -> seconds = raw.toIntOrNull() },
+                        onValueChange = { seconds = it },
                         modifier = Modifier.weight(1f),
+                        step = 5,
+                        min = MIN_HOLD_SECONDS,
+                        max = MAX_HOLD_SECONDS,
+                        suffix = strings.secondsUnit,
                     )
                 }
             }
         },
         confirmButton = {
-            TextButton(onClick = { onConfirm(sets, reps, seconds) }) {
+            TextButton(onClick = {
+                if (exercise.measure == Measure.Reps) onConfirm(sets, reps, null) else onConfirm(sets, null, seconds)
+            }) {
                 Text(if (joiningWorkout) strings.addExerciseToWorkout else strings.startExercise)
             }
         },

@@ -29,8 +29,16 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import com.david7ce.calistenia.logic.DEFAULT_HOLD_SECONDS
+import com.david7ce.calistenia.logic.DEFAULT_REPS
+import com.david7ce.calistenia.logic.MAX_HOLD_SECONDS
 import com.david7ce.calistenia.logic.MAX_NOTES
+import com.david7ce.calistenia.logic.MAX_REPS
 import com.david7ce.calistenia.logic.MAX_ROUTINE_NAME
+import com.david7ce.calistenia.logic.MAX_SETS
+import com.david7ce.calistenia.logic.MIN_HOLD_SECONDS
+import com.david7ce.calistenia.logic.MIN_REPS
+import com.david7ce.calistenia.logic.MIN_SETS
 import com.david7ce.calistenia.logic.RoutineDraft
 import com.david7ce.calistenia.logic.RoutineDraftExercise
 import com.david7ce.calistenia.logic.RoutineProblem
@@ -177,44 +185,37 @@ private fun LineCard(
                 modifier = Modifier.fillMaxWidth().padding(top = 4.dp),
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
             ) {
-                NumberBox(
-                    value = line.sets.takeIf { it > 0 },
+                Stepper(
+                    value = line.sets,
                     label = strings.targetSets,
-                    onValueChange = { raw ->
-                        onChange(line.copy(sets = raw.toIntOrNull()?.coerceIn(0, 99) ?: 0))
-                    },
+                    onValueChange = { onChange(line.copy(sets = it)) },
                     modifier = Modifier.weight(1f),
-                    maxDigits = 2,
+                    step = 1,
+                    min = MIN_SETS,
+                    max = MAX_SETS,
                 )
                 if (line.exercise.measure == Measure.Reps) {
-                    NumberBox(
-                        value = line.targetReps?.takeIf { it > 0 },
+                    Stepper(
+                        value = line.targetReps ?: DEFAULT_REPS,
                         label = strings.targetReps,
-                        onValueChange = { raw ->
-                            onChange(line.copy(targetReps = raw.toIntOrNull(), targetSeconds = null))
-                        },
+                        onValueChange = { onChange(line.copy(targetReps = it, targetSeconds = null)) },
                         modifier = Modifier.weight(1f),
+                        step = 5,
+                        min = MIN_REPS,
+                        max = MAX_REPS,
                     )
                 } else {
-                    NumberBox(
-                        value = line.targetSeconds?.takeIf { it > 0 },
+                    Stepper(
+                        value = line.targetSeconds ?: DEFAULT_HOLD_SECONDS,
                         label = strings.targetSeconds,
-                        onValueChange = { raw ->
-                            onChange(line.copy(targetSeconds = raw.toIntOrNull(), targetReps = null))
-                        },
+                        onValueChange = { onChange(line.copy(targetSeconds = it, targetReps = null)) },
                         modifier = Modifier.weight(1f),
+                        step = 5,
+                        min = MIN_HOLD_SECONDS,
+                        max = MAX_HOLD_SECONDS,
+                        suffix = strings.secondsUnit,
                     )
                 }
-                NumberBox(
-                    value = line.restSeconds,
-                    label = strings.restBetweenSets,
-                    onValueChange = { raw ->
-                        onChange(line.copy(restSeconds = raw.toIntOrNull()?.coerceIn(0, 600) ?: 0))
-                    },
-                    modifier = Modifier.weight(1f),
-                    suffix = strings.secondsUnit,
-                    maxDigits = 3,
-                )
             }
         }
     }
