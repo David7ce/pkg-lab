@@ -78,6 +78,7 @@ open class Strings {
     open val hold = "Hold"
     open val custom = "Custom"
     open val builtIn = "Built-in"
+    open val favorites = "Favorites"
 
     fun groupLabel(group: MuscleGroup): String = when (group) {
         MuscleGroup.Push -> groupPush
@@ -219,6 +220,8 @@ open class Strings {
     open val lastSessions = "Last sessions"
     open val builtInNotice = "Built-in exercises cannot be edited or deleted."
     open val exerciseHowTo = "How to do it"
+    open val musclesWorked = "Muscles worked"
+    open val startExercise = "Start exercise"
     open val descriptionLabel = "Description (optional)"
     open val filterGroup = "Group"
     open val filterMeasure = "Measure"

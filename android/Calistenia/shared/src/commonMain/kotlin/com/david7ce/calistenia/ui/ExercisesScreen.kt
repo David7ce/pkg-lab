@@ -17,10 +17,13 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
@@ -36,9 +39,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import com.david7ce.calistenia.logic.DEFAULT_HOLD_SECONDS
+import com.david7ce.calistenia.logic.DEFAULT_REPS
+import com.david7ce.calistenia.logic.DEFAULT_SET_COUNT
 import com.david7ce.calistenia.logic.ExerciseFamily
 import com.david7ce.calistenia.logic.ExerciseProgress
 import com.david7ce.calistenia.logic.descriptionFor
+import com.david7ce.calistenia.logic.effectiveMuscles
 import com.david7ce.calistenia.logic.filterFamilies
 import com.david7ce.calistenia.logic.formatDuration
 import com.david7ce.calistenia.logic.ProgressPoint
@@ -57,10 +64,15 @@ fun ExercisesScreen(app: AppState) {
     var query by remember { mutableStateOf("") }
     var group by remember { mutableStateOf<MuscleGroup?>(null) }
     var measure by remember { mutableStateOf<Measure?>(null) }
+    var favoritesOnly by remember { mutableStateOf(false) }
     var creating by remember { mutableStateOf(false) }
+    val favoriteIds = app.settings.favoriteExerciseIds
 
-    val shown = remember(query, group, measure, app.exercises, app.muscleFilter) {
-        filterFamilies(app.exercises, query, group, measure, app.muscleFilter)
+    val shown = remember(query, group, measure, favoritesOnly, app.exercises, app.muscleFilter, favoriteIds) {
+        filterFamilies(
+            app.exercises, query, group, measure, app.muscleFilter,
+            favoriteIds = if (favoritesOnly) favoriteIds else null,
+        )
     }
 
     Box(Modifier.fillMaxSize()) {
@@ -78,6 +90,16 @@ fun ExercisesScreen(app: AppState) {
                 singleLine = true,
                 modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp),
             )
+            Row(modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp)) {
+                FilterChip(
+                    selected = favoritesOnly,
+                    onClick = { favoritesOnly = !favoritesOnly },
+                    label = { Text(strings.favorites) },
+                    leadingIcon = {
+                        Icon(if (favoritesOnly) SharedIcons.Star else SharedIcons.StarOutline, null)
+                    },
+                )
+            }
             if (app.muscleFilter.isNotEmpty()) MuscleFilterRow(app)
             FilterRow(
                 groups = listOf(null) + MuscleGroup.entries,
@@ -211,6 +233,7 @@ fun ExerciseDetailScreen(app: AppState, exerciseId: String) {
     val description = exercise.descriptionFor(app.languageCode)
     var editing by remember { mutableStateOf(false) }
     var deleting by remember { mutableStateOf(false) }
+    var startingSets by remember { mutableStateOf(false) }
 
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
@@ -229,10 +252,49 @@ fun ExerciseDetailScreen(app: AppState, exerciseId: String) {
             }
         }
         item {
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
                 Pill(strings.groupLabel(exercise.group))
                 Pill(strings.measureLabel(exercise.measure))
                 if (exercise.isCustom) Pill(strings.custom)
+                Spacer(Modifier.weight(1f))
+                IconButton(onClick = { app.toggleFavorite(exercise.id) }) {
+                    Icon(
+                        if (app.isFavorite(exercise.id)) SharedIcons.Star else SharedIcons.StarOutline,
+                        strings.favorites,
+                    )
+                }
+            }
+        }
+        val muscles = exercise.effectiveMuscles()
+        if (muscles.isNotEmpty()) {
+            item {
+                Column {
+                    Text(
+                        strings.musclesWorked,
+                        style = MaterialTheme.typography.labelLarge,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                    Row(
+                        modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState())
+                            .padding(top = 6.dp),
+                        horizontalArrangement = Arrangement.spacedBy(6.dp),
+                    ) {
+                        muscles.forEach { muscle -> Pill(strings.muscleLabel(muscle)) }
+                    }
+                }
+            }
+        }
+        item {
+            Button(onClick = { startingSets = true }, modifier = Modifier.fillMaxWidth()) {
+                Icon(SharedIcons.Play, null)
+                Text(
+                    if (app.active != null) strings.addExerciseToWorkout else strings.startExercise,
+                    modifier = Modifier.padding(start = 8.dp),
+                )
             }
         }
         // Families without a registered figure stay text-only.
@@ -374,6 +436,67 @@ fun ExerciseDetailScreen(app: AppState, exerciseId: String) {
             destructive = true,
         )
     }
+    if (startingSets) {
+        QuickStartDialog(
+            exercise = exercise,
+            joiningWorkout = app.active != null,
+            onConfirm = { sets, reps, seconds ->
+                app.quickStart(exercise, sets, reps, seconds)
+                startingSets = false
+            },
+            onDismiss = { startingSets = false },
+        )
+    }
+}
+
+/** Sets/target before training one exercise on its own, outside the routine editor. */
+@Composable
+private fun QuickStartDialog(
+    exercise: Exercise,
+    joiningWorkout: Boolean,
+    onConfirm: (sets: Int, targetReps: Int?, targetSeconds: Int?) -> Unit,
+    onDismiss: () -> Unit,
+) {
+    val strings = LocalStrings.current
+    var sets by remember { mutableStateOf(DEFAULT_SET_COUNT) }
+    var reps by remember { mutableStateOf(if (exercise.measure == Measure.Reps) DEFAULT_REPS else null) }
+    var seconds by remember { mutableStateOf(if (exercise.measure == Measure.Seconds) DEFAULT_HOLD_SECONDS else null) }
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(if (joiningWorkout) strings.addExerciseToWorkout else strings.startExercise) },
+        text = {
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                NumberBox(
+                    value = sets.takeIf { it > 0 },
+                    label = strings.targetSets,
+                    onValueChange = { raw -> sets = raw.toIntOrNull()?.coerceIn(0, 99) ?: 0 },
+                    modifier = Modifier.weight(1f),
+                    maxDigits = 2,
+                )
+                if (exercise.measure == Measure.Reps) {
+                    NumberBox(
+                        value = reps?.takeIf { it > 0 },
+                        label = strings.targetReps,
+                        onValueChange = { raw -> reps = raw.toIntOrNull() },
+                        modifier = Modifier.weight(1f),
+                    )
+                } else {
+                    NumberBox(
+                        value = seconds?.takeIf { it > 0 },
+                        label = strings.targetSeconds,
+                        onValueChange = { raw -> seconds = raw.toIntOrNull() },
+                        modifier = Modifier.weight(1f),
+                    )
+                }
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = { onConfirm(sets, reps, seconds) }) {
+                Text(if (joiningWorkout) strings.addExerciseToWorkout else strings.startExercise)
+            }
+        },
+        dismissButton = { TextButton(onClick = onDismiss) { Text(strings.cancel) } },
+    )
 }
 
 /** Bars for the last sessions. Drawn with layout boxes, so it works on every target. */

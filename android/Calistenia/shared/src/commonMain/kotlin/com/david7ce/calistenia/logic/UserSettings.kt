@@ -11,6 +11,7 @@ data class AppSettings(
     val restSound: Boolean = true,
     val restVibrate: Boolean = true,
     val keepScreenOn: Boolean = true,
+    val favoriteExerciseIds: Set<String> = emptySet(),
 )
 
 const val DEFAULT_REST_SECONDS = 90
@@ -28,6 +29,7 @@ object SettingsKey {
     const val REST_SOUND = "restSound"
     const val REST_VIBRATE = "restVibrate"
     const val KEEP_SCREEN_ON = "keepScreenOn"
+    const val FAVORITE_EXERCISES = "favoriteExerciseIds"
 }
 
 /** Each field falls back to its default on its own, so one corrupt value never loses the rest. */
@@ -47,6 +49,8 @@ fun settingsFrom(stored: Map<String, String>): AppSettings {
         restSound = bool(SettingsKey.REST_SOUND, d.restSound),
         restVibrate = bool(SettingsKey.REST_VIBRATE, d.restVibrate),
         keepScreenOn = bool(SettingsKey.KEEP_SCREEN_ON, d.keepScreenOn),
+        favoriteExerciseIds = stored[SettingsKey.FAVORITE_EXERCISES]
+            ?.split(",")?.filter { it.isNotBlank() }?.toSet() ?: d.favoriteExerciseIds,
     )
 }
 
@@ -58,4 +62,5 @@ fun AppSettings.toStored(): Map<String, String> = mapOf(
     SettingsKey.REST_SOUND to restSound.toString(),
     SettingsKey.REST_VIBRATE to restVibrate.toString(),
     SettingsKey.KEEP_SCREEN_ON to keepScreenOn.toString(),
+    SettingsKey.FAVORITE_EXERCISES to favoriteExerciseIds.joinToString(","),
 )

@@ -69,9 +69,11 @@ fun filterFamilies(
     group: MuscleGroup? = null,
     measure: Measure? = null,
     muscles: Set<Muscle> = emptySet(),
+    favoriteIds: Set<String>? = null,
 ): List<ExerciseFamily> = familiesOf(exercises).filter { family ->
     (muscles.isEmpty() || family.variants.any { it.trainsAny(muscles) }) &&
         (group == null || family.parent.group == group) &&
         (measure == null || family.variants.any { it.measure == measure }) &&
-        (query.isBlank() || family.variants.any { it.matchesQuery(query) })
+        (query.isBlank() || family.variants.any { it.matchesQuery(query) }) &&
+        (favoriteIds == null || family.variants.any { it.id in favoriteIds })
 }

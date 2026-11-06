@@ -254,16 +254,23 @@ class CalisteniaRepository(
         return requireNotNull(session(sessionId)) { "Session $sessionId was not stored" }
     }
 
-    fun addExerciseToSession(sessionId: String, exercise: Exercise, restSeconds: Int) {
+    fun addExerciseToSession(
+        sessionId: String,
+        exercise: Exercise,
+        restSeconds: Int,
+        targetSets: Int = 3,
+        targetReps: Int? = if (exercise.measure == Measure.Reps) 8 else null,
+        targetSeconds: Int? = if (exercise.measure == Measure.Seconds) 30 else null,
+    ) {
         val position = q.selectSessionExercises(sessionId).executeAsList().size
         db.transaction {
             insertSessionExercise(
                 sessionId = sessionId,
                 position = position,
                 exercise = exercise,
-                targetSets = 3,
-                targetReps = if (exercise.measure == Measure.Reps) 8 else null,
-                targetSeconds = if (exercise.measure == Measure.Seconds) 30 else null,
+                targetSets = targetSets,
+                targetReps = targetReps,
+                targetSeconds = targetSeconds,
                 restSeconds = restSeconds,
             )
         }

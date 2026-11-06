@@ -403,6 +403,13 @@ class AppState(
     fun setRestVibrate(enabled: Boolean) = changeSettings { it.copy(restVibrate = enabled) }
     fun setKeepScreenOn(enabled: Boolean) = changeSettings { it.copy(keepScreenOn = enabled) }
 
+    fun isFavorite(exerciseId: String): Boolean = exerciseId in settings.favoriteExerciseIds
+
+    fun toggleFavorite(exerciseId: String) = changeSettings {
+        val current = it.favoriteExerciseIds
+        it.copy(favoriteExerciseIds = if (exerciseId in current) current - exerciseId else current + exerciseId)
+    }
+
     // ---------------------------------------------------------------------------------------------
     // Workout
 
@@ -470,6 +477,41 @@ class AppState(
             repo.addExerciseToSession(current.id, exercise, settings.defaultRestSeconds)
             repo.session(current.id)
         }) { session -> if (session != null) active = session }
+    }
+
+    /**
+     * Explore-an-exercise shortcut: train it right away with the chosen sets/target, without first
+     * building a named routine. Joins the current workout if one is active, otherwise starts a new
+     * unlinked session named after the exercise.
+     */
+    fun quickStart(exercise: Exercise, sets: Int, targetReps: Int?, targetSeconds: Int?) {
+        val current = active
+        if (current != null) {
+            persist({
+                repo.addExerciseToSession(
+                    current.id, exercise, settings.defaultRestSeconds, sets, targetReps, targetSeconds,
+                )
+                repo.session(current.id)
+            }) { session ->
+                if (session != null) active = session
+                screen = Screen.Workout
+            }
+            return
+        }
+        persist({
+            val session = repo.startSession(exercise.name, null)
+            repo.addExerciseToSession(
+                session.id, exercise, settings.defaultRestSeconds, sets, targetReps, targetSeconds,
+            )
+            repo.session(session.id)
+        }) { session ->
+            if (session != null) {
+                active = session
+                stopRest()
+                tab = Tab.Train
+                screen = Screen.Workout
+            }
+        }
     }
 
     fun removeExerciseFromWorkout(sessionExerciseId: String) {
@@ -643,6 +685,22 @@ class AppState(
             routines = list
             message = strings.routineAdded
             onDone()
+        }
+    }
+
+    /** Home shortcut: copies the template into your routines, same as [addStarterRoutine], and starts it. */
+    fun startStarterRoutine(template: StarterRoutine) {
+        if (active != null) {
+            screen = Screen.Workout
+            return
+        }
+        val draft = template.toDraft(exercises, languageCode, ::newKey) ?: return
+        persist({
+            val id = repo.saveRoutine(draft)
+            repo.routines() to repo.routine(id)
+        }) { (list, routine) ->
+            routines = list
+            if (routine != null) startWorkout(routine)
         }
     }
 

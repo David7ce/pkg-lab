@@ -9,7 +9,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
@@ -22,6 +24,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import com.david7ce.calistenia.logic.BuiltinRoutines
+import com.david7ce.calistenia.logic.StarterRoutine
 import com.david7ce.calistenia.logic.formatDuration
 import com.david7ce.calistenia.logic.weekSummary
 import com.david7ce.calistenia.model.Routine
@@ -51,6 +55,8 @@ fun TrainScreen(app: AppState) {
             } else {
                 items(app.routines.take(5), key = { it.id }) { routine -> RoutineQuickCard(app, routine) }
             }
+            item { SectionTitle(strings.starterRoutines) }
+            item { StarterRoutinesRow(app) }
         }
         item { SectionTitle(strings.lastSession) }
         if (last == null) {
@@ -160,6 +166,49 @@ private fun RoutineQuickCard(app: AppState, routine: Routine) {
                 )
             }
             Icon(SharedIcons.Play, strings.startRoutine, tint = MaterialTheme.colorScheme.primary)
+        }
+    }
+}
+
+/** Recommended routines, explored right from the home screen instead of only from the Routines tab. */
+@Composable
+private fun StarterRoutinesRow(app: AppState) {
+    LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        items(BuiltinRoutines.all, key = { it.key }) { template -> StarterRoutineCard(app, template) }
+    }
+}
+
+@Composable
+private fun StarterRoutineCard(app: AppState, template: StarterRoutine) {
+    val strings = LocalStrings.current
+    Card(onClick = { app.startStarterRoutine(template) }, modifier = Modifier.width(220.dp)) {
+        Column(Modifier.padding(16.dp)) {
+            Text(
+                template.name(app.languageCode),
+                style = MaterialTheme.typography.titleMedium,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
+            Text(
+                template.notes(app.languageCode),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.padding(top = 4.dp),
+            )
+            Row(
+                modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Text(
+                    strings.exercisesCount(template.exercises.size),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.weight(1f),
+                )
+                Icon(SharedIcons.Play, strings.startExercise, tint = MaterialTheme.colorScheme.primary)
+            }
         }
     }
 }
