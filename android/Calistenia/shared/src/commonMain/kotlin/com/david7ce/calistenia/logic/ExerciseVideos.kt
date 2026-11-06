@@ -6,7 +6,11 @@ package com.david7ce.calistenia.logic
  * for it -- the same one-line-per-entry shape as `figureFor` for drawn figures. Most exercises have
  * neither and stay text-only.
  */
-private val exerciseVideoSlugs: Set<String> = emptySet()
+private val exerciseVideoSlugs: Set<String> = setOf(
+    "pull-up",
+    "push-up",
+    "squat",
+)
 
 /**
  * Compose-resources path of a built-in exercise's demonstration video, or null when it doesn't have
