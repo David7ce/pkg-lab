@@ -192,6 +192,42 @@ object BuiltinDescriptions {
             "brazos rectos hasta que quede más o menos paralelo al suelo. Mantén los hombros activos y todo el " +
             "cuerpo firme. Es un movimiento avanzado. Progresa con versiones encogidas y straddle y calienta bien " +
             "los hombros.",
+        "builtin:burpee" to
+            "De pie, baja a sentadilla y pon las manos en el suelo, lleva los pies atrás de un salto hasta la " +
+            "plancha, haz una flexión y luego salta los pies de vuelta y explota hacia arriba con los brazos " +
+            "sobre la cabeza. Mantén el core firme durante la plancha para que la cadera no caiga. Quita la " +
+            "flexión y el salto para una versión más fácil mientras el patrón es nuevo.",
+        "builtin:mountain-climber" to
+            "Empieza en plancha con los hombros sobre las muñecas. Lleva una rodilla hacia el pecho y devuélvela, " +
+            "alternando las piernas a un ritmo constante de carrera mientras la cadera se mantiene baja y " +
+            "nivelada. Mantén la espalda plana en vez de subir la cadera. Baja el ritmo si la cadera empieza a " +
+            "rebotar.",
+        "builtin:high-knees" to
+            "Corre en el sitio llevando cada rodilla hacia la altura de la cadera y bombeando los brazos al " +
+            "ritmo. Aterriza en la punta de los pies y mantén el torso erguido en vez de echarte atrás. Úsalo " +
+            "como calentamiento o remate de acondicionamiento. Baja la altura de la rodilla primero si el " +
+            "equilibrio o la movilidad de cadera son limitados.",
+        "builtin:jump-squat" to
+            "Agáchate en sentadilla con los pies a la anchura de los hombros y luego empuja el suelo para saltar " +
+            "recto hacia arriba, balanceando los brazos para dar impulso. Aterriza con suavidad con las rodillas " +
+            "dobladas y hunde directamente en la siguiente sentadilla. Mantén el pecho arriba y las rodillas " +
+            "alineadas con los pies. Baja a una sentadilla sin salto si el aterrizaje resulta duro para las " +
+            "rodillas.",
+        "builtin:plank-jack" to
+            "Mantén una plancha alta o sobre antebrazos con los pies juntos, y salta abriéndolos y cerrándolos, " +
+            "como un jumping jack hecho en horizontal. Mantén la cadera nivelada y el core activo todo el tiempo " +
+            "para que no suba y baje con los pies. Abre los pies uno a uno en vez de saltar para una versión más " +
+            "suave.",
+        "builtin:bear-crawl" to
+            "A cuatro apoyos con las rodillas justo por encima del suelo, avanza moviendo una mano y el pie " +
+            "contrario a la vez, manteniendo la cadera baja y la espalda plana. Muévete lo bastante despacio " +
+            "para mantener el equilibrio en vez de apresurar los pasos. Mantén las rodillas bajas todo el rato; " +
+            "si la cadera sube, se convierte en un desplazamiento en plancha.",
+        "builtin:skater-jump" to
+            "De pie, empuja con una pierna y salta de lado hacia el otro pie, balanceando la pierna trasera para " +
+            "el equilibrio y dejando que la rodilla se doble para absorber el aterrizaje. Alterna lados en un " +
+            "ritmo continuo de patinador. Mantén cada aterrizaje suave y controlado. Quita el salto y simplemente " +
+            "da pasos de lado a lado si los aterrizajes resultan inestables.",
     )
 
     private val fr: Map<String, String> = mapOf(
@@ -383,6 +419,42 @@ object BuiltinDescriptions {
             "tendus, jusqu'à ce qu'il soit à peu près parallèle au sol. Garde les épaules actives et tout le corps " +
             "gainé. C'est un mouvement avancé. Progresse avec des versions groupées et écartées et échauffe bien " +
             "les épaules.",
+        "builtin:burpee" to
+            "Depuis la position debout, descends en squat et pose les mains au sol, envoie les pieds en arrière " +
+            "jusqu'à la planche, fais une pompe, puis ramène les pieds d'un bond et explose vers le haut avec " +
+            "les bras tendus au-dessus de la tête. Garde le gainage ferme pendant la planche pour que les " +
+            "hanches ne s'affaissent pas. Enlève la pompe et le saut pour une version plus facile tant que le " +
+            "schéma est nouveau.",
+        "builtin:mountain-climber" to
+            "Commence en planche, épaules au-dessus des poignets. Amène un genou vers la poitrine puis " +
+            "ramène-le, en alternant les jambes à un rythme de course régulier tout en gardant les hanches " +
+            "basses et stables. Garde le dos plat plutôt que de lever les hanches. Ralentis le tempo si les " +
+            "hanches commencent à rebondir.",
+        "builtin:high-knees" to
+            "Cours sur place en montant chaque genou vers la hauteur de la hanche et en pompant les bras au " +
+            "rythme. Atterris sur la pointe des pieds et garde le buste droit plutôt que de te pencher en " +
+            "arrière. Utilise-le comme échauffement ou comme finisher cardio. Baisse d'abord la hauteur des " +
+            "genoux si l'équilibre ou la mobilité de la hanche sont limités.",
+        "builtin:jump-squat" to
+            "Descends en squat avec les pieds à la largeur des épaules, puis pousse dans le sol pour sauter " +
+            "droit vers le haut en balançant les bras pour l'élan. Atterris en douceur avec les genoux fléchis " +
+            "et redescends directement dans le squat suivant. Garde la poitrine haute et les genoux alignés sur " +
+            "les orteils. Reviens à un squat sans saut si l'atterrissage est dur pour les genoux.",
+        "builtin:plank-jack" to
+            "Tiens une planche haute ou sur avant-bras avec les pieds joints, puis saute pour les écarter puis " +
+            "les rapprocher, comme un jumping jack à l'horizontale. Garde les hanches alignées et le gainage " +
+            "actif tout le temps pour qu'elles ne montent pas et descendent avec les pieds. Écarte les pieds un " +
+            "par un plutôt que de sauter pour une version plus douce.",
+        "builtin:bear-crawl" to
+            "À quatre pattes, genoux juste au-dessus du sol, avance en déplaçant une main et le pied opposé à la " +
+            "fois, en gardant les hanches basses et le dos plat. Bouge assez lentement pour garder l'équilibre " +
+            "plutôt que de précipiter les pas. Garde les genoux bas tout du long; si les hanches montent, ça " +
+            "devient une marche en planche.",
+        "builtin:skater-jump" to
+            "Depuis la position debout, pousse sur une jambe et bondis de côté vers l'autre pied, en balançant " +
+            "la jambe arrière pour l'équilibre et en laissant le genou fléchir pour absorber l'atterrissage. " +
+            "Alterne les côtés dans un rythme continu de patineur. Garde chaque atterrissage doux et contrôlé. " +
+            "Enlève le saut et fais simplement des pas de côté si les atterrissages semblent instables.",
     )
 
     private val de: Map<String, String> = mapOf(
@@ -577,6 +649,42 @@ object BuiltinDescriptions {
             "hinter die Stange, bis der Körper etwa parallel zum Boden ist. Halte die Schultern aktiv und den " +
             "ganzen Körper fest. Es ist eine fortgeschrittene Übung. Steigere dich mit eingerollten und " +
             "gegrätschten Versionen und wärme die Schultern gründlich auf.",
+        "builtin:burpee" to
+            "Geh aus dem Stand in die Hocke und setze die Hände auf den Boden, spring mit den Füßen zurück in " +
+            "die Planke, mach einen Liegestütz und spring dann die Füße zurück nach vorn und explodiere mit den " +
+            "Armen über dem Kopf nach oben. Halte den Rumpf während der Planke fest, damit die Hüfte nicht " +
+            "durchhängt. Lass den Liegestütz und den Sprung weg für eine leichtere Version, solange das Muster " +
+            "neu ist.",
+        "builtin:mountain-climber" to
+            "Beginne in der Planke mit den Schultern über den Handgelenken. Zieh ein Knie Richtung Brust und " +
+            "bring es zurück, wechsle die Beine in einem gleichmäßigen Lauftempo, während die Hüfte tief und " +
+            "ruhig bleibt. Halte den Rücken flach, statt die Hüfte hochzuziehen. Verlangsame das Tempo, wenn die " +
+            "Hüfte anfängt zu wippen.",
+        "builtin:high-knees" to
+            "Lauf auf der Stelle und zieh jedes Knie bis auf Hüfthöhe, während die Arme im Rhythmus mitschwingen. " +
+            "Lande auf dem Fußballen und halte den Oberkörper aufrecht, statt dich zurückzulehnen. Nutze es als " +
+            "Aufwärmübung oder Finisher. Senke zuerst die Kniehöhe, wenn Balance oder Hüftbeweglichkeit " +
+            "eingeschränkt sind.",
+        "builtin:jump-squat" to
+            "Geh in die Hocke mit schulterbreiten Füßen und drücke dich dann kraftvoll vom Boden ab, um gerade " +
+            "nach oben zu springen, die Arme schwingen für den Schwung mit. Lande weich mit gebeugten Knien und " +
+            "sinke direkt in die nächste Hocke. Halte die Brust oben und die Knie über den Zehen. Geh zu einer " +
+            "Hocke ohne Sprung über, wenn die Landung den Knien zu hart wird.",
+        "builtin:plank-jack" to
+            "Halte eine hohe Planke oder Unterarmplanke mit zusammengestellten Füßen und spring sie dann weit " +
+            "auseinander und wieder zurück, wie ein Hampelmann in der Horizontalen. Halte die Hüfte die ganze " +
+            "Zeit ruhig und den Rumpf fest, damit sie nicht mit den Füßen hoch- und runtergeht. Setz die Füße " +
+            "einzeln statt zu springen für eine sanftere Version.",
+        "builtin:bear-crawl" to
+            "Auf Händen und Füßen mit den Knien knapp über dem Boden, krabble vorwärts, indem du jeweils eine " +
+            "Hand und den gegenüberliegenden Fuß bewegst, während die Hüfte tief und der Rücken flach bleiben. " +
+            "Beweg dich langsam genug, um die Balance zu halten, statt die Schritte zu überstürzen. Halte die " +
+            "Knie durchgehend tief; wenn die Hüfte hochkommt, wird daraus ein Plank-Walk.",
+        "builtin:skater-jump" to
+            "Aus dem Stand drück dich von einem Bein ab und spring seitlich auf den anderen Fuß, schwing das " +
+            "hintere Bein zur Balance mit und lass das Knie beim Landen leicht einfedern. Wechsle die Seiten in " +
+            "einem durchgehenden Schlittschuh-Rhythmus. Halte jede Landung weich und kontrolliert. Lass den " +
+            "Sprung weg und mach einfach Schritte zur Seite, wenn die Landungen instabil wirken.",
     )
 
     private val pt: Map<String, String> = mapOf(
@@ -757,6 +865,41 @@ object BuiltinDescriptions {
             "A partir de um German hang ou de uma posição invertida na barra, desce o corpo atrás da barra com os " +
             "braços esticados até ficar mais ou menos paralelo ao chão. Mantém os ombros ativos e o corpo todo " +
             "firme. É um movimento avançado. Progride com versões encolhidas e straddle e aquece bem os ombros.",
+        "builtin:burpee" to
+            "De pé, desça até um agachamento e apoie as mãos no chão, leve os pés para trás com um salto até a " +
+            "prancha, faça uma flexão e depois salte os pés de volta e explode para cima com os braços acima da " +
+            "cabeça. Mantenha o core firme durante a prancha para que o quadril não caia. Tire a flexão e o " +
+            "salto para uma versão mais fácil enquanto o padrão é novo.",
+        "builtin:mountain-climber" to
+            "Comece em prancha com os ombros sobre os pulsos. Leve um joelho em direção ao peito e devolva, " +
+            "alternando as pernas em um ritmo constante de corrida enquanto o quadril fica baixo e nivelado. " +
+            "Mantenha as costas retas em vez de levantar o quadril. Diminua o ritmo se o quadril começar a " +
+            "saltar.",
+        "builtin:high-knees" to
+            "Corra no lugar levando cada joelho até a altura do quadril e bombeando os braços no ritmo. " +
+            "Aterrisse na ponta dos pés e mantenha o tronco erguido em vez de inclinar para trás. Use como " +
+            "aquecimento ou finalização de condicionamento. Diminua a altura do joelho primeiro se o equilíbrio " +
+            "ou a mobilidade do quadril forem limitados.",
+        "builtin:jump-squat" to
+            "Agache com os pés na largura dos ombros e então empurre o chão para saltar reto para cima, " +
+            "balançando os braços para dar impulso. Aterrisse suavemente com os joelhos dobrados e desça direto " +
+            "para o próximo agachamento. Mantenha o peito erguido e os joelhos alinhados com os pés. Volte a um " +
+            "agachamento sem salto se o pouso ficar pesado para os joelhos.",
+        "builtin:plank-jack" to
+            "Mantenha uma prancha alta ou de antebraços com os pés juntos, depois salte abrindo-os bem e " +
+            "voltando a juntá-los, como um jumping jack feito na horizontal. Mantenha o quadril nivelado e o " +
+            "core ativo o tempo todo para que não suba e desça com os pés. Abra os pés um de cada vez em vez de " +
+            "saltar para uma versão mais suave.",
+        "builtin:bear-crawl" to
+            "Em quatro apoios com os joelhos quase tocando o chão, avance movendo uma mão e o pé oposto ao mesmo " +
+            "tempo, mantendo o quadril baixo e as costas retas. Mova-se devagar o suficiente para manter o " +
+            "equilíbrio em vez de apressar os passos. Mantenha os joelhos baixos o tempo todo; se o quadril " +
+            "subir, isso se torna uma caminhada em prancha.",
+        "builtin:skater-jump" to
+            "De pé, empurre com uma perna e salte de lado para o outro pé, balançando a perna de trás para o " +
+            "equilíbrio e deixando o joelho dobrar para absorver o pouso. Alterne os lados em um ritmo contínuo " +
+            "de patinador. Mantenha cada pouso suave e controlado. Tire o salto e apenas dê passos para os lados " +
+            "se os pousos parecerem instáveis.",
     )
 
     private val it: Map<String, String> = mapOf(
@@ -941,6 +1084,42 @@ object BuiltinDescriptions {
             "braccia distese finché è più o meno parallelo al pavimento. Tieni le spalle attive e tutto il corpo " +
             "fermo. È un movimento avanzato. Progredisci con versioni raccolte e a gambe divaricate e riscalda " +
             "bene le spalle.",
+        "builtin:burpee" to
+            "In piedi, scendi in uno squat e appoggia le mani a terra, porta i piedi indietro con un salto fino " +
+            "alla plank, fai una flessione e poi salta i piedi di nuovo avanti ed esplodi verso l'alto con le " +
+            "braccia sopra la testa. Mantieni il core saldo durante la plank così i fianchi non cedono. Togli " +
+            "la flessione e il salto per una versione più facile finché lo schema è nuovo.",
+        "builtin:mountain-climber" to
+            "Parti in plank con le spalle sopra i polsi. Porta un ginocchio verso il petto e riportalo indietro, " +
+            "alternando le gambe con un ritmo di corsa costante mentre i fianchi restano bassi e allineati. " +
+            "Mantieni la schiena piatta invece di alzare i fianchi. Rallenta il ritmo se i fianchi iniziano a " +
+            "rimbalzare.",
+        "builtin:high-knees" to
+            "Corri sul posto portando ogni ginocchio all'altezza del fianco e pompando le braccia a ritmo. " +
+            "Atterra sulla punta dei piedi e mantieni il busto eretto invece di inclinarti indietro. Usalo come " +
+            "riscaldamento o come finisher di condizionamento. Abbassa prima l'altezza del ginocchio se " +
+            "l'equilibrio o la mobilità del fianco sono limitati.",
+        "builtin:jump-squat" to
+            "Scendi in uno squat con i piedi alla larghezza delle spalle, poi spingi contro il pavimento per " +
+            "saltare dritto verso l'alto, oscillando le braccia per la spinta. Atterra con dolcezza con le " +
+            "ginocchia flesse e scendi direttamente nello squat successivo. Mantieni il petto alto e le " +
+            "ginocchia in linea con le punte dei piedi. Passa a uno squat senza salto se l'atterraggio risulta " +
+            "duro per le ginocchia.",
+        "builtin:plank-jack" to
+            "Mantieni una plank alta o sugli avambracci con i piedi uniti, poi salta allargandoli e " +
+            "richiudendoli, come un jumping jack fatto in orizzontale. Mantieni i fianchi allineati e il core " +
+            "attivo per tutto il tempo così non salgono e scendono con i piedi. Allarga i piedi uno alla volta " +
+            "invece di saltare per una versione più dolce.",
+        "builtin:bear-crawl" to
+            "A quattro appoggi con le ginocchia appena sopra il pavimento, avanza muovendo una mano e il piede " +
+            "opposto insieme, mantenendo i fianchi bassi e la schiena piatta. Muoviti lentamente abbastanza da " +
+            "mantenere l'equilibrio invece di affrettare i passi. Mantieni le ginocchia basse per tutto il " +
+            "tempo; se i fianchi si alzano, diventa una camminata in plank.",
+        "builtin:skater-jump" to
+            "In piedi, spingi con una gamba e salta di lato verso l'altro piede, oscillando la gamba posteriore " +
+            "per l'equilibrio e lasciando che il ginocchio si fletta per assorbire l'atterraggio. Alterna i lati " +
+            "in un ritmo continuo da pattinatore. Mantieni ogni atterraggio morbido e controllato. Togli il " +
+            "salto e fai semplicemente dei passi laterali se gli atterraggi risultano instabili.",
     )
 
     /** The translated text, or null for English/unknown languages (the English description is the fallback). */

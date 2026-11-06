@@ -41,7 +41,7 @@ class MigrationTest {
 
         val pushUp = repo.exercises().first { it.id == "builtin:push-up" }
         assertTrue(pushUp.description.length >= 100, "the migrated row should receive the how-to text")
-        assertEquals(40, repo.exercises().size)
+        assertEquals(47, repo.exercises().size)
         assertTrue(repo.exercises().all { it.description.isNotBlank() })
         assertNull(pushUp.parentId)
         assertEquals(

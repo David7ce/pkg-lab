@@ -1,11 +1,15 @@
 package com.david7ce.calistenia.model
 
 /**
- * The five movement groups the library is organized by. Stored by name; reading an unknown value
+ * The six movement groups the library is organized by. Stored by name; reading an unknown value
  * falls back to [Push] instead of crashing on a corrupt database or an older/newer backup.
+ *
+ * [Body] (added 2026-11-06) is for full-body/cardio compound moves that don't belong to one of the
+ * other five -- burpees, mountain climbers, jump squats: nothing is purely "pushing" or "pulling"
+ * about them, and filing them under one anyway would be the wrong answer, not a missing feature.
  */
 enum class MuscleGroup {
-    Push, Pull, Legs, Core, Skill;
+    Push, Pull, Legs, Core, Skill, Body;
 
     companion object {
         fun fromStored(value: String): MuscleGroup =

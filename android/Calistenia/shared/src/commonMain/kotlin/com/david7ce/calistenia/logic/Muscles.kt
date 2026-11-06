@@ -10,7 +10,7 @@ import com.david7ce.calistenia.model.Routine
  *
  * Two rules keep this honest:
  *  - [Exercise.muscles] is the curated answer when it exists;
- *  - otherwise the five [MuscleGroup]s fall back to their obvious members, so a
+ *  - otherwise the six [MuscleGroup]s fall back to their obvious members, so a
  *    custom exercise (or a built-in nobody has tagged yet) is never invisible in
  *    a filtered list.
  *
@@ -23,6 +23,7 @@ fun musclesFor(group: MuscleGroup): Set<Muscle> = when (group) {
     MuscleGroup.Legs -> setOf(Muscle.Quads, Muscle.Hamstrings, Muscle.Glutes, Muscle.Calves)
     MuscleGroup.Core -> setOf(Muscle.Abs, Muscle.Obliques, Muscle.LowerBack)
     MuscleGroup.Skill -> setOf(Muscle.Shoulders, Muscle.Abs, Muscle.Forearms)
+    MuscleGroup.Body -> setOf(Muscle.Quads, Muscle.Calves, Muscle.Abs, Muscle.Shoulders)
 }
 
 /** The muscles to show and filter by: the curated tags, or the group's fallback. */

@@ -19,6 +19,7 @@ import com.david7ce.calistenia.model.Muscle.Quads
 import com.david7ce.calistenia.model.Muscle.Shoulders
 import com.david7ce.calistenia.model.Muscle.Triceps
 import com.david7ce.calistenia.model.MuscleGroup
+import com.david7ce.calistenia.model.MuscleGroup.Body
 import com.david7ce.calistenia.model.MuscleGroup.Core
 import com.david7ce.calistenia.model.MuscleGroup.Legs
 import com.david7ce.calistenia.model.MuscleGroup.Pull
@@ -329,15 +330,6 @@ object BuiltinExercises {
 
         // Skill
         exercise(
-            "jumping-jack", "Jumping Jack", Skill, Reps,
-            "Stand tall with the arms at the sides and the feet together. Jump the feet out wider than the " +
-                "shoulders while sweeping the arms overhead, then jump back to the start in one rhythm. Stay on " +
-                "the balls of the feet, keep the knees soft and the core braced. Use it as a warm-up: the point is " +
-                "the heart rate and the shoulders, not speed. Step the feet out instead of jumping if the impact " +
-                "bothers the knees.",
-            setOf(Shoulders, Calves, Quads),
-        ),
-        exercise(
             "wall-handstand", "Wall Handstand", Skill, Seconds,
             "Place the hands about 15 to 20 cm from a wall, kick or walk up until the chest faces the wall and the " +
                 "body is straight. Push through the shoulders, keep the ribs down and hold. Come down under " +
@@ -383,6 +375,71 @@ object BuiltinExercises {
                 "is an advanced movement. Build up with tuck and straddle versions and warm up the shoulders " +
                 "thoroughly.",
             setOf(Lats, Glutes, Hamstrings),
+        ),
+
+        // Body
+        exercise(
+            "jumping-jack", "Jumping Jack", Body, Reps,
+            "Stand tall with the arms at the sides and the feet together. Jump the feet out wider than the " +
+                "shoulders while sweeping the arms overhead, then jump back to the start in one rhythm. Stay on " +
+                "the balls of the feet, keep the knees soft and the core braced. Use it as a warm-up: the point is " +
+                "the heart rate and the shoulders, not speed. Step the feet out instead of jumping if the impact " +
+                "bothers the knees.",
+            setOf(Shoulders, Calves, Quads),
+        ),
+        exercise(
+            "burpee", "Burpee", Body, Reps,
+            "From standing, drop into a squat and place the hands on the floor, kick the feet back to a plank, do " +
+                "a push-up, then jump the feet back in and explode up into a jump with the arms overhead. Keep " +
+                "the core tight through the plank so the hips don't sag. Drop the push-up and the jump for an " +
+                "easier version while the pattern is new.",
+            setOf(Chest, Quads, Shoulders),
+        ),
+        exercise(
+            "mountain-climber", "Mountain Climber", Body, Reps,
+            "Start in a plank with the shoulders over the wrists. Drive one knee toward the chest and return it, " +
+                "alternating legs at a steady running rhythm while the hips stay low and level. Keep the back " +
+                "flat rather than piking up. Slow the tempo down if the hips start to bounce.",
+            setOf(Abs, Shoulders, Quads),
+        ),
+        exercise(
+            "high-knees", "High Knees", Body, Reps,
+            "Run in place, driving each knee up toward hip height and pumping the arms in rhythm. Land on the " +
+                "balls of the feet and keep the torso tall rather than leaning back. Use it as a warm-up or a " +
+                "conditioning finisher. Lower the knee height first if balance or hip mobility is limited.",
+            setOf(Quads, Calves, Abs),
+        ),
+        exercise(
+            "jump-squat", "Jump Squat", Body, Reps,
+            "Squat down with the feet shoulder-width apart, then drive through the floor to jump straight up, " +
+                "swinging the arms for momentum. Land softly with bent knees and sink straight back into the next " +
+                "squat. Keep the chest up and the knees tracking over the toes. Step down to a bodyweight squat " +
+                "if the landing feels harsh on the knees.",
+            setOf(Quads, Glutes, Calves),
+        ),
+        exercise(
+            "plank-jack", "Plank Jack", Body, Reps,
+            "Hold a forearm or high plank with the feet together, then jump them out wide and back in, like a " +
+                "jumping jack done horizontally. Keep the hips level and the core braced throughout so they " +
+                "don't rise and fall with the feet. Step the feet out one at a time instead of jumping for a " +
+                "gentler version.",
+            setOf(Abs, Shoulders, Quads),
+        ),
+        exercise(
+            "bear-crawl", "Bear Crawl", Body, Seconds,
+            "On hands and feet with the knees hovering just off the floor, crawl forward by moving one hand and " +
+                "the opposite foot at a time, keeping the hips low and the back flat. Move slowly enough to stay " +
+                "balanced rather than rushing the steps. Keep the knees low throughout; letting the hips pop up " +
+                "turns it into a plank walk instead.",
+            setOf(Shoulders, Abs, Quads),
+        ),
+        exercise(
+            "skater-jump", "Skater Jump", Body, Reps,
+            "From standing, push off one leg and leap sideways onto the other foot, swinging the trailing leg " +
+                "behind for balance and letting the knee bend to absorb the landing. Alternate sides in a " +
+                "continuous skating rhythm. Keep each landing soft and controlled. Remove the jump and simply " +
+                "step side to side if the landings feel unstable.",
+            setOf(Glutes, Quads, Calves),
         ),
     )
 

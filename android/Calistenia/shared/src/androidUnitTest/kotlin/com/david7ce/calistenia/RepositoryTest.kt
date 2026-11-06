@@ -79,7 +79,7 @@ class RepositoryTest {
         assertEquals(count, repo.exercises().size)
         assertTrue(repo.exercises().all { it.builtin })
         assertTrue(repo.exercises().all { it.description.length >= 100 })
-        assertEquals(16, repo.exercises().count { it.isTopLevel })
+        assertEquals(23, repo.exercises().count { it.isTopLevel })
         assertEquals("builtin:push-up", repo.exercises().first { it.id == "builtin:knee-push-up" }.parentId)
     }
 

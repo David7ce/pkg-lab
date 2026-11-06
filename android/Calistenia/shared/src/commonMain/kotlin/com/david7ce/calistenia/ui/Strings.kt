@@ -41,6 +41,7 @@ open class Strings {
     open val groupLegs = "Legs"
     open val groupCore = "Core"
     open val groupSkill = "Skill"
+    open val groupBody = "Body"
     open val muscleChest = "Chest"
     open val muscleLats = "Lats"
     open val muscleShoulders = "Shoulders"
@@ -84,6 +85,7 @@ open class Strings {
         MuscleGroup.Legs -> groupLegs
         MuscleGroup.Core -> groupCore
         MuscleGroup.Skill -> groupSkill
+        MuscleGroup.Body -> groupBody
     }
 
     fun muscleLabel(muscle: Muscle): String = when (muscle) {
