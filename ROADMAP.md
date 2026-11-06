@@ -5,6 +5,18 @@ Per-app pending work lives in each app's own README, not here (Recetario: "Deskt
 
 ## Open items
 
+- **Idea futura, sin decidir (2026-11-06): versión "gimnasio" de Calistenia.** Surgió al discutir
+  un rediseño del calendario ("estilo reserva por clase") -- el dueño quiere poder vender esto a
+  gimnasios: reserva de clases, registro de usuarios/monitores, validar si el usuario ha pagado o
+  restringir el acceso, idealmente integrado con un CRM o sistema propio de facturación y conteo de
+  usuarios/monitores. Esto es un pivote de producto, no un ajuste de UI: Calistenia hoy es 100%
+  local y sin cuentas (lo dice su propio string de privacidad). No se mezcla en la app actual --
+  si se persigue, es una iniciativa aparte (posible app nueva bajo pkg-lab, reutilizando catálogo
+  de ejercicios y componentes de UI) con servidor, autenticación, roles y multi-tenencia, que
+  necesitaría su propia sesión de diseño (MVP, con o sin CRM externo desde el día uno, modelo de
+  datos de gimnasios/clases con aforo/membresías/pagos). El calendario actual de Calistenia se deja
+  tal cual por ahora.
+
 - **Calistenia: mapa de músculos + filtro, y calendario de rutinas (diseñado 2026-11-04).**
   Diseño y clasificación en [`docs/feature-muscle-map-and-calendar.md`](docs/feature-muscle-map-and-calendar.md):
   un enum `Muscle` de 12 regiones como eje fino junto a los cinco `MuscleGroup`
